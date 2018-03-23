@@ -1,0 +1,295 @@
+// xfwrap1 internal header
+// NOTE: no include guards
+
+// sets up macro arguments for use in the header named by _INCL_FILE
+
+ #if _NARGS == 0
+  #define _CORE(x)		_CORE_0(x)
+  #define _CORE15(x, y)	_CORE15_0(x, y)
+  #define _CORE2(x, y)	_CORE2_0(x, y)
+  #define _TAIL(x)		_TAIL_0(x)
+  #define _NARGSm1 		_NARGSm1_0
+
+ #elif _NARGS == 1
+  #define _CORE(x)		_CORE_1(x)
+  #define _CORE15(x, y)	_CORE15_1(x, y)
+  #define _CORE2(x, y)	_CORE2_1(x, y)
+  #define _TAIL(x)		_TAIL_1(x)
+  #define _NARGSm1 		_NARGSm1_1
+
+ #elif _NARGS == 2
+  #define _CORE(x)		_CORE_2(x)
+  #define _CORE15(x, y)	_CORE15_2(x, y)
+  #define _CORE2(x, y)	_CORE2_2(x, y)
+  #define _TAIL(x)		_TAIL_2(x)
+  #define _NARGSm1 		_NARGSm1_2
+
+ #elif _NARGS == 3
+  #define _CORE(x)		_CORE_3(x)
+  #define _CORE15(x, y)	_CORE15_3(x, y)
+  #define _CORE2(x, y)	_CORE2_3(x, y)
+  #define _TAIL(x)		_TAIL_3(x)
+  #define _NARGSm1 		_NARGSm1_3
+
+ #elif _NARGS == 4
+  #define _CORE(x)		_CORE_4(x)
+  #define _CORE15(x, y)	_CORE15_4(x, y)
+  #define _CORE2(x, y)	_CORE2_4(x, y)
+  #define _TAIL(x)		_TAIL_4(x)
+  #define _NARGSm1 		_NARGSm1_4
+
+ #elif _NARGS == 5
+  #define _CORE(x)		_CORE_5(x)
+  #define _CORE15(x, y)	_CORE15_5(x, y)
+  #define _CORE2(x, y)	_CORE2_5(x, y)
+  #define _TAIL(x)		_TAIL_5(x)
+  #define _NARGSm1 		_NARGSm1_5
+
+ #elif _NARGS == 6
+  #define _CORE(x)		_CORE_6(x)
+  #define _CORE15(x, y)	_CORE15_6(x, y)
+  #define _CORE2(x, y)	_CORE2_6(x, y)
+  #define _TAIL(x)		_TAIL_6(x)
+  #define _NARGSm1 		_NARGSm1_6
+
+ #elif _NARGS == 7
+  #define _CORE(x)		_CORE_7(x)
+  #define _CORE15(x, y)	_CORE15_7(x, y)
+  #define _CORE2(x, y)	_CORE2_7(x, y)
+  #define _TAIL(x)		_TAIL_7(x)
+  #define _NARGSm1 		_NARGSm1_7
+
+ #elif _NARGS == 8
+  #define _CORE(x)		_CORE_8(x)
+  #define _CORE15(x, y)	_CORE15_8(x, y)
+  #define _CORE2(x, y)	_CORE2_8(x, y)
+  #define _TAIL(x)		_TAIL_8(x)
+  #define _NARGSm1 		_NARGSm1_8
+
+ #elif _NARGS == 9
+  #define _CORE(x)		_CORE_9(x)
+  #define _CORE15(x, y)	_CORE15_9(x, y)
+  #define _CORE2(x, y)	_CORE2_9(x, y)
+  #define _TAIL(x)		_TAIL_9(x)
+  #define _NARGSm1 		_NARGSm1_9
+
+ #elif _NARGS == 10
+  #define _CORE(x)		_CORE_10(x)
+  #define _CORE15(x, y)	_CORE15_10(x, y)
+  #define _CORE2(x, y)	_CORE2_10(x, y)
+  #define _TAIL(x)		_TAIL_10(x)
+  #define _NARGSm1 		_NARGSm1_10
+
+ #else /* _NARGS */
+  #error bad number of arguments
+ #endif /* _NARGS */
+
+ #if _NARGS == 0
+  #define _C_TAIL(x)	_TAIL(x)
+
+ #elif _NARGS == _NMAX
+  #define _C_TAIL(x)
+
+ #else /* _NARGS */
+  #define _C_TAIL(x)	, _TAIL(x)
+ #endif /* _NARGS */
+
+ #if _NARGS == 0
+  #define _FIRST(x)
+  #define _FIRSTm1(x)
+  #define _FIRST15(x, y)
+  #define _FIRST15m1(x, y)
+  #define _FIRST2(x, y)
+  #define _FIRST2m1(x, y)
+  #define _LAST(x)
+  #define _LAST15(x, y)
+  #define _LAST2(x, y)
+  #define _COMMA0
+  #define _COMMA1
+
+ #elif _NARGS == 1
+  #define _FIRST(x)			_YNAME(x, 0)
+  #define _FIRSTm1(x)
+  #define _FIRST15(x, y)	_YNAME15(x, y, 0)
+  #define _FIRST15m1(x, y)
+  #define _FIRST2(x, y)		_YNAME2(x, y, 0)
+  #define _FIRST2m1(x, y)
+  #define _LAST(x)
+  #define _LAST15(x, y)
+  #define _LAST2(x, y)
+  #define _COMMA0	,
+  #define _COMMA1
+
+ #else /* _NARGS */
+  #define _FIRST(x)			_YNAME(x, 0)
+  #define _FIRSTm1(x) 		_FIRST(x)
+  #define _FIRST15(x, y)		_YNAME15(x, y, 0)
+  #define _FIRST15m1(x, y)	_YNAME15(x, y, 0)
+  #define _FIRST2(x, y)		_YNAME2(x, y, 0)
+  #define _FIRST2m1(x, y)	_YNAME2(x, y, 0)
+  #define _LAST(x)			_YNAME(x, _NARGSm1)
+  #define _LAST15(x, y)		_YNAME15(x, y, _NARGSm1)
+  #define _LAST2(x, y) 		_YNAME2(x, y, _NARGSm1)
+  #define _COMMA0	,
+  #define _COMMA1	,
+ #endif /* _NARGS */
+
+ #if _NARGS < 2
+  #define _MCOMMA
+
+ #else /* _NARGS < 2 */
+  #define _MCOMMA	,
+ #endif /* _NARGS < 2*/
+
+ #if _NARGS < 3
+  #define _LCOMMA
+
+ #else /* _NARGS < 3*/
+  #define _LCOMMA	,
+ #endif /* _NARGS < 3*/
+
+#define _CLASS_NAME(x)		_YNAME(x, _NARGS)
+#define _PREV_NAME(x)		_YNAME(x, _NARGSm1)
+
+#define _CDR(x)				_CORE(x) _LCOMMA _LAST(x)
+#define _CDR15(x, y)		_CORE15(x, y) _LCOMMA _LAST15(x, y)
+#define _CDR2(x, y)			_CORE2(x, y) _LCOMMA _LAST2(x, y)
+#define _LIST(x)			_FIRST(x) _MCOMMA _CDR(x)
+#define _LISTm1(x)			_FIRSTm1(x) _LCOMMA _CORE(x)
+#define _LIST15(x, y)		_FIRST15(x, y) _MCOMMA _CDR15(x, y)
+#define _LIST15m1(x, y)		_FIRST15m1(x, y) _LCOMMA _CORE15(x, y)
+#define _LIST2(x, y)		_FIRST2(x, y) _MCOMMA _CDR2(x, y)
+#define _LIST2m1(x, y)		_FIRST2m1(x, y) _LCOMMA _CORE2(x, y)
+
+#define _CLASS_ARG0			_LIST(class _Arg)
+#define _CLASS_ARG0m1		_LISTm1(class _Arg)
+#define _CLASS_ARG1			_CDR(class _Arg)
+#define _CLASS_FARG0		_LIST(class _Farg)
+#define _ARG0_ARG1			_LIST(_Arg)
+#define _ARG0_ARG1_REF		_LIST15(_Arg, &)
+#define _ARG0_ARG1_CREF		_LIST15(const _Arg, &)
+#define _ARG0_ARG1m1		_LISTm1(_Arg)
+#define _ARG1_ARG2			_CDR(_Arg)
+#define _ARG1_ARG2m1		_CORE(_Arg)
+#define _FARG0_FARG1		_LIST(_Farg)
+#define _FARG0_FARG1_REF	_LIST15(_Farg, &)
+#define _FARG0_FARG1_CREF	_LIST15(const _Farg, &)
+#define _FARG1_FARG2		_CDR(_Farg)
+#define _FARG1_FARG2_REF	_CDR15(_Farg, &)
+#define _FARG1_FARG2_CREF	_CDR15(const _Farg, &)
+#define _ARG0_A0			_LIST2(_Arg, _Ax)
+#define _ARG0_A0_REF		_LIST2(_Arg, &_Ax)
+#define _ARG0_A0_CREF		_LIST2(const _Arg, &_Ax)
+#define _FARG1_F1			_CDR2(_Farg, _Fx)
+#define _FARG1_F1_REF		_CDR2(_Farg, &_Fx)
+#define _FARG1_F1_CREF		_CDR2(const _Farg, &_Fx)
+#define _FARG0_F0			_LIST2(_Farg, _Fx)
+#define _FARG0_F0_REF		_LIST2(_Farg, &_Fx)
+#define _FARG0_F0_CREF		_LIST2(const _Farg, &_Fx)
+#define _A0_A1				_LIST(_Ax)
+#define _F0_F1				_LIST(_Fx)
+#define _F1_F2				_CDR(_Fx)
+#define _A0_A1m1			_LISTm1(_Ax)
+#define _A1_A2m1			_CORE(_Ax)
+
+#define _ARG0_A0_TO_REF		\
+	_LIST2(typename _Remove_reference<_Arg, >::_Type& _Ax)
+#define _ARG0_ARG1_TO_REF	\
+	_LIST15(typename _Remove_reference<_Arg, >::_Type&)
+#define _C_ARG0_ARG1_TO_REF	_COMMA0 _ARG0_ARG1_TO_REF
+
+#define _C_CLASS_ARG0		_COMMA0	_CLASS_ARG0
+#define _C_CLASS_ARG1		_COMMA1	_CLASS_ARG1
+#define _C_ARG0_ARG1		_COMMA0	_ARG0_ARG1
+#define _C_ARG0_ARG1_REF	_COMMA0	_ARG0_ARG1_REF
+#define _C_ARG0_A0			_COMMA0 _ARG0_A0
+#define _C_A0_A1			_COMMA0 _A0_A1
+#define _C_A0_A1m1			_COMMA1 _A0_A1m1
+#define _C_ARG0_ARG1m1		_COMMA1 _ARG0_ARG1m1
+#define _C_CLASS_FARG0		_COMMA0 _CLASS_FARG0
+#define _C_FARG0_FARG1		_COMMA0	_FARG0_FARG1
+#define _C_FARG0_FARG1_REF	_COMMA0	_FARG0_FARG1_REF
+#define _C_FARG1_FARG2		_COMMA1	_FARG1_FARG2
+#define _C_FARG1_FARG2_REF	_COMMA1	_FARG1_FARG2_REF
+#define _C_FARG1_FARG2_CREF	_COMMA1	_FARG1_FARG2_CREF
+#define _C_FARG1_F1			_COMMA1 _FARG1_F1
+#define _C_FARG1_F1_REF		_COMMA1 _FARG1_F1_REF
+#define _C_FARG1_F1_CREF	_COMMA1 _FARG1_F1_CREF
+#define _C_FARG0_F0			_COMMA0 _FARG0_F0
+#define _C_FARG0_F0_REF		_COMMA0 _FARG0_F0_REF
+#define _C_F1_F2			_COMMA1 _F1_F2
+
+#include _INCL_FILE
+
+#undef _CORE
+#undef _CORE15
+#undef _CORE2
+#undef _TAIL
+#undef _NARGSm1
+#undef _C_TAIL
+#undef _FIRST
+#undef _FIRSTm1
+#undef _FIRST15
+#undef _FIRST15m1
+#undef _FIRST2
+#undef _FIRST2m1
+#undef _LAST
+#undef _LAST15
+#undef _LAST2
+#undef _COMMA0
+#undef _COMMA1
+#undef _LCOMMA
+#undef _MCOMMA
+#undef _CLASS_NAME
+#undef _PREV_NAME
+
+#undef _CDR
+#undef _CDR15
+#undef _CDR2
+#undef _LIST
+#undef _LISTm1
+#undef _LIST15
+#undef _LIST15m1
+#undef _LIST2
+#undef _LIST2m1
+
+#undef _CLASS_ARG0
+#undef _CLASS_ARG0m1
+#undef _CLASS_ARG1
+#undef _CLASS_FARG0
+#undef _ARG0_ARG1
+#undef _ARG0_ARG1_REF
+#undef _ARG0_ARG1_CREF
+#undef _ARG0_ARG1m1
+#undef _ARG1_ARG2
+#undef _ARG1_ARG2m1
+#undef _FARG0_FARG1
+#undef _FARG1_FARG2
+#undef _ARG0_A0
+#undef _ARG0_A0_REF
+#undef _ARG0_A0_CREF
+#undef _FARG1_F1
+#undef _FARG0_F0
+#undef _A0_A1
+#undef _F0_F1
+#undef _F1_F2
+#undef _A0_A1m1
+#undef _A1_A2m1
+
+#undef _C_CLASS_ARG0
+#undef _C_CLASS_ARG1
+#undef _C_ARG0_ARG1
+#undef _C_ARG0_A0
+#undef _C_A0_A1
+#undef _C_ARG0_ARG1m1
+#undef _C_CLASS_FARG0
+#undef _C_FARG0_FARG1
+#undef _C_FARG1_FARG2
+#undef _C_FARG1_F1
+#undef _C_FARG0_F0
+#undef _C_F1_F2
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

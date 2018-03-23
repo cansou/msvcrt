@@ -19,7 +19,7 @@
 # Change this to BLD_ASM=1 if you have MASM 6.11a or later and wish
 # to re-build the assembler sources provided in this release.
 
-BLD_ASM=1
+BLD_ASM=0
 
 #
 # Macro definitions:
@@ -76,27 +76,11 @@ AFLAGS=$(AFLAGS) -Zi
 
 #Static obj part of msvcm*.lib should contain manifest directives
 #to automatically pull in a reference to the CRT assembly.
-PURE_CFLAGS=$(CFLAGS:-D_CRT_NOFORCE_MANIFEST=)
-CLR_CFLAGS=$(CFLAGS:-D_CRT_NOFORCE_MANIFEST=)
-CLR_SAFE_CFLAGS=$(CFLAGS:-D_CRT_NOFORCE_MANIFEST=)
-CLR_SAFE_CFLAGS=$(CLR_SAFE_CFLAGS:-FIddbanned.h=)
 !if "$(BLD_BROWSE)" == "1"
 CFLAGS=-FR$(OBJDIR)\ $(CFLAGS)
-PURE_CFLAGS=-FR$(PURE_OBJDIR)\ $(PURE_CFLAGS)
-CLR_CFLAGS=-FR$(CLR_OBJDIR)\ $(CLR_CFLAGS)
-CLR_SAFE_CFLAGS=-FR$(CLR_OBJDIR)\ $(CLR_SAFE_CFLAGS)
 !if "$(TARGET_CPU)"!="IA64"
 AFLAGS=-FR$(OBJDIR)\ $(AFLAGS)
 !endif
-!endif
-
-PURE_CFLAGS=/clr:pure /D_PURE_MSIL_CRT_BUILD /wd4272 $(PURE_CFLAGS) /TP 
-CLR_CFLAGS=/clr /D_PURE_MSIL_CRT_BUILD /Z7 /wd4272 /wd4382 $(CLR_CFLAGS) /TP 
-CLR_SAFE_CFLAGS=/clr:safe $(CLR_SAFE_CFLAGS)
-# Tool definitions:
-!if "$(LIBPATH)" != "" 
-PURE_CFLAGS=$(PURE_CFLAGS) -d1clr:nostdlib 
-CLR_CFLAGS=$(CLR_CFLAGS) -d1clr:nostdlib
 !endif
 
 CC=cl
@@ -136,26 +120,15 @@ C_INCLUDES=-I.
 ###############################################################################
 
 CXXFLAGS=$(CFLAGS) -d1Binl -EHsc -GR
-PURE_CXXFLAGS=$(PURE_CFLAGS) -d1Binl -EHa -GR
-CLR_CXXFLAGS=$(CLR_CFLAGS) -d1Binl -EHa -GR
-CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CFLAGS) -EHa -GR
 
 !if "$(POST_BLD)"!="1"
 !if ("$(TARGET_CPU)"=="IA64" || "$(TARGET_CPU)"=="AMD64") && "$(BLD_SYSCRT)" == "1"
 CXXFLAGS=$(CXXFLAGS) -Istdhpp64
-PURE_CXXFLAGS=$(PURE_CXXFLAGS) -Istdhpp64
-CLR_CXXFLAGS=$(CLR_CXXFLAGS) -Istdhpp64
 !else
 CXXFLAGS=$(CXXFLAGS) -Istdhpp
-PURE_CXXFLAGS=$(PURE_CXXFLAGS) -Istdhpp
-CLR_CXXFLAGS=$(CLR_CXXFLAGS) -Istdhpp
-CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 !endif
 !else
 CXXFLAGS=$(CXXFLAGS) -Istdhpp
-PURE_CXXFLAGS=$(PURE_CXXFLAGS) -Istdhpp
-CLR_CXXFLAGS=$(CLR_CXXFLAGS) -Istdhpp
-CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 !endif
 
 
@@ -176,44 +149,20 @@ CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 .c{$(OBJDIR)}.obj::
     $(CC) $(CFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
 
-.c{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-.c{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
 !if "$(TARGET_CPU)"=="i386"
 
 {intel}.c{$(OBJDIR)}.obj::
     $(CC) $(CFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
-
-{intel}.c{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{intel}.c{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
 
 !elseif "$(TARGET_CPU)"=="IA64"
 
 {ia64}.c{$(OBJDIR)}.obj::
     $(CC) $(CFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
 
-{ia64}.c{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{ia64}.c{$(CLR_OBJDIR)}.obj:
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
 !elseif "$(TARGET_CPU)"=="AMD64"
 
 {amd64}.c{$(OBJDIR)}.obj::
     $(CC) $(CFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
-
-{amd64}.c{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{amd64}.c{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
 
 !endif
 
@@ -223,28 +172,10 @@ CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 .c{$(CPP_OBJDIR)}.obj::
     $(CC) $(CXXFLAGS) $(C_INCLUDES) -Fo$(CPP_OBJDIR)\ /TP $<
 
-.cpp{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-.cpp{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
-.cpp{$(CLR_SAFE_OBJDIR)}.obj::
-	$(CC) $(CLR_SAFE_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_SAFE_OBJDIR)\ $<
-
 !if "$(TARGET_CPU)"=="i386"
 
 {intel}.cpp{$(OBJDIR)}.obj::
     $(CC) $(CXXFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
-
-{intel}.cpp{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{intel}.cpp{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
-{intel}.cpp{$(CLR_SAFE_OBJDIR)}.obj::
-	$(CC) $(CLR_SAFE_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_SAFE_OBJDIR)\ $<
 
 !IF $(BLD_ASM)==1
 
@@ -261,15 +192,6 @@ CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 {AMD64}.cpp{$(OBJDIR)}.obj::
     $(CC) $(CXXFLAGS) $(C_INCLUDES) -Fo$(OBJDIR)\ $<
 
-{AMD64}.cpp{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{AMD64}.cpp{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
-{AMD64}.cpp{$(CLR_SAFE_OBJDIR)}.obj::
-	$(CC) $(CLR_SAFE_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_SAFE_OBJDIR)\ $<
-
 !IF $(BLD_ASM)==1
 
 {AMD64}.asm{$(OBJDIR)}.obj:
@@ -283,15 +205,6 @@ CLR_SAFE_CXXFLAGS=$(CLR_SAFE_CXXFLAGS) -Istdhpp
 
 {ia64}.cpp{$(OBJDIR)}.obj:
 	$(CC) $(CXXFLAGS) $(C_INCLUDES) /Fo$(OBJDIR)\ $<
-
-{ia64}.cpp{$(PURE_OBJDIR)}.obj::
-	$(CC) $(PURE_CXXFLAGS) $(C_INCLUDES) /Fo$(PURE_OBJDIR)\ $<
-
-{ia64}.cpp{$(CLR_OBJDIR)}.obj::
-	$(CC) $(CLR_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_OBJDIR)\ $<
-
-{ia64}.cpp{$(CLR_SAFE_OBJDIR)}.obj::
-	$(CC) $(CLR_SAFE_CXXFLAGS) $(C_INCLUDES) /Fo$(CLR_SAFE_OBJDIR)\ $<
 
 !IF $(BLD_ASM)==1
 {ia64}.s{$(OBJDIR)}.obj:

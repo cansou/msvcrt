@@ -1,0 +1,92 @@
+// xawrap1 internal header
+// NOTE: no include guard
+
+// generates const and non-const variants for
+// first 5 arguments, using <xawrap2>
+
+  #define _CMASK	0x00
+  #include <xawrap2>
+
+ #if 0 < _NARGS_MAX
+  #define _CMASK	0x01
+  #include <xawrap2>
+ #endif /* 0 < _NARGS_MAX */
+
+ #if 1 < _NARGS_MAX
+  #define _CMASK	0x02
+  #include <xawrap2>
+  #define _CMASK	0x03
+  #include <xawrap2>
+ #endif /* 1 < _NARGS */
+
+ #if 2 < _NARGS_MAX
+  #define _CMASK	0x04
+  #include <xawrap2>
+  #define _CMASK	0x05
+  #include <xawrap2>
+  #define _CMASK	0x06
+  #include <xawrap2>
+  #define _CMASK	0x07
+  #include <xawrap2>
+ #endif /* 2 < _NARGS */
+
+ #if 3 < _NARGS_MAX
+  #define _CMASK	0x08
+  #include <xawrap2>
+  #define _CMASK	0x09
+  #include <xawrap2>
+  #define _CMASK	0x0A
+  #include <xawrap2>
+  #define _CMASK	0x0B
+  #include <xawrap2>
+  #define _CMASK	0x0C
+  #include <xawrap2>
+  #define _CMASK	0x0D
+  #include <xawrap2>
+  #define _CMASK	0x0E
+  #include <xawrap2>
+  #define _CMASK	0x0F
+  #include <xawrap2>
+ #endif /* 3 < _NARGS */
+
+  #if 4 < _NARGS_MAX
+  #define _CMASK	0x10
+  #include <xawrap2>
+  #define _CMASK	0x11
+  #include <xawrap2>
+  #define _CMASK	0x12
+  #include <xawrap2>
+  #define _CMASK	0x13
+  #include <xawrap2>
+  #define _CMASK	0x14
+  #include <xawrap2>
+  #define _CMASK	0x15
+  #include <xawrap2>
+  #define _CMASK	0x16
+  #include <xawrap2>
+  #define _CMASK	0x17
+  #include <xawrap2>
+  #define _CMASK	0x18
+  #include <xawrap2>
+  #define _CMASK	0x19
+  #include <xawrap2>
+  #define _CMASK	0x1A
+  #include <xawrap2>
+  #define _CMASK	0x1B
+  #include <xawrap2>
+  #define _CMASK	0x1C
+  #include <xawrap2>
+  #define _CMASK	0x1D
+  #include <xawrap2>
+  #define _CMASK	0x1E
+  #include <xawrap2>
+  #define _CMASK	0x1F
+  #include <xawrap2>
+ #endif /* 4 < _NARGS_MAX */
+
+#undef _CMASK2
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

@@ -1,0 +1,64 @@
+// xfwrap internal header
+// NOTE: no include guard
+
+// includes <xfwrap1> for [0,10] arguments
+
+ #if _NMAX != 10
+  #error argument number mismatch
+ #endif /* _NMAX != 10 */
+
+#ifdef _NOZERO
+ #undef _NOZERO
+
+#else /* _NOZERO */
+ #define _NARGS 0
+ #include <xfwrap1>
+ #undef _NARGS
+#endif /* _NOZERO */
+
+#define _NARGS 1
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 2
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 3
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 4
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 5
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 6
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 7
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 8
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 9
+#include <xfwrap1>
+#undef _NARGS
+
+#define _NARGS 10
+#include <xfwrap1>
+#undef _NARGS
+
+#undef _INCL_FILE
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

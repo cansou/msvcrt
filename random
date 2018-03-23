@@ -1,0 +1,3456 @@
+// random TR1 header
+#pragma once
+#ifndef _RANDOM_
+#define _RANDOM_
+#ifndef RC_INVOKED
+#include <istream>
+#include <limits>
+#include <vector>
+#include <xtr1common>
+
+ #pragma pack(push,_CRT_PACKING)
+ #pragma warning(push,3)
+ #pragma warning(disable: 4127 4244 4521 6294)
+
+ #ifndef _BITS_BYTE
+  #define _BITS_BYTE	8
+ #endif /* _BITS_BYTE */
+
+ #if defined(_DEBUG) || defined(_RNG_CHECK)
+  #define _RNG_QUOTX(x) #x
+  #define _RNG_QUOT(x) _RNG_QUOTX(x)
+  #define _RNG_ASSERT(ex, msg)	\
+	((ex) ? (void)0 : _Rng_abort(__FILE__ "(" _RNG_QUOT(__LINE__) "): " msg))
+
+ #else /* defined(_DEBUG) || defined(_RNG_CHECK) */
+  #define _RNG_ASSERT(ex, msg) ((void)0)
+ #endif /* defined(_DEBUG) || defined(_RNG_CHECK) */
+
+_STD_BEGIN
+	namespace tr1 {	// TR1 additions
+
+	// CONSTANTS
+static const long double _Pi = 3.14159265358979323846264338327950288;
+static const long double _Exp1 = 2.71828182845904523536028747135266250;
+static const long double _Two32 = 4294967296.0;
+static const long double _Two31 = 2147483648.0;
+
+	// HELPER FUNCTIONS
+_CRTIMP2_PURE __declspec(noreturn) void __CLRCALL_PURE_OR_CDECL
+	_Xinvalid(_In_z_ const char *_Msg = "");
+_CRTIMP2_PURE __declspec(noreturn) void __CLRCALL_PURE_OR_CDECL
+	_Rng_abort(_In_z_ const char *_Msg);
+_CRTIMP2_PURE float __CLRCALL_PURE_OR_CDECL _XLgamma(float);
+_CRTIMP2_PURE double __CLRCALL_PURE_OR_CDECL _XLgamma(double);
+_CRTIMP2_PURE long double __CLRCALL_PURE_OR_CDECL _XLgamma(long double);
+
+	// TEMPLATE FUNCTION _Nrand
+#define _NRAND(eng, resty)	_Nrand(eng, (eng.min)(), (resty)1)
+
+template<class _Engine,
+	class _Ety,
+	class _Rty>
+	_Rty _Nrand(_Engine& _Eng, _Ety _Emin, _Rty _Inc)
+	{	// scale random value to [0, 1), integer engine
+	return ((_Eng() - _Emin)
+		/ ((_Rty)(_Eng.max)() - (_Rty)_Emin + _Inc));
+	}
+
+template<class _Engine,
+	class _Rty>
+	_Rty _Nrand(_Engine& _Eng, float _Emin, _Rty)
+	{	// scale random value to [0, 1), float engine
+	return ((_Eng() - _Emin) / ((_Eng.max)() - _Emin));
+	}
+
+template<class _Engine,
+	class _Rty>
+	_Rty _Nrand(_Engine& _Eng, double _Emin, _Rty)
+	{	// scale random value to [0, 1), double engine
+	return ((_Eng() - _Emin) / ((_Eng.max)() - _Emin));
+	}
+
+template<class _Engine,
+	class _Rty>
+	_Rty _Nrand(_Engine& _Eng, long double _Emin, _Rty)
+	{	// scale random value to [0, 1), long double engine
+	return ((_Eng() - _Emin) / ((_Eng.max)() - _Emin));
+	}
+
+	// I/O HELPERS FOR FLOATING-POINT VALUES
+static const int _Nwords = 4;
+
+template<class _Elem,
+	class _Traits>
+	std::basic_ostream<_Elem, _Traits>& _Write(
+		std::basic_ostream<_Elem, _Traits>& _Os, long double _Dx)
+	{	// write long double to stream
+	int _Ex;
+	long double _Frac = frexpl(_Dx, &_Ex);
+	for (int _Nw = 0; _Nw < _Nwords; ++_Nw)
+		{	// break into 31-bit words
+		_Frac *= _Two31;
+		long _Digits = (long)_Frac;
+		_Frac -= _Digits;
+		_Os << ' ' << _Digits;
+		}
+	_Os << ' ' << _Ex;
+	return (_Os);
+	}
+
+template<class _Elem,
+	class _Traits>
+	std::basic_istream<_Elem, _Traits>&
+		_Read(std::basic_istream<_Elem, _Traits>& _Is, long double& _Dx)
+	{	// read long double from stream
+	long double _Frac = 0.0;
+	long _Digits;
+	for (int _Nw = 0; _Nw < _Nwords; ++_Nw)
+		{	// accumulate 31-bit words
+		_Is >> _Digits;
+		long double _Temp = _Digits / _Two31;
+		for (int _Idx = 0; _Idx < _Nw; ++_Idx)
+			_Temp /= _Two31;
+		_Frac += _Temp;
+		}
+	_Is >> _Digits;
+	_Dx = ldexpl(_Frac, _Digits);
+	return (_Is);
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_istream<_Elem, _Traits>&
+		_In(std::basic_istream<_Elem, _Traits>& _Is, _Ty& _Dx)
+	{	// read from stream
+	long double _Vx;
+	_Ty _Max = (std::numeric_limits<_Ty>::max)();
+	_Read(_Is, _Vx);
+	if (fabsl(_Vx) <= _Max)
+		_Dx = (_Ty)_Vx;
+	else if (_Vx < 0)
+		_Dx = -_Max;
+	else
+		_Dx = _Max;
+	return (_Is);
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>&
+		_Out(std::basic_ostream<_Elem, _Traits>& _Os, _Ty _Dx)
+	{	// write to stream
+	return (_Write(_Os, _Dx));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	class _Wrap_istream
+	{	// wrap input stream as function object
+public:
+	_Wrap_istream(std::basic_istream<_Elem, _Traits>& _Is)
+		: _Str(_Is)
+		{	// construct
+		}
+
+	_Ty operator()()
+		{	// read next value
+		_Ty _Data;
+		_Str >> _Data;
+		if (!_Str)
+			_Xinvalid("input stream corrupted");
+		return (_Data);
+		}
+
+private:
+	std::basic_istream<_Elem, _Traits>& _Str;
+	};
+
+	// TEMPLATE CLASS variate_generator AND HELPERS
+template<class _Ty>
+	class _Wrap_eng
+	{	// provide uniform interface to engines passed
+		// by value, reference, and pointer
+public:
+	typedef _Ty _Type;
+
+	_Wrap_eng(_Ty _Earg)
+		: _Eng(_Earg)
+		{	// construct
+		}
+
+	const _Ty& _Get() const
+		{	// return reference to engine
+		return (_Eng);
+		}
+
+	_Ty& _Get()
+		{	// return reference to engine
+		return (_Eng);
+		}
+
+private:
+	_Type _Eng;
+	};
+
+template<class _Ty>
+	class _Wrap_eng<_Ty&>
+	{	// uniform interface to engines passed by value, reference, or pointer
+public:
+	typedef _Ty _Type;
+
+	_Wrap_eng(_Ty& _Earg)
+		: _Eng(&_Earg)
+		{	// construct
+		}
+
+	const _Ty& _Get() const
+		{	// return reference to engine
+		return (*_Eng);
+		}
+
+	_Ty& _Get()
+		{	// return reference to engine
+		return (*_Eng);
+		}
+
+private:
+	_Type *_Eng;
+	};
+
+template<class _Ty>
+	class _Wrap_eng<_Ty*>
+	{	// provide uniform interface to engines passed
+		// by value, reference, and pointer
+public:
+	typedef _Ty _Type;
+	_Wrap_eng(_Ty *_Earg)
+		: _Eng(_Earg)
+		{	// construct
+		}
+
+	const _Ty& _Get() const
+		{	// return reference to engine
+		return (*_Eng);
+		}
+
+	_Ty& _Get()
+		{	// return reference to engine
+		return (*_Eng);
+		}
+
+private:
+	_Type *_Eng;
+	};
+
+template<class _Engine,
+	class _Tgt_type>
+	class _Ewrap
+	{	// wrap an engine, producing an engine
+		// returning non-negative values of type _Tgt_type
+		// INVALID for engine producing [-1, INT_MAX], _Val-_Emin overflows
+public:
+	typedef typename _Wrap_eng<_Engine>::_Type _Engine_value_type;
+	typedef typename _Engine_value_type::result_type result_type;
+
+	_Ewrap(_Engine _Earg, int _Int_eng, int _Int_dist)
+		: _Eng(_Earg),
+			_Factor(_Getfactor(_Int_eng, _Int_dist)),
+			_Emin((_Eng._Get().min)())
+		{	// construct
+		}
+
+	_Tgt_type operator()()
+		{	// return wrapped value
+		return (_Scale(_Eng._Get()()));
+		}
+
+	_Tgt_type (min)() const
+		{	// return minimum value in range
+		return (_Tgt_type(0));
+		}
+
+	_Tgt_type (max)() const
+		{	// return maximum value in range
+		return (_Scale((_Eng._Get().max)()));
+		}
+
+	_Engine_value_type& _Get()
+		{	// return reference to engine object
+		return (_Eng._Get());
+		}
+
+	const _Engine_value_type& _Get() const
+		{	// return const reference to engine	object
+		return (_Eng._Get());
+		}
+
+private:
+	_Wrap_eng<_Engine> _Eng;
+	const _Tgt_type _Factor;
+	typename _Engine_value_type::result_type _Emin;
+
+	_Tgt_type _Scale(typename _Engine_value_type::result_type _Val) const
+		{	// translate and scale _Val to match range of _Tgt_type
+		return ((_Tgt_type)((_Val - _Emin) * _Factor));
+		}
+
+	_Tgt_type _Getfactor(int _Int_eng, int _Int_dist) const
+		{	// return scale factor to map engine's range to _Tgt_type
+		if (_Int_eng)
+			{	// engine's result type is integer
+			if (_Int_dist)
+				return (1);
+			else
+				return (_Tgt_type(1.0) / (_Tgt_type((_Eng._Get().max)())
+					- _Tgt_type((_Eng._Get().min)()) + _Tgt_type(1)));
+			}
+		else
+			{	// engine's result type is not integer
+			if (_Int_dist)
+				return (_Tgt_type((std::numeric_limits<_Tgt_type>::max)()
+					/ ((_Eng._Get().max)() - (_Eng._Get().min)())));
+			else
+				return ((_Tgt_type)(1.0 / (_Tgt_type((_Eng._Get().max)())
+					- (_Eng._Get().min)())));
+			}
+		}
+	};
+
+template<class _Engine,
+	class _Distrib>
+	class variate_generator
+	{	// template class combines engine and distribution to create generator
+public:
+	typedef _Engine engine_type;
+	typedef typename _Wrap_eng<_Engine>::_Type engine_value_type;
+	typedef _Distrib distribution_type;
+	typedef typename _Distrib::result_type result_type;
+	typedef _Ewrap<_Engine, typename _Distrib::input_type> _Eng_wrapper;
+
+	variate_generator(_Engine _Earg, _Distrib _Dx)
+		: _Eng(_Earg, std::numeric_limits<
+				typename engine_value_type::result_type>::is_integer,
+			std::numeric_limits<
+				typename _Distrib::input_type>::is_integer),
+			_Dist(_Dx)
+		{	// construct
+		}
+
+	result_type operator()()
+		{	// return next value
+		return (_Dist(_Eng));
+		}
+
+	template<class _Ty>
+		result_type operator()(_Ty _Value)
+		{	// return next value that doesn't exceed _Value
+		return (_Dist(_Eng, _Value));
+		}
+
+	engine_value_type& engine()
+		{	// return reference to engine object
+		return (_Eng._Get());
+		}
+
+	const engine_value_type& engine() const
+		{	// return const reference to engine	object
+		return (_Eng._Get());
+		}
+
+	distribution_type& distribution()
+		{	// return reference to distribution object
+		return (_Dist);
+		}
+
+	const distribution_type& distribution() const
+		{	// return const reference to distribution object
+		return (_Dist);
+		}
+
+	result_type (min)() const
+		{	// return minimum value in distribution's range
+		return ((_Dist.min)());
+		}
+
+	result_type (max)() const
+		{	// return maximum value in distribution's range
+		return ((_Dist.max)());
+		}
+
+private:
+	_Eng_wrapper _Eng;
+	distribution_type _Dist;
+	};
+
+	// MULTIPLE PRECISION MATH FUNCTIONS
+
+#ifdef _ULONGLONG
+typedef _ULONGLONG _Max_type;
+
+#else /* _ULONGLONG */
+typedef unsigned long _Max_type;
+#endif /* _ULONGLONG */
+
+static const int _MP_len = 5;
+typedef _Max_type _MP_arr[_MP_len];
+
+_CRTIMP2_PURE _Max_type __CLRCALL_PURE_OR_CDECL _MP_Get(_MP_arr);
+_CRTIMP2_PURE void __CLRCALL_PURE_OR_CDECL _MP_Add(_MP_arr, _Max_type);
+_CRTIMP2_PURE void __CLRCALL_PURE_OR_CDECL _MP_Mul(_MP_arr, _Max_type, _Max_type);
+_CRTIMP2_PURE void __CLRCALL_PURE_OR_CDECL _MP_Rem(_MP_arr, _Max_type);
+
+	// TEMPLATE CLASS linear_congruential
+template<class _Ity,
+	class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	struct _Mul_mod
+	{	// template class for linear congruential generator where
+		// _Ty is large enough to hold intermediate result without overflow
+	_Mul_mod(_Ty _Val = 0)
+		: _Prev(_Val)
+		{	// construct
+		}
+
+	_Ty operator()()
+		{	// return next value
+		static _Ty _Zero = 0;	// to quiet diagnostics
+		_Ty _Divisor = (_Ty)_Mx;
+
+		_Prev = _Mx ? ((_Ity)_Ax * _Prev + (_Ty)_Cx) % _Divisor
+			: ((_Ity)_Ax * _Prev + (_Ty)_Cx);
+		if (_Prev < _Zero)
+			_Prev += (_Ty)_Mx;
+		return (_Prev);
+		}
+
+	_Ty _Prev;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	class _Mult_prec
+	{	// template class for linear congruential generator using
+		// multiple precision arithmetic to avoid overflows
+public:
+	_Mult_prec(_Ty _Val = 0)
+		: _Prev(_Val)
+		{	// construct
+		}
+
+	_Ty operator()()
+		{	// return next value
+		_MP_arr _Wx;
+		_MP_Mul(_Wx, _Prev, _Ax);
+		_MP_Add(_Wx, _Cx);
+		_MP_Rem(_Wx, _Mx);
+		_Prev = _MP_Get(_Wx);
+		return (_Prev);
+		}
+
+	_Ty _Prev;
+	};
+
+#ifdef _ULONGLONG
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx,
+	bool>
+	struct _Select_ulonglong
+	{	// unsigned long long too small, use multiple precision
+	typedef _Mult_prec<_Ty, _Ax, _Cx, _Mx> _Type;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	struct _Select_ulonglong<_Ty, _Ax, _Cx, _Mx, true>
+	{	// unsigned long long can hold intermediate result
+	typedef _Mul_mod<_ULONGLONG, _Ty, _Ax, _Cx, _Mx> _Type;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx,
+	bool>
+	struct _Select_ulong
+	{	// unsigned long too small, try unsigned long long
+	typedef typename _Select_ulonglong<_Ty, _Ax, _Cx, _Mx,
+		_Cx < _ULLONG_MAX && _Mx <= (_ULLONG_MAX - _Cx) / _Ax>::_Type _Type;
+	};
+
+#else /* _ULONGLONG */
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx,
+	bool>
+	struct _Select_ulong
+	{	// unsigned long too small, use multiple precision
+	typedef _Mult_prec<_Ty, _Ax, _Cx, _Mx> _Type;
+	};
+#endif /* _ULONGLONG */
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	struct _Select_ulong<_Ty, _Ax, _Cx, _Mx, true>
+	{	// unsigned long can hold intermediate result
+	typedef _Mul_mod<unsigned long, _Ty, _Ax, _Cx, _Mx> _Type;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx,
+	bool>
+	struct _Select_uint
+	{	// unsigned int too small, try unsigned long
+	typedef typename _Select_ulong<_Ty, _Ax, _Cx, _Mx,
+		_Cx < ULONG_MAX && _Mx <= (ULONG_MAX - _Cx) / _Ax>::_Type _Type;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	struct _Select_uint<_Ty, _Ax, _Cx, _Mx, true>
+	{	// unsigned int can hold intermediate result
+	typedef _Mul_mod<unsigned int, _Ty, _Ax, _Cx, _Mx> _Type;
+	};
+
+template<class _Ty,
+	_Max_type _Ax,
+	_Max_type _Cx,
+	_Max_type _Mx>
+	struct _Select
+	{	// select a type large enough to hold intermediate result
+	typedef typename _Select_uint<_Ty, _Ax, _Cx, _Mx,
+		_Cx < UINT_MAX && _Mx <= (UINT_MAX - _Cx) / _Ax>::_Type _Type;
+	};
+
+template<class _Ty>
+	struct _Is_numeric
+		: _Or<_Is_integral<_Ty>::value, _Is_floating_point<_Ty>::value>
+	{	// determine whether _Ty is a numeric type
+	};
+
+template<class _Uint,
+	_Uint _Ax,
+	_Uint _Cx,
+	_Uint _Mx>
+	class linear_congruential
+	{	// template class to implement linear congruential generator
+public:
+	typedef linear_congruential<_Uint, _Ax, _Cx, _Mx> _Myt;
+	typedef _Uint result_type;
+
+	static const _Uint multiplier = _Ax;
+	static const _Uint increment = _Cx;
+	static const _Uint modulus = _Mx;
+
+	static const _Uint default_seed = 1U;
+
+	explicit linear_congruential(_Uint _X0 = default_seed)
+		{	// construct from initial value
+		seed(_X0);
+		}
+
+	linear_congruential(const _Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	linear_congruential(_Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	template<class _Gen>
+		linear_congruential(_Gen& _Gx)
+		{	// construct from generator
+		seed(_Gx);
+		}
+
+	void seed(_Uint _X0 = default_seed)
+		{	// reset sequence from numeric value
+		_Reset(_X0);
+		}
+
+	template<class _Gen>
+		void seed(_Gen& _Gx, bool = false)
+		{	// reset sequence from generator
+		_Seed(_Gx, _Is_numeric<_Gen>());
+		}
+
+	_Uint (min)() const
+		{	// return minimum possible generated value
+		return (_Cx != 0 ? 0 : 1);
+		}
+
+	_Uint (max)() const
+		{	// return maximum possible generated value
+		return (_Mx != 0 ? _Mx - 1 : (std::numeric_limits<_Uint>::max)());
+		}
+
+	_Uint operator()()
+		{	// return next value
+		return (_Imp());
+		}
+
+	void discard(unsigned long long _Nskip)
+		{	// discard _Nskip elements
+		for (; 0 < _Nskip; --_Nskip)
+			(*this)();
+		}
+
+	bool _Equals(const _Myt& _Right) const
+		{	// return true if *this will generate same sequence as _Right
+		return (_Imp._Prev == _Right._Imp._Prev);
+		}
+
+	template<class _Elem, class _Traits>
+		std::basic_ostream<_Elem, _Traits>&
+			_Write(std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		return (_Ostr << _Imp._Prev);
+		}
+
+private:
+	template<class _Gen>
+		void _Seed(_Gen& _Gx, const true_type&)
+		{	// reset sequence from numeric value
+		_Reset((_Uint)_Gx);
+		}
+
+	template<class _Gen>
+		void _Seed(_Gen& _Gx, const false_type&)
+		{	// reset sequence from generator
+		_Reset(_Gx());
+		}
+
+	void _Reset(_Uint _X0)
+		{	// reset sequence
+		_Uint _Divisor = _Mx;	// to quiet diagnostics
+
+		_Imp._Prev = _Mx != 0 ? _X0 % _Divisor : _X0;
+		_RNG_ASSERT(0 < _Imp._Prev || 0 < _Cx,
+			"invalid argument for linear_congruential::seed");
+		if (_Imp._Prev == 0 && _Cx == 0)
+			_Imp._Prev = 1;
+		}
+
+	typename _Select<_Uint, _Ax, _Cx, _Mx>::_Type _Imp;
+	};
+
+template<class _Uint,
+	_Uint _Ax,
+	_Uint _Cx,
+	_Uint _Mx>
+	bool operator==(
+		const linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Left,
+		const linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Right)
+	{	// return true if _Left will generate same sequence as _Right
+	return (_Left._Equals(_Right));
+	}
+
+template<class _Uint,
+	_Uint _Ax,
+	_Uint _Cx,
+	_Uint _Mx>
+	bool operator!=(
+		const linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Left,
+		const linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Right)
+	{	// return true if *this will not generate same sequence as _Right
+	return (!_Left._Equals(_Right));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Uint,
+	_Uint _Ax,
+	_Uint _Cx,
+	_Uint _Mx>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Eng)
+	{	// read state from _Istr
+	_Wrap_istream<_Elem, _Traits, _Uint> _In(_Istr);
+	_Eng.seed(_In);
+	return (_Istr);
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Uint,
+	_Uint _Ax,
+	_Uint _Cx,
+	_Uint _Mx>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const linear_congruential<_Uint, _Ax, _Cx, _Mx>& _Eng)
+	{	// write state to _Ostr
+	return (_Eng._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS _Circ_buf FOR subtract_with_carry,
+	//	subtract_with_carry_01, and mersenne_twister
+template<class _Ty,
+	int _Nw>
+	struct _Circ_buf
+	{	// template class to hold historical values for generators
+	_Ty _At(int _Ix) const
+		{	// return value at current position plus _Ix
+		return (_Ax[_Base(_Ix)]);
+		}
+
+	bool _Equals(const _Circ_buf& _Right) const
+		{	// return true if *this holds same values as _Right
+		const _Ty *_Last1 = _Ax + _Idx, *_Last2 = _Right._Ax + _Right._Idx;
+		const _Ty *_First, *_Last, *_Other;
+		bool _Use2 = _Base() < _Right._Base();
+
+		if (_Use2)
+			{	// _Right's range is higher up in the array
+				// than ours, so scan it first
+			_First = _Right._Ax + _Right._Base();
+			_Last = _Last2;
+			_Other = _Ax + _Base();
+			}
+		else
+			{	// our range is higher up in the array
+				// than _Right's, so scan ours first
+			_First = _Ax + _Base();
+			_Last = _Last1;
+			_Other = _Right._Ax + _Right._Base();
+			}
+
+		int _N0 = _Nw;
+		while (_N0)
+			{	// scan
+				// note: may need up to three passes; each scan starts at the
+				// current highest array position and ends at the end of the
+				// array or the _Idx value, whichever comes first; the
+				// equality test succeeds only by reaching the _Idx value.
+			const _Ty *_Limit = _First < _Last ? _Last
+				: _Use2 ? _Right._Ax + 2 * _Nw
+				: _Ax + 2 * _Nw;
+			_N0 -= _Limit - _First;
+			while (_First != _Limit)
+				if (*_First++ != *_Other++)
+					return (false);
+			_First = _Other;
+			_Last = _Use2 ? _Last1 : _Last2;
+			_Other = _Use2 ? _Right._Ax : _Ax;
+			_Use2 = !_Use2;
+			}
+		return (true);
+		}
+
+	unsigned int _Base(int _Ix = 0) const
+		{	// return _Ix'th historical element (loosely, (_Idx - _Nw) + _Ix)
+		return ((_Ix += _Idx) < _Nw ? (_Ix + _Nw) : (_Ix - _Nw));
+		}
+
+	unsigned int _Idx;
+	_Ty _Ax[2 * _Nw];
+	};
+
+	// TEMPLATE CLASS _Swc_base (subtract_with_carry, subtract_with_carry_01)
+template<class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	class _Swc_base
+		: public _Circ_buf<_Ty, _Rx>
+	{	// base template class for subtract_with_carry/_01
+public:
+	typedef _Ty result_type;
+	typedef _Circ_buf<_Ty, _Rx> _Mybase;
+	typedef typename _Swc_Traits::_Seed_t _Seed_t;
+
+	static const int short_lag = _Sx;
+	static const int long_lag = _Rx;
+
+	_Swc_base()
+		{	// construct with default seed
+		seed();
+		}
+
+	_Swc_base(typename _Swc_Traits::_Seed_t _X0)
+		{	// construct with specified seed
+		seed(_X0);
+		}
+
+	template<class _Gen>
+		_Swc_base(_Gen& _Gx)
+		{	// construct with seed values from generator
+		seed(_Gx);
+		}
+
+	void seed(unsigned long _Value = 19780503U)
+		{	// set initial values from specified seed value
+		_Seed(_Value, false, true_type());
+		}
+
+	template<class _Gen>
+		void seed(_Gen& _Gx, bool _Readcy = false)
+		{	// set initial values from range
+		_Seed(_Gx, _Readcy, _Is_numeric<_Gen>());
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return (_Swc_Traits::_Max);
+		}
+
+	result_type operator()()
+		{	// return next value
+		if (_Rx == this->_Idx)
+			_Refill_upper();
+		else if (2 * _Rx <= this->_Idx)
+			_Refill_lower();
+		return (this->_Ax[this->_Idx++]);
+		}
+
+	bool _Equals(const _Swc_base& _Right) const
+		{	// return true if *this will generate same sequence as _Right
+		return (_Mybase::_Equals(_Right) && _Carry == _Right._Carry);
+		}
+
+	template<class _Elem, class _Traits>
+		std::basic_ostream<_Elem, _Traits>&
+			_Write(std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Swc_Traits::_Write(_Ostr, *this, _Carry);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Gen>
+		void _Seed(_Gen& _Gx, bool _Readcy, const true_type&)
+		{	// reset sequence from numeric value
+		_RNG_ASSERT(0 < _Gx,
+			"invalid argument for subtract_with_carry[_01]::seed");
+		linear_congruential<unsigned long, 40014, 0, 2147483563> _Lc(_Gx);
+		_Reset(_Lc, _Readcy);
+		}
+
+	template<class _Gen>
+		void _Seed(_Gen& _Gx, bool _Readcy, const false_type&)
+		{	// reset sequence from generator
+		_Reset(_Gx, _Readcy);
+		}
+
+	template<class _Gen>
+		void _Reset(_Gen& _Gx, bool _Readcy)
+		{	// reset sequence
+		_Carry = _Swc_Traits::_Reset(_Gx, this->_Ax, _Readcy);
+		this->_Idx = _Rx;
+		}
+
+	void _Setx(int _Ix, _Ty _First, _Ty _Second)
+		{	// update _Ax[_Ix] and _Carry
+		_Ty _Newx = (_First -= _Carry) - _Second;
+		if (_First < _Second || _Swc_Traits::_Mod <= _Newx)
+			{	// underflowed, so add _Mod
+			_Newx += _Swc_Traits::_Mod;
+			_Carry = _Swc_Traits::_Cy;
+			}
+		else
+			_Carry = 0;
+		this->_Ax[_Ix] = _Newx;
+		}
+
+	void _Refill_lower()
+		{	// compute values for the lower half of the history array
+		int _Ix;
+		for (_Ix = 0; _Ix < _Sx; ++_Ix)
+			_Setx(_Ix, this->_Ax[_Ix + 2 * _Rx - _Sx], this->_Ax[_Ix + _Rx]);
+		for ( ; _Ix < _Rx; ++_Ix)
+			_Setx(_Ix, this->_Ax[_Ix - _Sx], this->_Ax[_Ix + _Rx]);
+		this->_Idx = 0;
+		}
+
+	void _Refill_upper()
+		{	// compute values for the upper half of the history array
+		for (int _Ix = _Rx; _Ix < 2 * _Rx; ++_Ix)
+			_Setx(_Ix, this->_Ax[_Ix - _Sx], this->_Ax[_Ix - _Rx]);
+		}
+
+	typename _Swc_Traits::_Cy_t _Carry;
+	};
+
+template<class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	bool operator==(const _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Left,
+		const _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Right)
+		{	// return true if _Left will generate same sequence as _Right
+		return (_Left._Equals(_Right));
+		}
+
+template<class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	bool operator!=(const _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Left,
+		const _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Right)
+		{	// return true if _Left will not generate same sequence as _Right
+		return (!_Left._Equals(_Right));
+		}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	std::basic_istream<_Elem, _Traits>&
+		operator>>(std::basic_istream<_Elem, _Traits>& _Istr,
+		_Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Eng)
+		{	// read state from _Istr
+		_Wrap_istream<_Elem, _Traits, typename _Swc_Traits::_Seed_t>
+			_Gen(_Istr);
+		_Eng.seed(_Gen, true);
+		return (_Istr);
+		}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	std::basic_ostream<_Elem, _Traits>&
+		operator<<(std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>& _Eng)
+		{	// write state to _Ostr
+		return (_Eng._Write(_Ostr));
+		}
+
+template<class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	const int _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>::short_lag;
+
+template<class _Ty,
+	int _Sx,
+	int _Rx,
+	class _Swc_Traits>
+	const int _Swc_base<_Ty, _Sx, _Rx, _Swc_Traits>::long_lag;
+
+	// TEMPLATE CLASS subtract_with_carry
+template<class _Ty,
+	_Ty _Mx,
+	int _Nw>
+	struct _Swc_traits
+	{	// traits template for subtract_with_carry generator
+	typedef int _Cy_t;
+	typedef _Ty _Mod_t;
+	typedef _Ty _Seed_t;
+
+	static const _Cy_t _Cy = 1;
+	static const _Mod_t _Mod = _Mx;
+	static const _Ty _Max = _Mx - 1;
+
+	template<class _Gen>
+		static _Cy_t _Reset(_Gen& _Gx, _Ty *_Ax, bool _Readcy)
+		{	// set initial values of _Ax from generator _Gx
+			// return value of _Cy from range if _Readcy is true,
+			// otherwise compute from last value
+		int _Kx;
+		if (_Mx == 0)
+			_Kx = (_BITS_BYTE * sizeof (_Ty) + 31) / 32;
+		else
+			{	// compute number of 32-bit words required
+			_ULonglong _Val = (_ULonglong)1 << 32;
+			for (_Kx = 1; 0 < _Val && _Val < _Mx; ++_Kx)
+				_Val = _Val << 32;
+			}
+
+		for (int _Ix = 0; _Ix < _Nw; ++_Ix)
+			{	// pack _Kx words
+			_Ax[_Ix] = _Gx();
+			for (int _Jx = 0; ++_Jx < _Kx; )
+				_Ax[_Ix] |= (_Ty)_Gx() << (32 * _Jx);
+			}
+
+		_Cy_t _Ans = _Reduce(_Ax);
+		if (!_Readcy)
+			return (_Ans);
+		else
+			return (_Gx());
+		}
+
+	static _Cy_t _Reduce(_Ty *_Ax)
+		{	// reduce values to allowed range
+		if (_Mx != 0)
+			for (int _Ix = 0; _Ix < _Nw; ++_Ix)
+				_Ax[_Ix] = _Ax[_Ix] % _Mx;
+		return (_Ax[_Nw - 1] == 0);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		static void _Write(std::basic_ostream<_Elem, _Traits>& _Ostr,
+			const _Circ_buf<_Ty, _Nw>& _Buf, _Cy_t _Cy)
+		{	// write state to _Ostr
+		for (int _Idx = 0; _Idx < _Nw; ++_Idx)
+			_Ostr << _Buf._At(_Idx) << ' ';
+		_Ostr << _Cy;
+		}
+	};
+
+template<class _Ty,
+	_Ty _Mx,
+	int _Sx,
+	int _Rx>
+	class subtract_with_carry
+		: public _Swc_base<_Ty, _Sx, _Rx, _Swc_traits<_Ty, _Mx, _Rx> >
+	{	// template class for subtract_with_carry generator
+public:
+	typedef subtract_with_carry<_Ty, _Mx, _Sx, _Rx> _Myt;
+	typedef _Swc_base<_Ty, _Sx, _Rx, _Swc_traits<_Ty, _Mx, _Rx> > _Mybase;
+
+	static const _Ty modulus = _Mx;
+
+	static const _Ty default_seed = 19780503U;
+
+	explicit subtract_with_carry(_Ty _X0 = default_seed)
+		: _Mybase(_X0)
+		{	// construct with default seed
+		}
+
+	subtract_with_carry(const _Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	subtract_with_carry(_Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	template<class _Gen>
+		subtract_with_carry(_Gen& _Gx)
+		: _Mybase(_Gx)
+		{	// construct with seed values from generator
+		}
+	};
+
+	// TEMPLATE CLASS subtract_with_carry_01
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	struct _Swc_01_traits
+	{	// traits template for subtract_with_carry_01 generator
+	typedef _Ty _Cy_t;
+	typedef _Ty _Mod_t;
+	typedef unsigned int _Seed_t;
+
+	static const _Cy_t _Cy;
+	static const _Mod_t _Mod;
+	static const _Ty _Max;
+	static const int _Nwords = (_Wx + 31) / 32;
+
+	template<class _Gen>
+		static _Cy_t _Reset(_Gen& _Gx, _Ty *_Ax, bool _Readcy)
+		{	// set initial values of _Ax from generator _Gx
+			// return value of _Cy from range if _Readcy is true,
+			// otherwise from last value
+		for (int _Ix = 0; _Ix < _Rx; ++_Ix)
+			{	// read values
+			_Ty _Factor = 1;
+			_Ty _Val = 0;
+			for (int _Jx = 0; _Jx < _Nwords - 1; ++_Jx)
+				{	// read components of value
+				_Factor /= (_Ty)_Two32;
+				_Val += _Gx() * _Factor;
+				}
+			_Ty _Temp = ((unsigned long)_Gx() & _Mask) / _Scale1;
+			_Val += (_Temp - (unsigned long)_Temp) * _Factor;
+			_Ax[_Ix] = _Val;
+			}
+		if (!_Readcy)
+			return (_Ax[_Rx - 1] == 0);
+		return (_Gx() == 0 ? 0 : _Cy);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		static void _Write(std::basic_ostream<_Elem, _Traits>& _Ostr,
+			const _Circ_buf<_Ty, _Rx>& _Buf, _Cy_t _Cy)
+		{	// write state to _Ostr
+		for (int _Ix = 0; _Ix < _Rx; ++_Ix)
+			{	// write values
+			_Ty _Val = _Buf._At(_Ix);
+			unsigned long _Temp;
+			for (int _Jx = 0; _Jx < _Nwords - 1; ++_Jx)
+				{	// write components of value
+				_Val *= (_Ty)_Two32;
+				_Temp = (unsigned long)_Val;
+				_Val -= _Temp;
+				_Ostr << _Temp << ' ';
+				}
+			_Temp = (unsigned long)(_Val * _Scale1);
+			_Ostr << _Temp << ' ';
+			}
+		_Ostr << _Cy ? 1 : 0;
+		}
+
+private:
+	static const _Ty _Scale1;
+	static const unsigned long _Mask;
+	};
+
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	const typename _Swc_01_traits<_Ty, _Wx, _Rx>::_Cy_t
+		_Swc_01_traits<_Ty, _Wx, _Rx>::_Cy =
+			(typename _Swc_01_traits<_Ty, _Wx, _Rx>::_Cy_t)
+				ldexp(1.0, -_Wx);
+
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	const typename _Swc_01_traits<_Ty, _Wx, _Rx>::_Mod_t
+		_Swc_01_traits<_Ty, _Wx, _Rx>::_Mod = 1;
+
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	const _Ty _Swc_01_traits<_Ty, _Wx, _Rx>::_Max = 1;
+
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	const _Ty _Swc_01_traits<_Ty, _Wx, _Rx>::_Scale1 =
+		(_Ty)ldexp(1.0, _Wx % 32);
+
+template<class _Ty,
+	int _Wx,
+	int _Rx>
+	const unsigned long _Swc_01_traits<_Ty, _Wx, _Rx>::_Mask =
+		~((~0UL) << (_Wx % 32));
+
+template<class _Ty,
+	int _Wx,
+	int _Sx,
+	int _Rx>
+	class subtract_with_carry_01
+		: public _Swc_base<_Ty, _Sx, _Rx, _Swc_01_traits<_Ty, _Wx, _Rx> >
+	{	// template class for subtract_with_carry_01 generator
+public:
+	static const int word_size = _Wx;
+	typedef _Swc_base<_Ty, _Sx, _Rx, _Swc_01_traits<_Ty, _Wx, _Rx> > _Mybase;
+
+	subtract_with_carry_01()
+		: _Mybase()
+		{	// construct with default seed
+		}
+
+	subtract_with_carry_01(const subtract_with_carry_01& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	subtract_with_carry_01(subtract_with_carry_01& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	explicit subtract_with_carry_01(typename _Mybase::_Seed_t _Value)
+		: _Mybase(_Value)
+		{	// construct with specified seed
+		}
+
+	template<class _Gen>
+		subtract_with_carry_01(_Gen& _Gx)
+			: _Mybase(_Gx)
+		{	// construct with seed values from generator
+		}
+	};
+
+template<class _Ty,
+	int _Wx,
+	int _Sx,
+	int _Rx>
+	const int subtract_with_carry_01<_Ty, _Wx, _Sx, _Rx>::word_size;
+
+	// TEMPLATE CLASS mersenne_twister
+template<class _Ty,
+	int _Wx,
+	int _Nx,
+	int _Mx,
+	int _Rx,
+	_Ty _Px,
+	int _Ux,
+	int _Sx,
+	_Ty _Bx,
+	int _Tx,
+	_Ty _Cx,
+	int _Lx>
+	class mersenne_twister
+		: public _Circ_buf<_Ty, _Nx>
+	{	// template class for mersenne twister generator
+public:
+	typedef mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+		_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx> _Myt;
+	typedef _Ty result_type;
+
+	static const int word_size = _Wx;
+	static const int state_size = _Nx;
+	static const int shift_size = _Mx;
+	static const int mask_bits = _Rx;
+	static const _Ty parameter_a = _Px;
+	static const int output_u = _Ux;
+	static const int output_s = _Sx;
+	static const _Ty output_b = _Bx;
+	static const int output_t = _Tx;
+	static const _Ty output_c = _Cx;
+	static const int output_l = _Lx;
+
+	static const _Ty default_seed = 5489U;
+
+	explicit mersenne_twister(unsigned long _X0 = default_seed)
+		{	// construct with specified seed
+		seed(_X0);
+		}
+
+	mersenne_twister(const _Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	mersenne_twister(_Myt& _Right)
+		{	// construct by copying
+		*this = _Right;
+		}
+
+	template<class _Gen>
+		explicit mersenne_twister(_Gen& _Gx)
+		{	// construct with seed values from generator
+		seed(_Gx);
+		}
+
+	void seed(unsigned long _X0 = default_seed)
+		{	// set initial values from specified value
+		_RNG_ASSERT(0 < _X0,
+			"invalid argument for mersenne_twister::seed");
+
+		int _Count = _Wx;	// to quiet diagnostics
+		_Ty _Mask = _Wx < std::numeric_limits<_Ty>::digits
+			? ~(~_Ty(0) << _Count) : ~_Ty(0);
+		_Ty _Prev = this->_Ax[0] = _X0 & _Mask;
+
+		for (int _Ix = 1; _Ix < _Nx; ++_Ix)
+			_Prev = this->_Ax[_Ix] =
+				(_Ix + 1812433253 * (_Prev ^ (_Prev >> (_Wx - 2)))) & _Mask;
+		this->_Idx = _Nx;
+		}
+
+	template<class _Gen>
+		void seed(_Gen& _Gx, bool = false)
+		{	// set initial values from range
+		int _Count = _Wx;	// to quiet diagnostics
+
+		_Ty _Mask = _Wx < std::numeric_limits<_Ty>::digits
+			? ~(~_Ty(0) << _Count) : ~_Ty(0);
+		for (int _Ix = 0; _Ix < _Nx; ++_Ix)
+			this->_Ax[_Ix] = _Gx() & _Mask;
+		this->_Idx = _Nx;
+		}
+
+	template<class _Elem,
+		class _S_Traits>
+		std::basic_ostream<_Elem, _S_Traits>&
+			_Write(std::basic_ostream<_Elem, _S_Traits>& _Ostr) const
+		{	// write state to _Ostr
+		for (int _Ix = 0; _Ix < _Nx; ++_Ix)
+			_Ostr << this->_At(_Ix) << ' ';
+		return (_Ostr);
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		int _Count = _Wx;	// to quiet diagnostics
+
+		return (_BITS_BYTE * sizeof(_Ty) == _Wx
+			? (std::numeric_limits<_Ty>::max)()
+			: ~(~(result_type)0 << _Count));
+		}
+
+	result_type operator()()
+		{	// return next value
+		if (this->_Idx == _Nx)
+			_Refill_upper();
+		else if (2 * _Nx <= this->_Idx)
+			_Refill_lower();
+		_Ty _Res = this->_Ax[this->_Idx++];
+		_Res ^= _Res >> _Ux;
+		_Res ^= (_Res << _Sx) & _Bx;
+		_Res ^= (_Res << _Tx) & _Cx;
+		_Res ^= _Res >> _Lx;
+		return (_Res);
+		}
+
+private:
+	void _Refill_lower()
+		{	// compute values for the lower half of the history array
+		int _Ix;
+		for (_Ix = 0; _Ix < _Nx - _Mx; ++_Ix)
+			{	// fill in lower region
+			_Ty _Tmp = (this->_Ax[_Ix + _Nx] & _HMSK)
+				| (this->_Ax[_Ix + _Nx + 1] & _LMSK);
+			this->_Ax[_Ix] = (_Tmp >> 1)
+				^ (_Tmp & 1 ? _Px : 0) ^ this->_Ax[_Ix + _Nx + _Mx];
+			}
+
+		for (; _Ix < _Nx - 1; ++_Ix)
+			{	// fill in upper region (avoids modulus operation)
+			_Ty _Tmp = (this->_Ax[_Ix +_Nx] & _HMSK)
+				| (this->_Ax[_Ix + _Nx + 1] & _LMSK);
+			this->_Ax[_Ix] = (_Tmp >> 1)
+				^ (_Tmp & 1 ? _Px : 0) ^ this->_Ax[_Ix - _Nx + _Mx];
+			}
+
+		_Ty _Tmp = (this->_Ax[_Ix + _Nx] & _HMSK) | (this->_Ax[0] & _LMSK);
+		this->_Ax[_Ix] = (_Tmp >> 1) ^
+			(_Tmp & 1 ? _Px : 0) ^ this->_Ax[_Mx - 1];
+		this->_Idx = 0;
+		}
+
+	void _Refill_upper()
+		{	// compute values for the upper half of the history array
+		int _Ix;
+		for (_Ix = _Nx; _Ix < 2 * _Nx; ++_Ix)
+			{	// fill in values
+			_Ty _Tmp = (this->_Ax[_Ix - _Nx] & _HMSK)
+				| (this->_Ax[_Ix - _Nx + 1] & _LMSK);
+			this->_Ax[_Ix] = (_Tmp >> 1)
+				^ (_Tmp & 1 ? _Px : 0) ^ this->_Ax[_Ix - _Nx + _Mx];
+			}
+		}
+
+	static const _Ty _HMSK = (~_Ty(0) << _Rx);
+	static const _Ty _LMSK = ~_HMSK;
+	};
+
+template<class _Ty, int _Wx, int _Nx, int _Mx, int _Rx,
+	_Ty _Px, int _Ux, int _Sx, _Ty _Bx, int _Tx, _Ty _Cx, int _Lx>
+	bool operator==(
+		const mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Left,
+		const mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Right)
+	{	// return true if _Left will generate same sequence as _Right
+	return (_Left._Equals(_Right));
+	}
+
+template<class _Ty, int _Wx, int _Nx, int _Mx, int _Rx,
+	_Ty _Px, int _Ux, int _Sx, _Ty _Bx, int _Tx, _Ty _Cx, int _Lx>
+	bool operator!=(
+		const mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Left,
+		const mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Right)
+	{	// return true if _Left will not generate same sequence as _Right
+	return (!_Left._Equals(_Right));
+	}
+
+template<class _Elem, class _S_Traits,
+	class _Ty, int _Wx, int _Nx, int _Mx, int _Rx,
+	_Ty _Px, int _Ux, int _Sx, _Ty _Bx, int _Tx, _Ty _Cx, int _Lx>
+	std::basic_istream<_Elem, _S_Traits>& operator>>(
+		std::basic_istream<_Elem, _S_Traits>& _Istr,
+		mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Eng)
+	{	// read state from _Istr
+	_Wrap_istream<_Elem, _S_Traits, _Ty> _Gen(_Istr);
+	_Eng.seed(_Gen);
+	return (_Istr);
+	}
+
+template<class _Elem, class _S_Traits,
+	class _Ty, int _Wx, int _Nx, int _Mx, int _Rx,
+	_Ty _Px, int _Ux, int _Sx, _Ty _Bx, int _Tx, _Ty _Cx, int _Lx>
+	std::basic_ostream<_Elem, _S_Traits>& operator<<(
+		std::basic_ostream<_Elem, _S_Traits>& _Ostr,
+		const mersenne_twister<_Ty, _Wx, _Nx, _Mx, _Rx,
+			_Px, _Ux, _Sx, _Bx, _Tx, _Cx, _Lx>& _Eng)
+	{	// write state to _Ostr
+	return (_Eng._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS discard_block
+template<class _Engine,
+	int _Px,
+	int _Rx>
+	class discard_block
+	{	// template class for discard_block compound engine
+public:
+	typedef discard_block<_Engine, _Px, _Rx> _Myt;
+	typedef _Engine base_type;
+	typedef typename _Engine::result_type result_type;
+
+	static const int block_size = _Px;
+	static const int used_block = _Rx;
+
+	discard_block()
+		: _Nx(0)
+		{	// construct
+		}
+
+	discard_block(const discard_block& _Right)
+		: _Eng(_Right._Eng), _Nx(_Right._Nx)
+		{	// construct by copying
+		}
+
+	discard_block(discard_block& _Right)
+		: _Eng(_Right._Eng), _Nx(_Right._Nx)
+		{	// construct by copying
+		}
+
+	explicit discard_block(const base_type& _Ex)
+		: _Eng(_Ex), _Nx(0)
+		{	// construct with engine initializer _Ex
+		}
+
+	explicit discard_block(result_type _Seed)
+		: _Eng(_Seed), _Nx(0)
+		{	// construct from specified seed value
+		}
+
+	template<class _Gen>
+		discard_block(_Gen& _Gx)
+		: _Eng(_Gx), _Nx(0)
+		{	// construct from range
+		}
+
+	void seed()
+		{	// seed engine from default value
+		_Eng.seed();
+		_Nx = 0;
+		}
+
+	void seed(result_type _X0)
+		{	// seed engine from specified value
+		_Eng.seed(_X0);
+		_Nx = 0;
+		}
+
+	template<class _Gen>
+		void seed(_Gen& _Gx, bool _Readcy = false)
+		{	// seed engine from range
+		_Eng.seed(_Gx, _Readcy);
+		_Nx = 0;
+		}
+
+	const base_type& base() const
+		{	// return const reference to engine
+		return (_Eng);
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return ((_Eng.min)());
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return ((_Eng.max)());
+		}
+
+	result_type operator()()
+		{	// return next value
+		if (_Rx <= _Nx)
+			{	// discard values
+			while (_Nx++ < _Px)
+				_Eng();
+			_Nx = 0;
+			}
+		++_Nx;
+		return (_Eng());
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		return (_Istr >> _Eng >> _Nx);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		return (_Ostr << _Eng << ' ' << _Nx);
+		}
+
+private:
+	base_type _Eng;
+	int _Nx;
+	};
+
+template<class _Engine,
+	int _Px,
+	int _Rx>
+	const int discard_block<_Engine, _Px, _Rx>::block_size;
+
+template<class _Engine,
+	int _Px,
+	int _Rx>
+	const int discard_block<_Engine, _Px, _Rx>::used_block;
+
+template<class _Engine,
+	int _Px,
+	int _Rx>
+	bool operator==(
+		const discard_block<_Engine, _Px, _Rx>& _Left,
+		const discard_block<_Engine, _Px, _Rx>& _Right)
+	{	// return true if _Left will generate same sequence as _Right
+	return (_Left.base() == _Right.base());
+	}
+
+template<class _Engine,
+	int _Px,
+	int _Rx>
+	bool operator!=(
+		const discard_block<_Engine, _Px, _Rx>& _Left,
+		const discard_block<_Engine, _Px, _Rx>& _Right)
+	{	// return true if _Left will not generate same sequence as _Right
+	return (!(_Left == _Right));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Engine,
+	int _Px,
+	int _Rx>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		discard_block<_Engine, _Px, _Rx>& _Eng)
+	{	// read state from _Istr
+	return (_Eng._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Engine,
+	int _Px,
+	int _Rx>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const discard_block<_Engine, _Px, _Rx>& _Eng)
+	{	// write state to _Ostr
+	return (_Eng._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS xor_combine
+template<class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	class xor_combine
+	{	// template class for xor_combine compound engine
+public:
+	typedef xor_combine<_Engine1, _S1, _Engine2, _S2> _Myt;
+	typedef _Engine1 base1_type;
+	typedef _Engine2 base2_type;
+
+	typedef typename _Engine1::result_type _Eres1;
+	typedef typename _Engine1::result_type _Eres2;
+	typedef typename _If<(_Eres1)(-1) <= (_Eres2)(-1),
+		_Eres1, _Eres2>::_Result result_type;
+
+	static const int shift1 = _S1;
+	static const int shift2 = _S2;
+
+	xor_combine()
+		{	// construct
+		_Init();
+		}
+
+	xor_combine(const xor_combine& _Right)
+		: _Eng1(_Right._Eng1), _Eng2(_Right._Eng2),
+			_Min(_Right._Min), _Max(_Right._Max)
+		{	// construct by copying
+		}
+
+	xor_combine(xor_combine& _Right)
+		: _Eng1(_Right._Eng1), _Eng2(_Right._Eng2),
+			_Min(_Right._Min), _Max(_Right._Max)
+		{	// construct by copying
+		}
+
+	explicit xor_combine(result_type _X0)
+		: _Eng1((_Eres1)_X0), _Eng2((_Eres2)_X0 + 1)
+		{	// construct with common seed
+		_Init();
+		}
+
+	xor_combine(const base1_type& _E1, const base2_type& _E2)
+		: _Eng1(_E1), _Eng2(_E2)
+		{	// construct with engine initializers _E1 and _E2
+		_Init();
+		}
+
+	template<class _Gen>
+		xor_combine(_Gen& _Gx)
+		: _Eng1(_Gx), _Eng2(_Gx)
+		{	// construct from range
+		_Init();
+		}
+
+	void seed()
+		{	// seed from default values
+		_Eng1.seed();
+		_Eng2.seed();
+		}
+
+	void seed(result_type _X0)
+		{	// seed from default values
+		_Eng1.seed((_Eres1)_X0);
+		_Eng2.seed((_Eres2)_X0 + 1);
+		}
+
+	template<class _Gen>
+		void seed(_Gen& _Gx, bool = false)
+		{	// seed from generator
+		_Eng1.seed(_Gx);
+		_Eng2.seed(_Gx);
+		}
+
+	const base1_type& base1() const
+		{	// return const reference to first engine
+		return (_Eng1);
+		}
+
+	const base2_type& base2() const
+		{	// return const reference to second engine
+		return (_Eng2);
+		}
+
+	base1_type& _Base1()
+		{	// return reference to first engine
+		return (_Eng1);
+		}
+
+	base2_type& _Base2()
+		{	// return reference to second engine
+		return (_Eng2);
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (_Min);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return (_Max);
+		}
+
+	result_type operator()()
+		{	// return next value
+		return ((_Eng1() << _S1) ^ (_Eng2() << _S2));
+		}
+
+private:
+	void _Init()
+		{	// determine minimum and maximum values
+		result_type _Mx, _Temp;
+		result_type _Ax, _Bx, _Cx, _Dx;
+		unsigned _SS = _S1 < _S2 ? _S1 : _S2;
+
+		_Mx = (std::numeric_limits<result_type>::max)()
+			- ((std::numeric_limits<result_type>::max)() >> 1);
+		_Ax = (_Eng1.min)() << (_S1 - _SS);
+		_Bx = (_Eng1.max)() << (_S1 - _SS);
+		_Cx = (_Eng2.min)() << (_S2 - _SS);
+		_Dx = (_Eng2.max)() << (_S2 - _SS);
+		while (_Mx != 0)
+			{	// loop through bits
+			if (_Mx & ~_Ax & _Cx)
+				{	// adjust minimum from _Eng1
+				if ((_Temp = (_Ax | _Mx) & (0 - _Mx)) <= _Bx)
+					_Ax = _Temp;
+				}
+			else if (_Mx & _Ax & ~_Cx)
+				{	// adjust minimum from _Eng2
+				if ((_Temp = (_Cx | _Mx) & (0 - _Mx)) <= _Dx)
+					_Cx = _Temp;
+				}
+			_Mx >>= 1;
+			}
+		_Min = (_Ax ^ _Cx) << _SS;
+
+		_Mx = (std::numeric_limits<result_type>::max)()
+			- ((std::numeric_limits<result_type>::max)() >> 1);
+		_Ax = (_Eng1.min)() << (_S1 - _SS);
+		_Bx = (_Eng1.max)() << (_S1 - _SS);
+		_Cx = (_Eng2.min)() << (_S2 - _SS);
+		_Dx = (_Eng2.max)() << (_S2 - _SS);
+		while (_Mx != 0)
+			{	// loop through bits
+			if (!(_Mx & _Bx & _Dx))
+				;
+			else if (_Ax <= (_Temp = (_Bx - _Mx) | (_Mx - 1)))
+				_Bx = _Temp;
+			else if (_Cx <= (_Temp = (_Dx - _Mx) | (_Mx - 1)))
+				_Dx = _Temp;
+			_Mx >>= 1;
+			}
+		_Max = (_Bx ^ _Dx) << _SS;
+		}
+
+	_Engine1 _Eng1;
+	_Engine2 _Eng2;
+	result_type _Min;
+	result_type _Max;
+	};
+
+template<class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	const int xor_combine<_Engine1, _S1, _Engine2, _S2>::shift1;
+
+template<class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	const int xor_combine<_Engine1, _S1, _Engine2, _S2>::shift2;
+
+template<class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	bool operator==(
+		const xor_combine<_Engine1, _S1, _Engine2, _S2>& _Left,
+		const xor_combine<_Engine1, _S1, _Engine2, _S2>& _Right)
+	{	// return true if _Left will generate same sequence as _Right
+	return (_Left.base1() == _Right.base1()
+		&& _Left.base2() == _Right.base2());
+	}
+
+template<class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	bool operator!=(
+		const xor_combine<_Engine1, _S1, _Engine2, _S2>& _Left,
+		const xor_combine<_Engine1, _S1, _Engine2, _S2>& _Right)
+	{	// return true if _Left will not generate same sequence as _Right
+	return (!(_Left == _Right));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		xor_combine<_Engine1, _S1, _Engine2, _S2>& _Eng)
+	{	// read state from _Istr
+	return (_Istr >> _Eng._Base1() >> _Eng._Base2());
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Engine1,
+	int _S1,
+	class _Engine2,
+	int _S2>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const xor_combine<_Engine1, _S1, _Engine2, _S2>& _Eng)
+	{	// write state to _Ostr
+	return (_Ostr << _Eng.base1() << ' ' << _Eng.base2());
+	}
+
+	// TEMPLATE CLASS uniform_int
+template<class _Ty = int>
+	class uniform_int
+	{	// template class for uniform integer distribution
+public:
+	typedef uniform_int<_Ty> _Myt;
+	typedef _Ty input_type;
+	typedef _Ty result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(result_type _Min0 = 0, result_type _Max0 = 9)
+			{	// construct from parameters
+			_Init(_Min0, _Max0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Min == _Right._Min && _Max == _Right._Max);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		result_type a() const
+			{	// return a value
+			return (_Min);
+			}
+
+		result_type b() const
+			{	// return b value
+			return (_Max);
+			}
+
+		void _Init(_Ty _Min0, _Ty _Max0)
+			{	// set internal state
+			_RNG_ASSERT(_Min0 <= _Max0,
+				"invalid min and max arguments for uniform_int");
+			_Min = _Min0;
+			_Max = _Max0;
+			}
+
+		result_type _Min;
+		result_type _Max;
+		};
+
+	explicit uniform_int(_Ty _Min0 = 0,
+		_Ty _Max0 = 9)
+		: _Par(_Min0, _Max0)
+		{	// construct from parameters
+		}
+
+	explicit uniform_int(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	result_type a() const
+		{	// return a value
+		return (_Par.a());
+		}
+
+	result_type b() const
+		{	// return b value
+		return (_Par.b());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (_Par._Min);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return (_Par._Max);
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par._Min, _Par._Max));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0._Min, _Par0._Max));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, result_type _Nx) const
+		{	// return next value
+		return (_Eval(_Eng, 0, _Nx - 1));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty _Min0;
+		_Ty _Max0;
+		_Istr >> _Min0 >> _Max0;
+		_Par._Init(_Min0, _Max0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		return (_Ostr << _Par._Min << ' ' << _Par._Max);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, _Ty _Min, _Ty _Max) const
+		{	// compute next value in range [_Min, _Max]
+		typedef double _Wty;
+		_Wty _Wmax = (_Wty)_Max;
+		_Wty _Wmin = (_Wty)_Min;
+		_Wty _Ans = _NRAND(_Eng, _Wty)
+			* (_Wmax - _Wmin + (_Wty)1) + _Wmin;
+		return (_Wmax <= _Ans ? _Max : (result_type)_Ans);
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		uniform_int<_Ty>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const uniform_int<_Ty>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS bernoulli_distribution
+class bernoulli_distribution
+	{	// class for bernoulli distribution
+public:
+	typedef bernoulli_distribution _Myt;
+	typedef int input_type;
+	typedef bool result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(double _P0 = 0.5)
+			{	// construct from parameters
+			_Init(_P0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Px == _Right._Px);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		double p() const
+			{	// return probability
+			return (_Px);
+			}
+
+		void _Init(double _P0)
+			{	// set internal state
+			_RNG_ASSERT(0.0 <= _P0 && _P0 <= 1.0,
+				"invalid probability argument for bernoulli_distribution");
+
+			_Px = _P0;
+			}
+
+		double _Px;
+		};
+
+	explicit bernoulli_distribution(double _P0 = 0.5)
+		: _Par(_P0)
+		{	// construct
+		}
+
+	explicit bernoulli_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	double p() const
+		{	// return probability
+		return (_Par.p());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (false);
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return (true);
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		double _P0;
+		_In(_Istr, _P0);
+		_Par._Init(_P0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Px);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value
+		return (_NRAND(_Eng, double) < _Par0._Px);
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		bernoulli_distribution& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const bernoulli_distribution& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS geometric_distribution
+template<class _Ty0 = int,
+	class _Ty1 = double>
+	class geometric_distribution
+	{	// template class for geometric distribution
+public:
+	typedef geometric_distribution<_Ty0, _Ty1> _Myt;
+	typedef _Ty1 input_type;
+	typedef _Ty0 result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty1 _P0 = _Ty1(0.5))
+			{	// construct from parameters
+			_Init(_P0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Px == _Right._Px);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty1 p() const
+			{	// return probability
+			return (_Px);
+			}
+
+		void _Init(_Ty1 _P0)
+			{	// initialize
+			_RNG_ASSERT(0.0 < _P0 && _P0 < 1.0,
+				"invalid probability argument for geometric_distribution");
+			_Px = _P0;
+			_Log_1_p = log(1 - _Px);
+			}
+
+		_Ty1 _Px;
+		_Ty1 _Log_1_p;
+		};
+
+	explicit geometric_distribution(_Ty1 _P0 = _Ty1(0.5))
+		: _Par(_P0)
+		{	// construct
+		}
+
+	explicit geometric_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	_Ty1 p() const
+		{	// return probability
+		return (_Par.p());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty1 _P0;
+		_In(_Istr, _P0);
+		_Par._Init(_P0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Px);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value
+		return ((_Ty0)(log(_NRAND(_Eng, _Ty1))
+			/ _Par0._Log_1_p));
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		geometric_distribution<_Ty0, _Ty1>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const geometric_distribution<_Ty0, _Ty1>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS poisson_distribution AND HELPER
+template<class _Ty0 = int,
+	class _Ty1 = double>
+	class _Small_poisson_distribution
+	{	//template class for poisson distribution with small mean
+public:
+	template<class _Engine>
+		_Ty0 operator()(_Engine& _Eng) const
+		{	// return next value
+		_Ty0 _Res;
+		_Ty1 _Val;
+		for (_Res = 0, _Val = 1.0; ; ++_Res)
+			{	// count repetitions
+			_Val *= _NRAND(_Eng, _Ty1);
+			if (_Val <= _G0)
+				break;
+			}
+		return (_Res);
+		}
+
+	void _Init(const _Ty1& _Mean0)
+		{	// set internal state
+		_G0 = exp(-_Mean0);
+		}
+
+private:
+	_Ty1 _G0;
+	};
+
+template<class _Ty0 = int,
+	class _Ty1 = double>
+	class poisson_distribution
+	{	// template class for poisson distribution
+public:
+	typedef poisson_distribution<_Ty0, _Ty1> _Myt;
+	typedef _Ty1 input_type;
+	typedef _Ty0 result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty1 _Mean0 = _Ty1(1))
+			{	// construct from parameters
+			_Init(_Mean0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Mean == _Right._Mean);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty1 mean() const
+			{	// return mean value
+			return (_Mean);
+			}
+
+		void _Init(_Ty1 _Mean0)
+			{	// set internal state
+			_RNG_ASSERT(0.0 < _Mean0,
+				"invalid mean argument for poisson_distribution");
+			_Mean = _Mean0;
+			_Sqrt = sqrt(2.0 * _Mean0);
+			_Logm = log(_Mean0);
+			_G1 = _Mean0 * _Logm - _XLgamma(_Mean0 + 1.0);
+			_Small._Init(_Mean0);
+			}
+
+		_Ty1 _Mean;
+		_Ty1 _Sqrt;
+		_Ty1 _Logm;
+		_Ty1 _G1;
+		_Small_poisson_distribution<_Ty0, _Ty1> _Small;
+		};
+
+	explicit poisson_distribution(_Ty1 _Mean0 = _Ty1(1))
+		: _Par(_Mean0)
+		{	// construct
+		}
+
+	explicit poisson_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	_Ty1 mean() const
+		{	// return mean value
+		return (_Par.mean());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return ((std::numeric_limits<result_type>::max)());
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty1 _Mean0;
+		_In(_Istr, _Mean0);
+		_Par._Init(_Mean0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Mean);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value
+		if (_Par0._Mean < 12.0)
+			return (_Par0._Small(_Eng));
+		for (; ; )
+			{	// generate and reject
+			_Ty0 _Res;
+			_Ty1 _Yx;
+			for (; ; )
+				{	// generate a tentative value
+				_Yx = (_Ty1)tan(_Pi * _NRAND(_Eng, _Ty1));
+				_Res = (_Ty0)(_Par0._Sqrt * _Yx + _Par0._Mean);
+				if (0 <= _Res)
+					break;
+				}
+			if (_NRAND(_Eng, _Ty1) <= 0.9 * (1.0 + _Yx * _Yx)
+				* exp(_Res * _Par0._Logm
+					- _XLgamma(_Res + 1.0) - _Par0._G1))
+				return (_Res);
+			}
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		poisson_distribution<_Ty0, _Ty1>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const poisson_distribution<_Ty0, _Ty1>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS binomial_distribution
+template<class _Ty0 = int,
+	class _Ty1 = double>
+	class binomial_distribution
+	{	// template class for binomial distribution
+public:
+	typedef binomial_distribution<_Ty0, _Ty1> _Myt;
+	typedef _Ty1 input_type;
+	typedef _Ty0 result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty0 _T0 = 1, _Ty1 _P0 = _Ty1(0.5))
+			{	// construct from parameters
+			_Init(_T0, _P0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Tx == _Right._Tx && _Px == _Right._Px);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty0 t() const
+			{	// return max value
+			return (_Tx);
+			}
+
+		_Ty1 p() const
+			{	// return probability
+			return (_Px);
+			}
+
+		void _Init(_Ty0 _T0, _Ty1 _P0)
+			{	// initialize
+			_RNG_ASSERT(0.0 <= _T0,
+				"invalid max argument for binomial_distribution");
+			_RNG_ASSERT(0.0 <= _P0 && _P0 <= 1.0,
+				"invalid probability argument for binomial_distribution");
+			_Tx = _T0;
+			_Px = _P0;
+			_Pp = _Px < 0.5 ? _Px : (1.0 - _Px);
+			_Mean = _Tx * _Pp;
+			_G1 = _XLgamma(_Tx + 1.0);
+			_Sqrt = sqrt(2 * _Mean * (1 - _Pp));
+			_Logp = log(_Pp);
+			_Logp1 = log(1.0 - _Pp);
+			_Small._Init(_Mean);
+			}
+
+		_Ty0 _Tx;
+		_Ty1 _Px;
+		_Ty1 _Pp;
+		_Ty1 _Mean;
+		_Ty1 _G1;
+		_Ty1 _Sqrt;
+		_Ty1 _Logp;
+		_Ty1 _Logp1;
+		_Small_poisson_distribution<_Ty0, _Ty1> _Small;
+		};
+
+	explicit binomial_distribution(_Ty0 _T0 = 1,
+		_Ty1 _P0 = _Ty1(0.5))
+		: _Par(_T0, _P0)
+		{	// construct
+		}
+
+	explicit binomial_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	_Ty0 t() const
+		{	// return max value
+		return (_Par.t());
+		}
+
+	_Ty1 p() const
+		{	// return probability
+		return (_Par.p());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return ((std::numeric_limits<result_type>::max)());
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty0 _T0;
+		_Ty1 _P0;
+		_In(_Istr, _P0);
+		_In(_Istr, _T0);
+		_Par._Init(_T0, _P0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Px);
+		_Out(_Ostr, _Par._Tx);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// Press et al., Numerical Recipes in C, 2nd ed., pp 295-296.
+		_Ty0 _Res;
+		if (_Par0._Tx < 25)
+			{	// generate directly
+			_Res = 0;
+			for (_Ty0 _Ix = 0; _Ix < _Par0._Tx; ++_Ix)
+				if (_NRAND(_Eng, _Ty1) < _Par0._Px)
+					++_Res;
+			return (_Res);
+			}
+		else if (_Par0._Mean < 1.0)
+			// events are rare, use Poisson distribution
+			return (_Par0._Small(_Eng));
+		else
+			{	// no shortcuts
+			for (; ; )
+				{	// generate and reject
+				_Ty1 _Yx;
+				for (; ; )
+					{	// generate a tentative value
+					_Yx = (_Ty1)tan(_Pi * _NRAND(_Eng, _Ty1));
+					_Res = (_Ty0)(_Par0._Sqrt * _Yx + _Par0._Mean);
+					if (0 <= _Res && _Res <= _Par0._Tx)
+						break;
+					}
+				if (_NRAND(_Eng, _Ty1) <= 1.2 * _Par0._Sqrt
+					* (1.0 + _Yx * _Yx)
+					* exp(_Par0._G1 - _XLgamma(_Res + 1.0)
+						- _XLgamma(_Par0._Tx - _Res
+						+ 1.0) + _Res * _Par0._Logp
+						+ (_Par0._Tx - _Res) * _Par0._Logp1))
+					break;
+				}
+			return (_Par0._Px == _Par0._Pp ? _Res : (_Par0._Tx - _Res));
+			}
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		binomial_distribution<_Ty0, _Ty1>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty0,
+	class _Ty1>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const binomial_distribution<_Ty0, _Ty1>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS uniform_real
+template<class _Ty = double>
+	class uniform_real
+	{	// template class for uniform real distribution
+public:
+	typedef uniform_real<_Ty> _Myt;
+	typedef _Ty input_type;
+	typedef _Ty result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty _Min0 = _Ty(0),
+			_Ty _Max0 = _Ty(1))
+			{	// construct from parameters
+			_Init(_Min0, _Max0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Min == _Right._Min && _Max == _Right._Max);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		result_type a() const
+			{	// return a value
+			return (_Min);
+			}
+
+		result_type b() const
+			{	// return b value
+			return (_Max);
+			}
+
+		void _Init(_Ty _Min0, _Ty _Max0)
+			{	// set internal state
+			_RNG_ASSERT(_Min0 <= _Max0,
+				"invalid min and max arguments for uniform_real");
+			_Min = _Min0;
+			_Max = _Max0;
+			}
+
+		result_type _Min;
+		result_type _Max;
+		};
+
+	explicit uniform_real(_Ty _Min0 = _Ty(0),
+		_Ty _Max0 = _Ty(1))
+		: _Par(_Min0, _Max0)
+		{	// construct
+		}
+
+	explicit uniform_real(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	result_type a() const
+		{	// return a value
+		return (_Par.a());
+		}
+
+	result_type b() const
+		{	// return b value
+		return (_Par.b());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (_Par._Min);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return (_Par._Max);
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem, class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty _Min0;
+		_Ty _Max0;
+		_In(_Istr, _Min0);
+		_In(_Istr, _Max0);
+		_Par._Init(_Min0, _Max0);
+		return (_Istr);
+		}
+
+	template<class _Elem, class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Min);
+		_Out(_Ostr, _Par._Max);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value
+		return (_NRAND(_Eng, _Ty) * (_Par0._Max - _Par0._Min) + _Par0._Min);
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits, class _Ty>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		uniform_real<_Ty>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const uniform_real<_Ty>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS exponential_distribution
+template<class _Ty = double>
+	class exponential_distribution
+	{	// template class for exponential distribution
+public:
+	typedef exponential_distribution<_Ty> _Myt;
+	typedef _Ty input_type;
+	typedef _Ty result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty _Lambda0 = _Ty(1))
+			{	// construct from parameters
+			_Init(_Lambda0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Lambda == _Right._Lambda);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty lambda() const
+			{	// return lambda value
+			return (_Lambda);
+			}
+
+		void _Init(_Ty _Lambda0)
+			{	// set internal state
+			_RNG_ASSERT(0.0 < _Lambda0,
+				"invalid lambda argument for exponential_distribution");
+			_Lambda = _Lambda0;
+			}
+
+		_Ty _Lambda;
+		};
+
+	explicit exponential_distribution(_Ty _Lambda0 = _Ty(1))
+		: _Par(_Lambda0)
+		{	// construct
+		}
+
+	explicit exponential_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	_Ty lambda() const
+		{	// return lambda value
+		return (_Par.lambda());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return ((std::numeric_limits<result_type>::max)());
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty _Lambda0;
+		_In(_Istr, _Lambda0);
+		_Par._Init(_Lambda0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Lambda);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value
+		return (-log(_Ty(1) - _NRAND(_Eng, _Ty)) / _Par0._Lambda);
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		exponential_distribution<_Ty>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const exponential_distribution<_Ty>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS normal_distribution
+template<class _Ty = double>
+	class normal_distribution
+	{	// template class for normal distribution
+public:
+	typedef normal_distribution<_Ty> _Myt;
+	typedef _Ty input_type;
+	typedef _Ty result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty _Mean0 = 0.0, _Ty _Sigma0 = 1.0)
+			{	// construct from parameters
+			_Init(_Mean0, _Sigma0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Mean == _Right._Mean && _Sigma == _Right._Sigma);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty mean() const
+			{	// return mean value
+			return (_Mean);
+			}
+
+		_Ty sigma() const
+			{	// return sigma value
+			return (_Sigma);
+			}
+
+		_Ty stddev() const
+			{	// return sigma value
+			return (_Sigma);
+			}
+
+		void _Init(_Ty _Mean0, _Ty _Sigma0)
+			{	// set internal state
+			_RNG_ASSERT(0.0 < _Sigma0,
+				"invalid sigma argument for normal_distribution");
+			_Mean = _Mean0;
+			_Sigma = _Sigma0;
+			}
+
+		_Ty _Mean;
+		_Ty _Sigma;
+		};
+
+	explicit normal_distribution(_Ty _Mean0 = 0.0, _Ty _Sigma0 = 1.0)
+		: _Par(_Mean0, _Sigma0), _Valid(false)
+		{	// construct
+		}
+
+	explicit normal_distribution(param_type _Par0)
+		: _Par(_Par0), _Valid(false)
+		{	// construct from parameter package
+		}
+
+	_Ty mean() const
+		{	// return mean value
+		return (_Par.mean());
+		}
+
+	_Ty sigma() const
+		{	// return sigma value
+		return (_Par.sigma());
+		}
+
+	_Ty stddev() const
+		{	// return sigma value
+		return (_Par.sigma());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		reset();
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (-(std::numeric_limits<result_type>::max)());
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return ((std::numeric_limits<result_type>::max)());
+		}
+
+	void reset()
+		{	// clear internal state
+		_Valid = false;
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng)
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0)
+		{	// return next value, given parameter package
+		reset();
+		return (_Eval(_Eng, _Par0, false));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty _Mean0;
+		_Ty _Sigma0;
+		_In(_Istr, _Mean0);
+		_In(_Istr, _Sigma0);
+		_Par._Init(_Mean0, _Sigma0);
+
+		_Istr >> _Valid;
+		_In(_Istr, _X2);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Mean);
+		_Out(_Ostr, _Par._Sigma);
+
+		_Ostr << ' ' << _Valid;
+		_Out(_Ostr, _X2);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, const param_type& _Par0,
+			bool _Keep = true)
+		{	// compute next value
+			// Knuth, vol. 2, p. 122, alg. P
+		_Ty _Res;
+		if (_Keep && _Valid)
+			{	// return stored value
+			_Res = _X2;
+			_Valid = false;
+			}
+		else
+			{	// generate two values, store one, return one
+			double _V1, _V2, _Sx;
+			for (; ; )
+				{	// reject bad values
+				_V1 = 2 * _NRAND(_Eng, _Ty) - 1.0;
+				_V2 = 2 * _NRAND(_Eng, _Ty) - 1.0;
+				_Sx = _V1 * _V1 + _V2 * _V2;
+				if (_Sx < 1.0)
+					break;
+				}
+			double _Fx = sqrt(-2.0 * log(_Sx) / _Sx);
+			if (_Keep)
+				{	// save second value for next call
+				_X2 = _Fx * _V2;
+				_Valid = true;
+				}
+			_Res = _Fx * _V1;
+			}
+		return (_Res * _Par0._Sigma + _Par0._Mean);
+		}
+
+	param_type _Par;
+	bool _Valid;
+	_Ty _X2;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		normal_distribution<_Ty>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const normal_distribution<_Ty>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// TEMPLATE CLASS gamma_distribution
+template<class _Ty = double>
+	class gamma_distribution
+	{	// template class for gamma distribution
+public:
+	typedef gamma_distribution<_Ty> _Myt;
+	typedef _Ty input_type;
+	typedef _Ty result_type;
+
+	struct param_type
+		{	// parameter package
+		typedef _Myt distribution_type;
+
+		param_type(_Ty _Alpha0 = _Ty(1), _Ty _Beta0 = _Ty(1))
+			{	// construct from parameters
+			_Init(_Alpha0, _Beta0);
+			}
+
+		bool operator==(const param_type& _Right) const
+			{	// test for equality
+			return (_Px == _Right._Px);
+			}
+
+		bool operator!=(const param_type& _Right) const
+			{	// test for inequality
+			return (!(*this == _Right));
+			}
+
+		_Ty alpha() const
+			{	// return alpha value
+			return (_Alpha);
+			}
+
+		_Ty beta() const
+			{	// return beta value
+			return (_Beta);
+			}
+
+		void _Init(_Ty _Alpha0, _Ty _Beta0)
+			{	// initialize
+			_RNG_ASSERT(0.0 < _Alpha0,
+				"invalid alpha argument for gamma_distribution");
+			_RNG_ASSERT(0.0 < _Beta0,
+				"invalid beta argument for gamma_distribution");
+			_Alpha = _Alpha0;
+			_Beta = _Beta0;
+			_Px = (_Ty)(_Exp1 / (_Alpha + _Exp1));
+			_Sqrt = sqrt(2 * _Alpha - 1);
+			}
+
+		_Ty _Alpha;
+		_Ty _Beta;
+		_Ty _Px;
+		_Ty _Sqrt;
+		exponential_distribution<_Ty> _Exp;
+		};
+
+	explicit gamma_distribution(_Ty _Alpha0 = _Ty(1), _Ty _Beta0 = _Ty(1))
+		: _Par(_Alpha0, _Beta0)
+		{	// construct
+		}
+
+	explicit gamma_distribution(param_type _Par0)
+		: _Par(_Par0)
+		{	// construct from parameter package
+		}
+
+	_Ty alpha() const
+		{	// return alpha value
+		return (_Par.alpha());
+		}
+
+	_Ty beta() const
+		{	// return beta value
+		return (_Par.beta());
+		}
+
+	param_type param() const
+		{	// return parameter package
+		return (_Par);
+		}
+
+	void param(const param_type& _Par0)
+		{	// set parameter package
+		_Par = _Par0;
+		}
+
+	result_type (min)() const
+		{	// get smallest possible result
+		return (std::numeric_limits<result_type>::denorm_min());
+		}
+
+	result_type (max)() const
+		{	// get largest possible result
+		return ((std::numeric_limits<result_type>::max)());
+		}
+
+	void reset()
+		{	// clear internal state
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng) const
+		{	// return next value
+		return (_Eval(_Eng, _Par));
+		}
+
+	template<class _Engine>
+		result_type operator()(_Engine& _Eng, const param_type& _Par0) const
+		{	// return next value, given parameter package
+		return (_Eval(_Eng, _Par0));
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_istream<_Elem, _Traits>& _Read(
+			std::basic_istream<_Elem, _Traits>& _Istr)
+		{	// read state from _Istr
+		_Ty _Alpha0;
+		_Ty _Beta0;
+		_In(_Istr, _Alpha0);
+		_In(_Istr, _Beta0);
+		_Par._Init(_Alpha0, _Beta0);
+		return (_Istr);
+		}
+
+	template<class _Elem,
+		class _Traits>
+		std::basic_ostream<_Elem, _Traits>& _Write(
+			std::basic_ostream<_Elem, _Traits>& _Ostr) const
+		{	// write state to _Ostr
+		_Out(_Ostr, _Par._Alpha);
+		_Out(_Ostr, _Par._Beta);
+		return (_Ostr);
+		}
+
+private:
+	template<class _Engine>
+		result_type _Eval(_Engine& _Eng, param_type _Par0) const
+		{	// return next value
+		_Ty _Ux, _Vx;
+		_Ty _Xx, _Yx, _Qx;
+		int _Count;
+		if (_Par0._Alpha < 1)
+			{	// small values of alpha
+				// from Knuth
+			for (; ; )
+				{	// generate and reject
+				_Ux = _NRAND(_Eng, _Ty);
+				while ((_Vx = _NRAND(_Eng, _Ty)) == 0)
+					;
+				if (_Ux < _Par0._Px)
+					{	// small _Ux
+					_Xx = pow(_Vx, _Ty(1) / _Par0._Alpha);
+					_Qx = exp(-_Xx);
+					}
+				else
+					{	// large _Ux
+					_Xx = 1 - log(_Vx);
+					_Qx = pow(_Xx, _Par0._Alpha - 1);
+					}
+				if (_NRAND(_Eng, _Ty) < _Qx)
+					return (_Par0._Beta * _Xx);
+				}
+			}
+		else if (_Par0._Alpha == 1)
+			return (_Par0._Beta * _Par0._Exp(_Eng));
+		else if ((_Count = (int)_Par0._Alpha) == _Par0._Alpha
+			&& _Count < 20)
+			{	// _Alpha is small integer, compute directly
+			_Yx = _NRAND(_Eng, _Ty);
+			while (--_Count)
+				{	// adjust result
+				while ((_Ux = _NRAND(_Eng, _Ty)) == 0)
+					;
+				_Yx *= _Ux;
+				}
+			return (_Par0._Beta *  -log(_Yx));
+			}
+		else
+			{	// no shortcuts
+			for(; ; )
+				{	// generate and reject
+				_Yx = (_Ty)tan(_Pi * _NRAND(_Eng, _Ty));
+				_Xx = _Par0._Sqrt * _Yx + _Par0._Alpha - 1;
+				if (0 < _Xx &&
+					_NRAND(_Eng, _Ty) <= (1 + _Yx * _Yx)
+						* exp((_Par0._Alpha - 1)
+						* log(_Xx / (_Par0._Alpha - 1))
+							- _Par0._Sqrt * _Yx))
+					return (_Par0._Beta * _Xx);
+				}
+			}
+		}
+
+	param_type _Par;
+	};
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_istream<_Elem, _Traits>& operator>>(
+		std::basic_istream<_Elem, _Traits>& _Istr,
+		gamma_distribution<_Ty>& _Dist)
+	{	// read state from _Istr
+	return (_Dist._Read(_Istr));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	std::basic_ostream<_Elem, _Traits>& operator<<(
+		std::basic_ostream<_Elem, _Traits>& _Ostr,
+		const gamma_distribution<_Ty>& _Dist)
+	{	// write state to _Ostr
+	return (_Dist._Write(_Ostr));
+	}
+
+	// PREDEFINED GENERATORS
+typedef linear_congruential<unsigned long, 16807, 0, 2147483647>
+	minstd_rand0;
+typedef linear_congruential<unsigned long, 48271, 0, 2147483647>
+	minstd_rand;
+typedef mersenne_twister<unsigned long, 32, 624, 397, 31, 0x9908b0df,
+	11, 7, 0x9d2c5680, 15, 0xefc60000, 18> mt19937;
+typedef subtract_with_carry<unsigned long, 1 << 24, 10, 24> _Ranbase;
+typedef discard_block<_Ranbase, 223, 24> ranlux3;
+typedef discard_block<_Ranbase, 389, 24> ranlux4;
+typedef subtract_with_carry_01<float, 24, 10, 24> ranlux_base_01;
+typedef subtract_with_carry_01<double, 48, 5, 12> ranlux64_base_01;
+typedef discard_block<ranlux_base_01, 223, 24> ranlux3_01;
+typedef discard_block<ranlux_base_01, 389, 24> ranlux4_01;
+
+	// CLASS random_device
+_CRTIMP2_PURE unsigned int __CLRCALL_PURE_OR_CDECL _Random_device();
+
+class random_device
+	{	// class to generate random numbers (from hardware where available)
+public:
+	typedef unsigned int result_type;
+
+	explicit random_device(const std::string& = "")
+		{	// construct
+		(*this)();	// force early failure if bad engine
+		}
+
+	result_type (min)() const
+		{	// return minimum possible generated value
+		return (0);
+		}
+
+	result_type (max)() const
+		{	// return maximum possible generated value
+		return ((result_type)-1);
+		}
+
+	double entropy()
+		{	// return entropy of random number source
+		return (32.0);
+		}
+
+	result_type operator()()
+		{	// return next value
+		return (_Random_device());
+		}
+
+private:
+	random_device(const random_device&);
+	random_device& operator=(const random_device&);
+	};
+
+	}	// namespace tr1
+
+_STD_END
+ #pragma warning(default: 4127 4244 4521 6294)
+ #pragma warning(pop)
+ #pragma pack(pop)
+
+#endif /* RC_INVOKED */
+#endif /* _RANDOM_ */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

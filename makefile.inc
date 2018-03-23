@@ -7,8 +7,6 @@
 ###############################################################################
 
 PREOBJDIR = $(CPUDIR)\$(BLD_MODEL)_lib
-PURE_PREOBJDIR = $(PREOBJDIR)\$(PURE_OBJ_DIR)
-CLR_PREOBJDIR = $(PREOBJDIR)\$(CLR_OBJ_DIR)
 
 # These are the prebuilt objects which are static link components in the
 # MSVCRXX[D].DLL implib
@@ -34,50 +32,6 @@ DLL_STAT_PREBLD = \
         $(OBJDIR)\tncleanup.obj \
 !endif
         $(OBJDIR)\ehvecdtr.obj
-
-# !if "$(BLD_SYSCRT)" != "1"
-
-DLL_STAT_PURE = \
-        $(PURE_OBJDIR)\mehvccctr.obj \
-        $(PURE_OBJDIR)\mehvcccvb.obj \
-        $(PURE_OBJDIR)\mehvecctr.obj \
-        $(PURE_OBJDIR)\mehveccvb.obj \
-        $(PURE_OBJDIR)\mehvecdtr.obj \
-        $(PURE_OBJDIR)\xtxtmode.obj \
-        $(PURE_OBJDIR)\xthdloc.obj \
-        $(PURE_OBJDIR)\xncommod.obj \
-        $(PURE_OBJDIR)\_newmode.obj \
-!if "$(TARGET_CPU)"=="AMD64"
-        $(PURE_OBJDIR)\dllsupp.obj \
-!elseif "$(TARGET_CPU)"=="IA64"
-        $(PURE_OBJDIR)\dllsupp.obj \
-        $(PURE_OBJDIR)\divhelp.obj \
-!endif
-        $(PURE_OBJDIR)\rtti.obj \
-
-
-DLL_STAT_CLR = \
-        $(CLR_OBJDIR)\mehvccctr.obj \
-        $(CLR_OBJDIR)\mehvcccvb.obj \
-        $(CLR_OBJDIR)\mehvecctr.obj \
-        $(CLR_OBJDIR)\mehveccvb.obj \
-        $(CLR_OBJDIR)\mehvecdtr.obj \
-        $(CLR_OBJDIR)\xtxtmode.obj \
-        $(CLR_OBJDIR)\xthdloc.obj \
-        $(CLR_OBJDIR)\xncommod.obj \
-        $(CLR_OBJDIR)\_newmode.obj \
-        $(CLR_OBJDIR)\tlssup.obj \
-
-PT_CLR_OBJECTS = \
-        $(CLR_OBJDIR)\ptrust.obj
-
-PT_PURE_OBJECTS = \
-        $(PURE_OBJDIR)\ptrust.obj
-
-CLR_SAFE_OBJECTS = \
-        $(CLR_SAFE_OBJDIR)\generics.obj
-
-# !endif
 
 # Here is the target for building LIBC{,D} / LIBCMT{,D} / MSVCRT{,D}.LIB
 
@@ -117,22 +71,6 @@ all: \
 !if "$(BLD_DLL)"=="1"
         $(DLL_STAT_PREBLD)
 !endif
-
-
-# Here is the target for building LIBCP{,D} / LIBCPMT{,D} / MSVCPRT{,D}.LIB
-
-MIXED_SRC=mix_
-
-_mix_ : \
-    $(OBJDIR)\$(MIXED_SRC).lib
-
-_pure_ : \
-    $(OBJDIR)\pure.lib \
-    $(OBJDIR)\clr.lib \
-    $(DLL_STAT_CLR) \
-    $(DLL_STAT_PURE) \
-    $(PT_CLR_OBJECTS) \
-    $(PT_PURE_OBJECTS)
     
 
 STDCPP_SRC = stdcpp
@@ -237,11 +175,6 @@ DLLSTUFF_OBJECTS = \
 !if "$(TARGET_CPU)"=="IA64"
         $(OBJDIR)\dllsupp.obj  \
 !endif
-
-DLLSTUFF_OBJECTS_PURE = \
-        $(OBJDIR)\pure_xtxtmode.obj \
-        $(OBJDIR)\pure_xthdloc.obj \
-        $(OBJDIR)\pure_xncommod.obj
 
 DOS_OBJECTS = \
         $(OBJDIR)\access.obj   \
@@ -409,18 +342,6 @@ LINKOPTS_OBJECTS = \
         $(OBJDIR)\threadlocale.obj \
         $(OBJDIR)\thrownew.obj \
         $(OBJDIR)\wsetargv.obj \
-
-PLINKOPTS_OBJECTS = \
-        $(PURE_OBJDIR)\pbinmode.obj  \
-        $(PURE_OBJDIR)\pcommode.obj  \
-        $(PURE_OBJDIR)\pinvalidcontinue.obj \
-        $(PURE_OBJDIR)\pnewmode.obj  \
-        $(PURE_OBJDIR)\pnoarg.obj    \
-        $(PURE_OBJDIR)\pnoenv.obj    \
-        $(PURE_OBJDIR)\pnothrownew.obj \
-        $(PURE_OBJDIR)\psetargv.obj  \
-        $(PURE_OBJDIR)\pthreadlocale.obj \
-        $(PURE_OBJDIR)\pwsetargv.obj
 
 LOWIO_OBJECTS = \
         $(OBJDIR)\chsize.obj   \
@@ -753,115 +674,6 @@ STARTUP_OBJECTS = \
         $(OBJDIR)\fp8.obj      \
 !endif
 
-
-MIXED_OBJECTS = \
-        $(OBJDIR)\exedefad.obj      \
-        $(CLR_OBJDIR)\mmatherr.obj  \
-!if "$(BLD_DBG)"=="1"
-        $(CLR_OBJDIR)\mdbghook.obj  \
-        $(CLR_OBJDIR)\mdbgheap.obj  \
-!endif
-        $(CLR_OBJDIR)\mhandler.obj  \
-!if "$(TARGET_CPU)"=="IA64"
-        $(OBJDIR)\memcpy.obj \
-        $(OBJDIR)\memcpy_s.obj \
-        $(OBJDIR)\memmove.obj \
-        $(OBJDIR)\memmove_s.obj \
-        $(OBJDIR)\memset.obj \
-!endif
-        $(CLR_OBJDIR)\muser.obj  \
-        $(CLR_OBJDIR)\mfpieeeflt.obj  \
-        $(CLR_OBJDIR)\mstdexpt.obj \
-        $(CLR_OBJDIR)\mstartup.obj \
-        $(CLR_OBJDIR)\thread.obj \
-        $(CLR_OBJDIR)\threadex.obj \
-#	STDCPP objects for support of STL and SCP in /clr:pure
-        $(CLR_OBJDIR)\badfunction.obj \
-        $(CLR_OBJDIR)\badweakptr.obj \
-        $(CLR_OBJDIR)\multprec.obj \
-        $(CLR_OBJDIR)\regex.obj \
-        $(CLR_OBJDIR)\xinvalid.obj \
-        $(CLR_OBJDIR)\xlgamma.obj \
-        $(CLR_OBJDIR)\xoutrange.obj \
-        $(CLR_OBJDIR)\xrngabort.obj \
-        $(CLR_OBJDIR)\xrngdev.obj \
-        $(CLR_OBJDIR)\iomanip.obj \
-        $(CLR_OBJDIR)\ios.obj \
-        $(CLR_OBJDIR)\iostream.obj \
-        $(CLR_OBJDIR)\wiostrea.obj \
-        $(CLR_OBJDIR)\iosptrs.obj \
-        $(CLR_OBJDIR)\ushiostr.obj \
-        $(CLR_OBJDIR)\cerr.obj \
-        $(CLR_OBJDIR)\cin.obj \
-        $(CLR_OBJDIR)\clog.obj \
-        $(CLR_OBJDIR)\cout.obj \
-        $(CLR_OBJDIR)\ushcerr.obj \
-        $(CLR_OBJDIR)\ushcin.obj \
-        $(CLR_OBJDIR)\ushclog.obj \
-        $(CLR_OBJDIR)\ushcout.obj \
-        $(CLR_OBJDIR)\wcerr.obj \
-        $(CLR_OBJDIR)\wcin.obj \
-        $(CLR_OBJDIR)\wclog.obj \
-        $(CLR_OBJDIR)\wcout.obj \
-        $(CLR_OBJDIR)\locale.obj \
-        $(CLR_OBJDIR)\locale0.obj \
-        $(CLR_OBJDIR)\wlocale.obj \
-        $(CLR_OBJDIR)\xdateord.obj \
-        $(CLR_OBJDIR)\xgetwctype.obj \
-        $(CLR_OBJDIR)\xmbtowc.obj \
-        $(CLR_OBJDIR)\xtowlower.obj \
-        $(CLR_OBJDIR)\xtowupper.obj \
-        $(CLR_OBJDIR)\xstrcoll.obj \
-        $(CLR_OBJDIR)\xstrxfrm.obj \
-        $(CLR_OBJDIR)\xwcscoll.obj \
-        $(CLR_OBJDIR)\xwcsxfrm.obj \
-        $(CLR_OBJDIR)\xwctomb.obj \
-        $(CLR_OBJDIR)\xmutex.obj \
-        $(CLR_OBJDIR)\xlock.obj \
-        $(CLR_OBJDIR)\xmtx.obj \
-        $(CLR_OBJDIR)\xcosh.obj \
-        $(CLR_OBJDIR)\xdnorm.obj \
-        $(CLR_OBJDIR)\xdscale.obj \
-        $(CLR_OBJDIR)\xdtest.obj \
-        $(CLR_OBJDIR)\xexp.obj \
-        $(CLR_OBJDIR)\xsinh.obj \
-        $(CLR_OBJDIR)\xpoly.obj \
-        $(CLR_OBJDIR)\xvalues.obj \
-        $(CLR_OBJDIR)\xfcosh.obj \
-        $(CLR_OBJDIR)\xfdnorm.obj \
-        $(CLR_OBJDIR)\xfdscale.obj \
-        $(CLR_OBJDIR)\xfdtest.obj \
-        $(CLR_OBJDIR)\xfexp.obj \
-        $(CLR_OBJDIR)\xfsinh.obj \
-        $(CLR_OBJDIR)\xfvalues.obj \
-        $(CLR_OBJDIR)\xlcosh.obj \
-        $(CLR_OBJDIR)\xldscale.obj \
-        $(CLR_OBJDIR)\xldtest.obj \
-        $(CLR_OBJDIR)\xlexp.obj \
-        $(CLR_OBJDIR)\xlsinh.obj \
-        $(CLR_OBJDIR)\xlpoly.obj \
-        $(CLR_OBJDIR)\xlvalues.obj \
-        $(CLR_OBJDIR)\xferaise.obj \
-        $(CLR_OBJDIR)\fiopen.obj \
-        $(CLR_OBJDIR)\string.obj \
-!if "$(BLD_DBG)"=="1"
-        $(CLR_OBJDIR)\xdebug.obj \
-!endif
-        $(CLR_OBJDIR)\stdthrow.obj \
-        $(CLR_OBJDIR)\nomemory.obj \
-        $(CLR_OBJDIR)\uncaught.obj \
-        $(CLR_OBJDIR)\_tolower.obj \
-        $(CLR_OBJDIR)\_toupper.obj \
-        $(CLR_OBJDIR)\wctrans.obj \
-        $(CLR_OBJDIR)\wctype.obj \
-        $(CLR_OBJDIR)\xlocale.obj  \
-        $(CLR_OBJDIR)\xstod.obj \
-        $(CLR_OBJDIR)\xstof.obj \
-        $(CLR_OBJDIR)\xstol.obj \
-        $(CLR_OBJDIR)\xstoll.obj \
-        $(CLR_OBJDIR)\xstold.obj \
-        $(CLR_OBJDIR)\xstoul.obj \
-        $(CLR_OBJDIR)\xstoull.obj
 
 STDCPP_OBJECTS = \
         $(OBJDIR)\badfunction.obj \
@@ -1256,149 +1068,6 @@ TIME_OBJECTS = \
         $(OBJDIR)\wutime.obj   \
         $(OBJDIR)\wutime64.obj
 
-CLR_OBJECTS = \
-        $(CLR_OBJDIR)\delaopnt.obj \
-        $(CLR_OBJDIR)\delopnt.obj \
-        $(CLR_OBJDIR)\dll_argv.obj \
-        $(CLR_OBJDIR)\dllargv.obj \
-        $(CLR_OBJDIR)\mehvccctr.obj \
-        $(CLR_OBJDIR)\mehvcccvb.obj \
-        $(CLR_OBJDIR)\mehvecctr.obj \
-        $(CLR_OBJDIR)\mehveccvb.obj \
-        $(CLR_OBJDIR)\mehvecdtr.obj \
-        $(CLR_OBJDIR)\helperfunc.obj \
-        $(CLR_OBJDIR)\managdeh.obj \
-        $(CLR_OBJDIR)\ManagedMain.obj \
-        $(CLR_OBJDIR)\mcrtexe.obj \
-        $(CLR_OBJDIR)\mcrtexew.obj \
-        $(CLR_OBJDIR)\merr.obj \
-        $(CLR_OBJDIR)\mbsearch.obj \
-        $(CLR_OBJDIR)\mqsort.obj  \
-        $(CLR_OBJDIR)\mlfind.obj \
-        $(CLR_OBJDIR)\mlsearch.obj \
-        $(CLR_OBJDIR)\msilexit.obj \
-        $(CLR_OBJDIR)\mstartup.obj \
-        $(CLR_OBJDIR)\mwcrtexe.obj \
-        $(CLR_OBJDIR)\mwcrtexew.obj \
-        $(CLR_OBJDIR)\newaopnt.obj \
-        $(CLR_OBJDIR)\newopnt.obj \
-        $(CLR_OBJDIR)\nothrow0.obj \
-        $(CLR_OBJDIR)\puremsilcode.obj \
-        $(CLR_OBJDIR)\wdll_av.obj \
-        $(CLR_OBJDIR)\wdllargv.obj \
-        $(CLR_OBJDIR)\wildcard.obj \
-!if "$(TARGET_CPU)"=="AMD64"
-        $(CLR_OBJDIR)\dllsupp.obj \
-!elseif "$(TARGET_CPU)"=="IA64"
-        $(CLR_OBJDIR)\dllsupp.obj \
-        $(CLR_OBJDIR)\divhelp.obj \
-!endif
-
-PURE_OBJECTS = \
-        $(PURE_OBJDIR)\badfunction.obj \
-        $(PURE_OBJDIR)\badweakptr.obj \
-        $(PURE_OBJDIR)\multprec.obj \
-        $(PURE_OBJDIR)\regex.obj \
-        $(PURE_OBJDIR)\xinvalid.obj \
-        $(PURE_OBJDIR)\xlgamma.obj \
-        $(PURE_OBJDIR)\xoutrange.obj \
-        $(PURE_OBJDIR)\xrngabort.obj \
-        $(PURE_OBJDIR)\xrngdev.obj \
-!if "$(BLD_DBG)"=="1"
-        $(PURE_OBJDIR)\dbgdel.obj \
-!else
-        $(PURE_OBJDIR)\delete.obj \
-!endif
-        $(PURE_OBJDIR)\delete2.obj \
-        $(PURE_OBJDIR)\delaopnt.obj \
-        $(PURE_OBJDIR)\delopnt.obj \
-        $(PURE_OBJDIR)\dll_argv.obj \
-        $(PURE_OBJDIR)\dllargv.obj \
-        $(PURE_OBJDIR)\locale_implib_pure.obj \
-        $(PURE_OBJDIR)\mehvccctr.obj \
-        $(PURE_OBJDIR)\mehvcccvb.obj \
-        $(PURE_OBJDIR)\mehvecctr.obj \
-        $(PURE_OBJDIR)\mehveccvb.obj \
-        $(PURE_OBJDIR)\mehvecdtr.obj \
-        $(PURE_OBJDIR)\helperfunc.obj \
-        $(PURE_OBJDIR)\managdeh.obj \
-        $(PURE_OBJDIR)\ManagedMain.obj \
-        $(PURE_OBJDIR)\mcrtexe.obj \
-        $(PURE_OBJDIR)\mcrtexew.obj \
-        $(PURE_OBJDIR)\merr.obj \
-        $(PURE_OBJDIR)\mbsearch.obj \
-        $(PURE_OBJDIR)\mqsort.obj  \
-        $(PURE_OBJDIR)\mlfind.obj \
-        $(PURE_OBJDIR)\mlsearch.obj \
-        $(PURE_OBJDIR)\mpiostream.obj \
-        $(PURE_OBJDIR)\mpushiostream.obj \
-        $(PURE_OBJDIR)\msilexit.obj \
-        $(PURE_OBJDIR)\mstartup.obj \
-        $(PURE_OBJDIR)\mwcrtexe.obj \
-        $(PURE_OBJDIR)\mwcrtexew.obj \
-        $(PURE_OBJDIR)\new.obj \
-        $(PURE_OBJDIR)\new2.obj \
-        $(PURE_OBJDIR)\newaopnt.obj \
-        $(PURE_OBJDIR)\newopnt.obj \
-        $(PURE_OBJDIR)\nothrow0.obj \
-        $(PURE_OBJDIR)\puremsilcode.obj \
-        $(PURE_OBJDIR)\rtti.obj \
-        $(PURE_OBJDIR)\ti_inst.obj \
-        $(PURE_OBJDIR)\wdll_av.obj \
-        $(PURE_OBJDIR)\wdllargv.obj \
-        $(PURE_OBJDIR)\wildcard.obj \
-        $(PURE_OBJDIR)\xvalues.obj  \
-        $(PURE_OBJDIR)\xfvalues.obj \
-        $(PURE_OBJDIR)\xlvalues.obj \
-        $(PURE_OBJDIR)\xmutex.obj \
-        $(PURE_OBJDIR)\xmtx.obj \
-        $(PURE_OBJDIR)\xcosh.obj \
-        $(PURE_OBJDIR)\xferaise.obj \
-        $(PURE_OBJDIR)\xdtest.obj \
-        $(PURE_OBJDIR)\xexp.obj \
-        $(PURE_OBJDIR)\xsinh.obj \
-        $(PURE_OBJDIR)\xfcosh.obj \
-        $(PURE_OBJDIR)\xfdtest.obj \
-        $(PURE_OBJDIR)\xfexp.obj \
-        $(PURE_OBJDIR)\xfsinh.obj \
-        $(PURE_OBJDIR)\xdateord.obj \
-        $(PURE_OBJDIR)\xdnorm.obj \
-        $(PURE_OBJDIR)\xdscale.obj \
-        $(PURE_OBJDIR)\xpoly.obj \
-        $(PURE_OBJDIR)\xfdnorm.obj \
-        $(PURE_OBJDIR)\xfdscale.obj \
-        $(PURE_OBJDIR)\xlcosh.obj \
-        $(PURE_OBJDIR)\xldnorm.obj \
-        $(PURE_OBJDIR)\xldscale.obj \
-        $(PURE_OBJDIR)\xldtest.obj \
-        $(PURE_OBJDIR)\xlexp.obj \
-        $(PURE_OBJDIR)\xlsinh.obj \
-        $(PURE_OBJDIR)\xlpoly.obj \
-        $(PURE_OBJDIR)\fiopen.obj \
-        $(PURE_OBJDIR)\stdthrow.obj \
-        $(PURE_OBJDIR)\xstrcoll.obj \
-        $(PURE_OBJDIR)\_tolower.obj \
-        $(PURE_OBJDIR)\xgetwctype.obj \
-        $(PURE_OBJDIR)\xstod.obj \
-        $(PURE_OBJDIR)\xstof.obj \
-        $(PURE_OBJDIR)\xstold.obj \
-        $(PURE_OBJDIR)\xstoll.obj \
-        $(PURE_OBJDIR)\xstoul.obj \
-        $(PURE_OBJDIR)\xstoull.obj \
-        $(PURE_OBJDIR)\xstol.obj \
-        $(PURE_OBJDIR)\xstrxfrm.obj \
-        $(PURE_OBJDIR)\_toupper.obj \
-        $(PURE_OBJDIR)\xtowlower.obj \
-        $(PURE_OBJDIR)\xtowupper.obj \
-        $(PURE_OBJDIR)\xwcscoll.obj \
-        $(PURE_OBJDIR)\xwcsxfrm.obj \
-!if "$(TARGET_CPU)"=="AMD64"
-        $(PURE_OBJDIR)\dllsupp.obj \
-!elseif "$(TARGET_CPU)"=="IA64"
-        $(PURE_OBJDIR)\dllsupp.obj \
-        $(PURE_OBJDIR)\divhelp.obj \
-!endif
-
 $(OBJDIR)\convert.lib: $(CONVERT_OBJECTS)
     $(LIB) -out:$@ @<<$*.rsp
 $(CONVERT_OBJECTS: =^
@@ -1492,12 +1161,6 @@ $(STARTUP_OBJECTS: =^
 <<keep
 
 
-$(OBJDIR)\$(MIXED_SRC).lib: $(MIXED_OBJECTS)
-    $(LIB) -out:$@ @<<$*.rsp
-$(MIXED_OBJECTS: =^
-)
-<<keep
-
 $(OBJDIR)\$(STDCPP_SRC).lib: $(STDCPP_OBJECTS)
     $(LIB) -out:$@ @<<$*.rsp
 $(STDCPP_OBJECTS: =^
@@ -1525,17 +1188,6 @@ $(TIME_OBJECTS: =^
 )
 <<keep
 
-$(OBJDIR)\clr.lib: $(CLR_OBJECTS)
-    $(LIB) -out:$@ @<<$*.rsp
-$(CLR_OBJECTS: =^
-)
-<<keep
-
-$(OBJDIR)\pure.lib: $(PURE_OBJECTS)
-    $(LIB) -out:$@ @<<$*.rsp
-$(PURE_OBJECTS: =^
-)
-<<keep
 
 $(OBJDIR)\eh.lib: $(PREOBJDIR)\eh.lib
         copy $(PREOBJDIR)\eh.lib $@
@@ -1577,60 +1229,6 @@ $(OBJDIR)\ehvecdtr.obj: $(PREOBJDIR)\ehvecdtr.obj
 
 # !if "$(BLD_SYSCRT)" != "1"
 
-$(CLR_OBJDIR)\mehvccctr.obj :: $(CLR_PREOBJDIR)\mehvccctr.obj
-	copy $(CLR_PREOBJDIR)\mehvccctr.obj $@
-
-$(CLR_OBJDIR)\mehvcccvb.obj :: $(CLR_PREOBJDIR)\mehvcccvb.obj
-	copy $(CLR_PREOBJDIR)\mehvcccvb.obj $@
-
-$(CLR_OBJDIR)\mehvecctr.obj :: $(CLR_PREOBJDIR)\mehvecctr.obj
-	copy $(CLR_PREOBJDIR)\mehvecctr.obj $@
-
-$(CLR_OBJDIR)\mehveccvb.obj :: $(CLR_PREOBJDIR)\mehveccvb.obj
-	copy $(CLR_PREOBJDIR)\mehveccvb.obj $@
-
-$(CLR_OBJDIR)\mehvecdtr.obj :: $(CLR_PREOBJDIR)\mehvecdtr.obj
-	copy $(CLR_PREOBJDIR)\mehvecdtr.obj $@
-
-$(CLR_OBJDIR)\managdeh.obj :: $(CLR_PREOBJDIR)\managdeh.obj
-	copy $(CLR_PREOBJDIR)\managdeh.obj $@
-
-$(CLR_OBJDIR)\mstdexpt.obj :: $(CLR_PREOBJDIR)\mstdexpt.obj
-	copy $(CLR_PREOBJDIR)\mstdexpt.obj $@
-
-$(CLR_OBJDIR)\mtypinfo.obj :: $(CLR_PREOBJDIR)\mtypinfo.obj
-	copy $(CLR_PREOBJDIR)\mtypinfo.obj $@
-
-$(CLR_OBJDIR)\atlssup.obj :: $(CLR_PREOBJDIR)\atlssup.obj
-	copy $(CLR_PREOBJDIR)\atlssup.obj $@
-
-$(PURE_OBJDIR)\mehvccctr.obj :: $(PURE_PREOBJDIR)\mehvccctr.obj
-	copy $(PURE_PREOBJDIR)\mehvccctr.obj $@
-
-$(PURE_OBJDIR)\mehvcccvb.obj :: $(PURE_PREOBJDIR)\mehvcccvb.obj
-	copy $(PURE_PREOBJDIR)\mehvcccvb.obj $@
-
-$(PURE_OBJDIR)\mehvecctr.obj :: $(PURE_PREOBJDIR)\mehvecctr.obj
-	copy $(PURE_PREOBJDIR)\mehvecctr.obj $@
-
-$(PURE_OBJDIR)\mehveccvb.obj :: $(PURE_PREOBJDIR)\mehveccvb.obj
-	copy $(PURE_PREOBJDIR)\mehveccvb.obj $@
-
-$(PURE_OBJDIR)\mehvecdtr.obj :: $(PURE_PREOBJDIR)\mehvecdtr.obj
-	copy $(PURE_PREOBJDIR)\mehvecdtr.obj $@
-
-$(PURE_OBJDIR)\managdeh.obj :: $(PURE_PREOBJDIR)\managdeh.obj
-	copy $(PURE_PREOBJDIR)\managdeh.obj $@
-
-$(PURE_OBJDIR)\mtypinfo.obj :: $(PURE_PREOBJDIR)\mtypinfo.obj
-	copy $(PURE_PREOBJDIR)\mtypinfo.obj $@
-
-$(PURE_OBJDIR)\atlssup.obj :: $(PURE_PREOBJDIR)\atlssup.obj
-	copy $(PURE_PREOBJDIR)\atlssup.obj $@
-
-$(PURE_OBJDIR)\rtti.obj :: $(PURE_PREOBJDIR)\rtti.obj
-	copy $(PURE_PREOBJDIR)\rtti.obj $@
-
 $(OBJDIR)\tncleanup.obj: $(PREOBJDIR)\tncleanup.obj
         copy $(PREOBJDIR)\tncleanup.obj $@
 
@@ -1654,40 +1252,6 @@ $(OBJDIR)\calldtor.obj: $(PREOBJDIR)\calldtor.obj
 
 $(OBJDIR)\setjmp.obj: $(PREOBJDIR)\setjmp.obj
         copy $(PREOBJDIR)\setjmp.obj $@
-
-$(PURE_OBJDIR)\pbinmode.obj : $(PURE_OBJDIR)\binmode.obj 
-	copy $** $@
-
-$(PURE_OBJDIR)\pcommode.obj : $(PURE_OBJDIR)\commode.obj 
-	copy $** $@
-
-$(PURE_OBJDIR)\pinvalidcontinue.obj : $(PURE_OBJDIR)\invalidcontinue.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\pnewmode.obj : $(PURE_OBJDIR)\newmode.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\pnoarg.obj : $(PURE_OBJDIR)\noarg.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\pnoenv.obj : $(PURE_OBJDIR)\noenv.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\pnothrownew.obj : $(PURE_OBJDIR)\nothrownew.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\psetargv.obj : $(PURE_OBJDIR)\setargv.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\pthreadlocale.obj : $(PURE_OBJDIR)\threadlocale.obj
-	copy $** $@
-
-$(PURE_OBJDIR)\puthrownew.obj	: $(PURE_OBJDIR)\thrownew.obj	
-	copy $** $@
-
-$(PURE_OBJDIR)\pwsetargv.obj : $(PURE_OBJDIR)\wsetargv.obj
-	copy $** $@
-
 
 !if "$(TARGET_CPU)" == "i386"
 

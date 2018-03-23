@@ -1,0 +1,902 @@
+// type_traits TR1 header
+#pragma once
+#ifndef _TYPE_TRAITS_
+#define _TYPE_TRAITS_
+#ifndef RC_INVOKED
+#include <limits>
+#include <xtr1common>
+
+	// COMPILER SUPORT MACROS
+
+  #define _IS_BASE_OF(_Base, _Der)	\
+	: _Cat_base<__is_base_of(_Base, _Der)>
+  #define _IS_CONVERTIBLE(_From, _To)	\
+	: _Cat_base<is_void<_From>::value && is_void<_To>::value \
+		|| __is_convertible_to(_From, _To)>
+  #define _IS_UNION(_Ty)	: _Cat_base<__is_union(_Ty)>
+  #define _IS_CLASS(_Ty)	: _Cat_base<__is_class(_Ty)>
+  #define _IS_ENUM(_Ty)	: _Cat_base<__is_enum(_Ty)>
+  #define _IS_POD(_Ty)	: _Cat_base<is_void<_Ty>::value \
+	|| is_scalar<_Ty>::value \
+	|| __has_trivial_constructor(_Ty) && __is_pod(_Ty)>
+  #define _IS_EMPTY(_Ty)	: _Cat_base<__is_empty(_Ty)>
+  #define _IS_POLYMORPHIC(_Ty)	: _Cat_base<__is_polymorphic(_Ty)>
+  #define _IS_ABSTRACT(_Ty)	: _Cat_base<__is_abstract(_Ty)>
+  #define _HAS_TRIVIAL_CONSTRUCTOR(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_trivial_constructor(_Ty)>
+  #define _HAS_TRIVIAL_COPY(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_trivial_copy(_Ty)>
+  #define _HAS_TRIVIAL_ASSIGN(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_trivial_assign(_Ty)>
+  #define _HAS_TRIVIAL_DESTRUCTOR(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_trivial_destructor(_Ty)>
+  #define _HAS_NOTHROW_CONSTRUCTOR(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_nothrow_constructor(_Ty)>
+  #define _HAS_NOTHROW_COPY(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_nothrow_copy(_Ty)>
+  #define _HAS_NOTHROW_ASSIGN(_Ty)	\
+	: _Cat_base<is_pod<_Ty>::value || __has_nothrow_assign(_Ty)>
+  #define _HAS_VIRTUAL_DESTRUCTOR(_Ty)	\
+	: _Cat_base<__has_virtual_destructor(_Ty)>
+
+_STD_BEGIN
+	namespace tr1 {	// TR1 additions
+
+	// TEMPLATE CLASS _Ptr_traits
+template<class _Ty>
+	struct _Ptr_traits
+	{	// basic definition
+	};
+
+template<class _Ty>
+	struct _Ptr_traits<_Ty*>
+	{	// pointer properties
+	static const bool _Is_const = false;
+	static const bool _Is_volatile = false;
+	};
+
+template<class _Ty>
+	struct _Ptr_traits<const _Ty*>
+	{	// pointer to const properties
+	static const bool _Is_const = true;
+	static const bool _Is_volatile = false;
+	};
+
+template<class _Ty>
+	struct _Ptr_traits<volatile _Ty*>
+	{	// pointer to volatile properties
+	static const bool _Is_const = false;
+	static const bool _Is_volatile = true;
+	};
+
+template<class _Ty>
+	struct _Ptr_traits<const volatile _Ty*>
+	{	// pointer to const volatile properties
+	static const bool _Is_const = true;
+	static const bool _Is_volatile = true;
+	};
+
+template<class _Ty>
+	struct _Is_funptr
+		: false_type
+	{	// base class for function pointer predicates
+	};
+
+template<class _Ty>
+	struct _Is_memfunptr
+		: false_type
+	{	// base class for member function pointer predicates
+	};
+
+#define _INCL_FILE "xxtype_traits"
+#include "xfwrap"
+
+	// Type modifiers
+	// TEMPLATE CLASS remove_const
+template<class _Ty>
+	struct remove_const
+	{	// remove top level const qualifier
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_const<const _Ty>
+	{	// remove top level const qualifier
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_const<const _Ty[]>
+	{	// remove top level const qualifier
+	typedef _Ty type[];
+	};
+
+template<class _Ty, unsigned _Nx>
+	struct remove_const<const _Ty[_Nx]>
+	{	// remove top level const qualifier
+	typedef _Ty type[_Nx];
+	};
+
+	// TEMPLATE CLASS remove_volatile
+template<class _Ty>
+	struct remove_volatile
+	{	// remove top level volatile qualifier
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_volatile<volatile _Ty>
+	{	// remove top level volatile qualifier
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_volatile<volatile _Ty[]>
+	{	// remove top level volatile qualifier
+	typedef _Ty type[];
+	};
+
+template<class _Ty, unsigned _Nx>
+	struct remove_volatile<volatile _Ty[_Nx]>
+	{	// remove top level volatile qualifier
+	typedef _Ty type[_Nx];
+	};
+
+	// TEMPLATE CLASS remove_cv
+template<class _Ty>
+	struct remove_cv
+	{	// remove top level const and volatile qualifiers
+	typedef typename remove_const<typename remove_volatile<_Ty>::type>::type
+		type;
+	};
+
+	// TEMPLATE CLASS add_const
+template<class _Ty>
+	struct add_const
+	{	// add top level const qualifier
+	typedef const _Ty type;
+	};
+
+template<class _Ty>
+	struct add_const<_Ty&>
+	{	// add top level const qualifier
+	typedef _Ty& type;
+	};
+
+	// TEMPLATE CLASS add_volatile
+template<class _Ty>
+	struct add_volatile
+	{	// add top level volatile qualifier
+	typedef volatile _Ty type;
+	};
+
+template<class _Ty>
+	struct add_volatile<_Ty&>
+	{	// add top level volatile qualifier
+	typedef _Ty& type;
+	};
+
+	// TEMPLATE CLASS add_cv
+template<class _Ty>
+	struct add_cv
+	{	// add top level const and volatile qualifiers
+	typedef typename add_const<typename add_volatile<_Ty>::type>::type type;
+	};
+
+	// TEMPLATE CLASS remove_reference
+template<class _Ty>
+	struct remove_reference
+	: _Remove_reference<_Ty>
+	{	// remove reference
+	typedef typename _Remove_reference<_Ty>::_Type type;
+	};
+
+	// TEMPLATE CLASS add_reference
+template<class _Ty>
+	struct add_reference
+	{	// add reference
+	typedef typename _Remove_reference<_Ty>::_Type& type;
+	};
+
+template<>
+	struct add_reference<void>
+	{	// add reference
+	typedef void type;
+	};
+
+template<>
+	struct add_reference<const void>
+	{	// add reference
+	typedef const void type;
+	};
+
+template<>
+	struct add_reference<volatile void>
+	{	// add reference
+	typedef volatile void type;
+	};
+
+template<>
+	struct add_reference<const volatile void>
+	{	// add reference
+	typedef const volatile void type;
+	};
+
+	// TEMPLATE CLASS remove_extent
+template<class _Ty>
+	struct remove_extent
+	{	// remove array extent
+	typedef _Ty type;
+	};
+
+template<class _Ty, unsigned _Ix>
+	struct remove_extent<_Ty[_Ix]>
+	{	// remove array extent
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_extent<_Ty[]>
+	{	// remove array extent
+	typedef _Ty type;
+	};
+
+	// TEMPLATE CLASS remove_all_extents
+template<class _Ty>
+	struct remove_all_extents
+	{	// remove all array extents
+	typedef _Ty type;
+	};
+
+template<class _Ty, unsigned _Ix>
+	struct remove_all_extents<_Ty[_Ix]>
+	{	// remove all array extents
+	typedef typename remove_all_extents<_Ty>::type type;
+	};
+
+template<class _Ty>
+	struct remove_all_extents<_Ty[]>
+	{	// remove all array extents
+	typedef typename remove_all_extents<_Ty>::type type;
+	};
+
+	// TEMPLATE CLASS remove_pointer
+template<class _Ty>
+	struct remove_pointer
+	{	// remove pointer
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_pointer<_Ty*>
+	{	// remove pointer
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_pointer<_Ty* const>
+	{	// remove pointer
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_pointer<_Ty* volatile>
+	{	// remove pointer
+	typedef _Ty type;
+	};
+
+template<class _Ty>
+	struct remove_pointer<_Ty* const volatile>
+	{	// remove pointer
+	typedef _Ty type;
+	};
+
+	// TEMPLATE CLASS add_pointer
+template<class _Ty>
+	struct add_pointer
+	{	// add pointer
+	typedef typename remove_reference<_Ty>::type* type;
+	};
+
+	// TYPE PREDICATES
+	// TEMPLATE CLASS is_void
+template<class _Ty>
+	struct _Is_void
+	: false_type
+	{	// determine whether _Ty is void
+	};
+
+template<>
+	struct _Is_void<void>
+	: true_type
+	{	// determine whether _Ty is void
+	};
+
+template<class _Ty>
+	struct is_void
+	: _Is_void<typename remove_cv<_Ty>::type>
+	{	// determine whether _Ty is void
+	};
+
+	// TEMPLATE CLASS is_integral
+template<class _Ty>
+	struct is_integral
+	: _Is_integral<typename remove_cv<_Ty>::type>
+	{	// determine whether _Ty is integral
+	};
+
+	// TEMPLATE CLASS is_floating_point
+template<class _Ty>
+	struct is_floating_point
+	: _Is_floating_point<typename remove_cv<_Ty>::type>
+	{	// determine whether _Ty is floating point
+	};
+
+	// TEMPLATE CLASS is_array
+template<class _Ty>
+	struct is_array
+	: false_type
+	{	// determine whether _Ty is an array
+	};
+
+template<class _Ty, size_t _Nx>
+	struct is_array<_Ty[_Nx]>
+	: true_type
+	{	// determine whether _Ty is an array
+	};
+
+template<class _Ty>
+	struct is_array<_Ty[]>
+	: true_type
+	{	// determine whether _Ty is an array
+	};
+
+	// TEMPLATE CLASS is_reference
+template<class _Ty>
+	struct is_reference
+	: false_type
+	{	// determine whether _Ty is a reference
+	};
+
+template<class _Ty>
+	struct is_reference<_Ty&>
+	: true_type
+	{	// determine whether _Ty is a reference
+	};
+
+	// TEMPLATE CLASS is_member_object_pointer
+template<class _Ty>
+	struct _Is_member_object_pointer
+	: false_type
+	{	// determine whether _Ty is a pointer to member object
+	};
+
+template<class _Ty1, class _Ty2>
+	struct _Is_member_object_pointer<_Ty1 _Ty2::*>
+	: _Cat_base<!_Is_memfunptr<_Ty1 _Ty2::*>::value>
+	{	// determine whether _Ty is a pointer to member object
+	};
+
+template<class _Ty>
+	struct is_member_object_pointer
+	: _Is_member_object_pointer<typename remove_cv<_Ty>::type>
+	{	// determine whether _Ty is a pointer to member object
+	};
+
+	// TEMPLATE CLASS is_member_function_pointer
+template<class _Ty>
+	struct is_member_function_pointer
+	: _Cat_base<_Is_memfunptr<typename remove_cv<_Ty>::type>::value>
+	{	// determine whether _Ty is a pointer to member function
+	};
+
+	// TEMPLATE CLASS is_pointer
+template<class _Ty>
+	struct _Is_pointer
+	: false_type
+	{	// determine whether _Ty is a pointer
+	};
+
+template<class _Ty>
+	struct _Is_pointer<_Ty *>
+	: _Cat_base<!is_member_object_pointer<_Ty *>::value
+		&& !is_member_function_pointer<_Ty *>::value>
+	{	// determine whether _Ty is a pointer
+	};
+
+template<class _Ty>
+	struct is_pointer
+	: _Is_pointer<typename remove_cv<_Ty>::type>
+	{	// determine whether _Ty is a pointer
+	};
+
+	// TEMPLATE CLASS is_union
+template<class _Ty>
+	struct is_union _IS_UNION(_Ty)
+	{	// determine whether _Ty is a union
+	};
+
+	// TEMPLATE CLASS is_class
+template<class _Ty>
+	struct is_class _IS_CLASS(_Ty)
+	{	// determine whether _Ty is a class
+	};
+
+	// TEMPLATE CLASS is_function
+template<class _Ty>
+	struct is_function
+	: _Cat_base<_Is_funptr<typename remove_cv<_Ty>::type*>::value>
+	{	// determine whether _Ty is a function
+	};
+
+template<class _Ty>
+	struct is_function<_Ty&>
+	: false_type
+	{	// determine whether _Ty is a function
+	};
+
+	// TEMPLATE CLASS is_arithmetic
+template<class _Ty>
+	struct is_arithmetic
+	: _Cat_base<is_integral<_Ty>::value
+		|| is_floating_point<_Ty>::value>
+	{	// determine whether _Ty is an arithmetic type
+	};
+
+	// TEMPLATE CLASS is_fundamental
+template<class _Ty>
+	struct is_fundamental
+	: _Cat_base<is_arithmetic<_Ty>::value
+		|| is_void<_Ty>::value>
+	{	// determine whether _Ty is a fundamental type
+	};
+
+	// TEMPLATE CLASS is_object
+template<class _Ty>
+	struct is_object
+	: _Cat_base<!is_function<_Ty>::value
+		&& !is_reference<_Ty>::value
+		&& !is_void<_Ty>::value>
+	{	// determine whether _Ty is an object type
+	};
+
+	// TEMPLATE CLASS is_convertible
+template<class _To>
+	_Yes _Cvt_test(_To);
+
+template<class _To>
+	_No _Cvt_test(...);
+
+template<class _From, class _To, bool>
+	struct _Is_convertible
+	{	// determine whether _From is convertible to _To
+	static const bool value =
+		_IS_YES(_Cvt_test<_To>(_From()));
+	};
+
+template<class _From, class _To>
+	struct _Is_convertible<_From, _To, false>
+	{	// determine whether _From is convertible to _To
+	static const bool value = false;
+	};
+
+template<class _From, class _To>
+	struct is_convertible _IS_CONVERTIBLE(_From, _To)
+	{	// determine whether _From is convertible to _To
+	};
+
+	// TEMPLATE CLASS is_enum
+template<class _Ux>
+	_Yes _Cl_test(const volatile int _Ux::*);
+
+template<class _Ux>
+	_No _Cl_test(...);
+
+template<class _Ty>
+	struct _Is_composite
+	{	// determine whether _Ty is a class, struct, or union
+	static const bool _Value =
+		_IS_YES(_Cl_test<_Ty>(0));
+	};
+
+template<class _Ty>
+	struct _Is_enum
+	: _Cat_base<!is_arithmetic<_Ty>::value
+		&& !_Is_composite<_Ty>::_Value
+		&& is_convertible<_Ty, int>::value>
+	{	// determine whether _Ty is an enumerated type
+	};
+
+template<>
+	struct _Is_enum<void>
+	: false_type
+	{	// determine whether _Ty is an enumerated type
+	};
+
+template<class _Ty>
+	struct _Is_enum<_Ty&>
+	: false_type
+	{	// determine whether _Ty is an enumerated type
+	};
+
+template<class _Ty, size_t _Nx>
+	struct _Is_enum<_Ty[_Nx]>
+	: false_type
+	{	// determine whether _Ty is an enumerated type
+	};
+
+template<class _Ty>
+	struct is_enum _IS_ENUM(_Ty)
+	{	// determine whether _Ty is an enumerated type
+	};
+
+	// TEMPLATE CLASS is_compound
+template<class _Ty>
+	struct is_compound
+	: _Cat_base<!is_fundamental<_Ty>::value>
+	{	// determine whether _Ty is a compound type
+	};
+
+	// TEMPLATE CLASS is_member_pointer
+template<class _Ty>
+	struct is_member_pointer
+	: _Cat_base<is_member_object_pointer<_Ty>::value
+		|| is_member_function_pointer<_Ty>::value>
+	{	// determine whether _Ty is a pointer to member
+	};
+
+	// TEMPLATE CLASS is_scalar
+template<class _Ty>
+	struct is_scalar
+	: _Cat_base<is_arithmetic<_Ty>::value
+		|| is_enum<_Ty>::value
+		|| is_pointer<_Ty>::value
+		|| is_member_pointer<_Ty>::value>
+	{	// determine whether _Ty is a scalar type
+	};
+
+template<class _Ty>
+	struct is_scalar<_Ty&>
+	: false_type
+	{
+	};
+
+	// TEMPLATE CLASS is_const
+template<class _Ty>
+	struct is_const
+	: _Cat_base<_Ptr_traits<_Ty*>::_Is_const
+		&& !is_function<_Ty>::value>
+	{	// determine whether _Ty is const qualified
+	};
+
+template<class _Ty, unsigned _Nx>
+	struct is_const<_Ty[_Nx]>
+	: false_type
+	{	// determine whether _Ty is const qualified
+	};
+
+template<class _Ty, unsigned _Nx>
+	struct is_const<const _Ty[_Nx]>
+	: true_type
+	{	// determine whether _Ty is const qualified
+	};
+
+template<class _Ty>
+	struct is_const<_Ty&>
+	: false_type
+	{	// determine whether _Ty is const qualified
+	};
+
+	// TEMPLATE CLASS is_volatile
+template<class _Ty>
+	struct is_volatile
+	: _Cat_base<_Ptr_traits<_Ty*>::_Is_volatile
+		&& !is_function<_Ty>::value>
+	{	// determine whether _Ty is volatile qualified
+	};
+
+template<class _Ty>
+	struct is_volatile<_Ty&>
+	: false_type
+	{	// determine whether _Ty is volatile qualified
+	};
+
+	// TEMPLATE CLASS is_pod
+template<class _Ty>
+	struct _Is_pod _IS_POD(_Ty)
+	{	// determine whether _Ty is a POD type
+	};
+
+template<class _Ty>
+	struct is_pod
+	: _Is_pod<typename std::tr1::remove_all_extents<_Ty>::type>
+	{	// determine whether _Ty is a POD type
+	};
+
+	// TEMPLATE CLASS is_empty
+template<class _Ty>
+	struct is_empty _IS_EMPTY(_Ty)
+	{	// determine whether _Ty is an empty class
+	};
+
+	// TEMPLATE CLASS is_polymorphic
+template<class _Ty>
+	struct is_polymorphic _IS_POLYMORPHIC(_Ty)
+	{	// determine whether _Ty is a polymorphic type
+	};
+
+	// TEMPLATE CLASS is_abstract
+template<class _Ty>
+	struct is_abstract _IS_ABSTRACT(_Ty)
+	{	// determine whether _Ty is an abstract class
+	};
+
+	// TEMPLATE CLASS has_trivial_constructor
+template<class _Ty>
+	struct has_trivial_constructor _HAS_TRIVIAL_CONSTRUCTOR(_Ty)
+	{	// determine whether _Ty has a trivial constructor
+	};
+
+	// TEMPLATE CLASS has_trivial_copy
+template<class _Ty>
+	struct has_trivial_copy _HAS_TRIVIAL_COPY(_Ty)
+	{	// determine whether _Ty has a trivial copy constructor
+	};
+
+	// TEMPLATE CLASS has_trivial_assign
+template<class _Ty>
+	struct has_trivial_assign _HAS_TRIVIAL_ASSIGN(_Ty)
+	{	// determine whether _Ty has a trivial assignment operator
+	};
+
+	// TEMPLATE CLASS has_trivial_destructor
+template<class _Ty>
+	struct has_trivial_destructor _HAS_TRIVIAL_DESTRUCTOR(_Ty)
+	{	// determine whether _Ty has a trivial destructor
+	};
+
+	// TEMPLATE CLASS has_nothrow_constructor
+template<class _Ty>
+	struct has_nothrow_constructor _HAS_NOTHROW_CONSTRUCTOR(_Ty)
+	{	// determine whether _Ty has a nothrow constructor
+	};
+
+	// TEMPLATE CLASS has_nothrow_copy
+template<class _Ty>
+	struct has_nothrow_copy _HAS_NOTHROW_COPY(_Ty)
+	{	// determine whether _Ty has a nothrow copy constructor
+	};
+
+	// TEMPLATE CLASS has_nothrow_assign
+template<class _Ty>
+	struct has_nothrow_assign _HAS_NOTHROW_ASSIGN(_Ty)
+	{	// determine whether _Ty has a nothrow assignment operator
+	};
+
+	// TEMPLATE CLASS has_virtual_destructor
+template<class _Ty>
+	struct has_virtual_destructor _HAS_VIRTUAL_DESTRUCTOR(_Ty)
+	{	// determine whether _Ty has a virtaul destructor
+	};
+
+	// TEMPLATE CLASS is_signed
+template<bool _Signed>
+	struct _Is_signedX
+	: false_type
+	{	// determine whether _Ty is a signed type
+	};
+
+template<>
+	struct _Is_signedX<true>
+	: true_type
+	{	// determine whether _Ty is a signed type
+	};
+
+template<class _Ty, bool _Arith>
+	struct _Is_signed
+	: false_type
+	{	// determine whether _Ty is a signed type
+	};
+
+template<class _Ty>
+	struct _Is_signed<_Ty, true>
+	: _Is_signedX<std::numeric_limits<
+		typename remove_cv<_Ty>::type>::is_signed>
+	{	// determine whether _Ty is a signed type
+	};
+
+template<class _Ty>
+	struct is_signed
+	: _Is_signed<_Ty, is_integral<_Ty>::value>
+	{	// determine whether _Ty is a signed type
+	};
+
+	// TEMPLATE CLASS is_unsigned
+template<bool _Unsigned>
+	struct _Is_unsignedX
+	: false_type
+	{	// determine whether _Ty is an unsigned type
+	};
+
+template<>
+	struct _Is_unsignedX<true>
+	: true_type
+	{	// determine whether _Ty is an unsigned type
+	};
+
+template<class _Ty, bool _Arith>
+	struct _Is_unsigned
+	: false_type
+	{	// determine whether _Ty is an unsigned type
+	};
+
+template<class _Ty>
+	struct _Is_unsigned<_Ty, true>
+	: _Is_unsignedX<!std::numeric_limits<
+		typename remove_cv<_Ty>::type>::is_signed>
+	{	// determine whether _Ty is an unsigned type
+	};
+
+template<class _Ty>
+	struct is_unsigned
+	: _Is_unsigned<_Ty, is_integral<_Ty>::value>
+	{	// determine whether _Ty is an unsigned type
+	};
+
+	// TEMPLATE CLASS alignment_of
+template<class _Ty>
+	struct _Get_align
+	{	// struct used to determine alignemt of _Ty
+	_Ty _Elt0;
+	char _Elt1;
+	_Ty _Elt2;
+	};
+
+#define _ALIGN_OF(ty) (sizeof(_Get_align<ty>) - 2 * sizeof(ty))
+
+template<class _Ty>
+	struct alignment_of
+	: integral_constant<size_t, _ALIGN_OF(_Ty)>
+	{	// determine alignment of _Ty
+	};
+
+template<class _Ty>
+	struct alignment_of<_Ty&>
+	: integral_constant<size_t, _ALIGN_OF(_Ty*)>
+	{	// assume references are aligned like pointers
+	};
+
+	// TEMPLATE CLASS aligned_storage
+#define _FITS(ty) _Align == _ALIGN_OF(ty)
+#define _NEXT_ALIGN(ty) \
+	typedef typename _Aligned<_Len, _Align, ty, _FITS(ty)>::_Type _Type
+
+template<class _Ty, size_t _Len> union _Align_type
+	{	// union with size _Len bytes and alignment of _Ty
+	_Ty _Val;
+	char _Pad[_Len];
+	};
+
+template<size_t _Len, size_t _Align, class _Ty, bool _Ok>
+	struct _Aligned;
+
+template<size_t _Len, size_t _Align, class _Ty>
+	struct _Aligned<_Len, _Align, _Ty, true>
+	{	// define type with size _Len and alignment _Ty
+	typedef _Align_type<_Ty, _Len> _Type;
+	};
+
+template<size_t _Len, size_t _Align>
+	struct _Aligned<_Len, _Align, long, false>
+	{	// define type with size _Len and alignment _Ty
+	typedef _Align_type<double, _Len> _Type;
+	};
+
+template<size_t _Len, size_t _Align>
+	struct _Aligned<_Len, _Align, int, false>
+	{	// define type with size _Len and alignment _Ty
+	_NEXT_ALIGN(long);
+	};
+
+template<size_t _Len, size_t _Align>
+	struct _Aligned<_Len, _Align, short, false>
+	{	// define type with size _Len and alignment _Ty
+	_NEXT_ALIGN(int);
+	};
+
+template<size_t _Len, size_t _Align>
+	struct _Aligned<_Len, _Align, char, false>
+	{	// define type with size _Len and alignment _Ty
+	_NEXT_ALIGN(short);
+	};
+
+template<size_t _Len, size_t _Align>
+	struct aligned_storage
+	{	// define type with size _Len and alignment _Ty
+	typedef typename _Aligned<_Len, _Align, char, _FITS(char)>::_Type type;
+	};
+
+#undef _FITS
+#undef _NEXT_ALIGN
+#undef _ALIGN_OF
+
+	// TEMPLATE CLASS rank
+template<class _Ty>
+	struct rank
+	: integral_constant<size_t, 0>
+	{	// determine number of dimensions of array _Ty
+	};
+
+template<class _Ty, unsigned _Ix>
+	struct rank<_Ty[_Ix]>
+	: integral_constant<size_t, rank<_Ty>::value + 1>
+	{	// determine number of dimensions of array _Ty
+	};
+
+template<class _Ty>
+	struct rank<_Ty[]>
+	: integral_constant<size_t, rank<_Ty>::value + 1>
+	{	// determine number of dimensions of array _Ty
+	};
+
+	// TEMPLATE CLASS extent
+template<class _Ty, unsigned _Nx>
+	struct _Extent
+	: integral_constant<size_t, 0>
+	{	// determine extent of dimension _Nx of array _Ty
+	};
+
+template<class _Ty, unsigned _Ix>
+	struct _Extent<_Ty[_Ix], 0>
+	: integral_constant<size_t, _Ix>
+	{	// determine extent of dimension _Nx of array _Ty
+	};
+
+template<class _Ty, unsigned _Nx, unsigned _Ix>
+	struct _Extent<_Ty[_Ix], _Nx>
+	: _Extent<_Ty, _Nx - 1>
+	{	// determine extent of dimension _Nx of array _Ty
+	};
+
+template<class _Ty, unsigned _Nx>
+	struct _Extent<_Ty[], _Nx>
+	: _Extent<_Ty, _Nx - 1>
+	{	// determine extent of dimension _Nx of array _Ty
+	};
+
+template<class _Ty, unsigned _Nx = 0>
+	struct extent
+	: _Extent<_Ty, _Nx>
+	{	// determine extent of dimension _Nx of array _Ty
+	};
+
+	// TEMPLATE CLASS is_same
+template<class _Ty1, class _Ty2>
+	struct is_same
+	: false_type
+	{	// determine whether _Ty1 and _Ty2 are the same type
+	};
+
+template<class _Ty1>
+	struct is_same<_Ty1, _Ty1>
+	: true_type
+	{	// determine whether _Ty1 and _Ty2 are the same type
+	};
+
+	// TEMPLATE CLASS is_base_of
+template<class _Base, class _Der>
+	struct is_base_of _IS_BASE_OF(_Base, _Der)
+	{	// determine whether _Base is a base of or the same as _Der
+	};
+
+	}	// namespace tr1
+
+_STD_END
+
+#endif /* RC_INVOKED */
+#endif /* _TYPE_TRAITS_ */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

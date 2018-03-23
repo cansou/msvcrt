@@ -1,0 +1,1857 @@
+// memory standard header
+#pragma once
+#ifndef _MEMORY_
+#define _MEMORY_
+#ifndef RC_INVOKED
+#include <iterator>
+#include <xmemory>
+
+#ifdef _MSC_VER
+ #pragma pack(push,_CRT_PACKING)
+ #pragma warning(push,3)
+#endif  /* _MSC_VER */
+_STD_BEGIN
+
+		// TEMPLATE FUNCTION get_temporary_buffer
+template<class _Ty> inline
+	pair<_Ty _FARQ *, _PDFT>
+		get_temporary_buffer(_PDFT _Count)
+	{	// get raw temporary buffer of up to _Count elements
+	_Ty _FARQ *_Pbuf;
+
+	if (_Count <= 0)
+		_Count = 0;
+	else if (((size_t)(-1) / _Count) < sizeof (_Ty))
+		_THROW_NCEE(std::bad_alloc, NULL);
+
+	for (_Pbuf = 0; 0 < _Count; _Count /= 2)
+		if ((_Pbuf = (_Ty _FARQ *)operator new(
+			(_SIZT)_Count * sizeof (_Ty), nothrow)) != 0)
+			break;
+
+	return (pair<_Ty _FARQ *, _PDFT>(_Pbuf, _Count));
+	}
+
+		// TEMPLATE FUNCTION return_temporary_buffer
+template<class _Ty> inline
+	void return_temporary_buffer(_Ty *_Pbuf)
+	{	// delete raw temporary buffer
+	operator delete(_Pbuf);
+	}
+
+		// TEMPLATE FUNCTION uninitialized_copy
+template<class _InIt,
+	class _FwdIt> inline
+	_FwdIt _Uninit_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Nonscalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy [_First, _Last) to raw _Dest, arbitrary type
+	_DEBUG_RANGE(_First, _Last);
+	_DEBUG_POINTER(_Dest);
+	_FwdIt _Next = _Dest;
+
+	_TRY_BEGIN
+	for (; _First != _Last; ++_Dest, ++_First)
+		_Construct(&*_Dest, *_First);
+	_CATCH_ALL
+	for (; _Next != _Dest; ++_Next)
+		_Destroy(&*_Next);
+	_RERAISE;
+	_CATCH_END
+	return (_Dest);
+	}
+
+template<class _Ty1,
+	class _Ty2> inline
+	_Ty2 _Uninit_copy(_Ty1 _First, _Ty1 _Last, _Ty2 _Dest,
+		_Scalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy [_First, _Last) to raw _Dest, scalar type
+	_DEBUG_RANGE(_First, _Last);
+	_DEBUG_POINTER(_Dest);
+	size_t _Count = (size_t)(_Last - _First);
+	_Ty2 _Result = _Dest + _Count;
+	if (_Count > 0)
+		_CRT_SECURE_MEMMOVE(&*_Dest,
+			_Count * sizeof (*_First), &*_First,
+			_Count * sizeof (*_First));	// NB: non-overlapping move
+	return (_Result);
+	}
+
+#if _SECURE_SCL
+
+template<class _InIt,
+	class _FwdIt> inline
+_IF_CHK(_FwdIt) uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, size_t _Size>
+inline
+_FwdElem* uninitialized_copy(_InIt _First, _InIt _Last, _FwdElem (&_Dest)[_Size])
+	{	// copy [_First, _Last) to raw _Dest
+	return (uninitialized_copy(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size)).base());
+	}
+
+template<class _InIt,
+	class _FwdIt> inline
+_SCL_INSECURE_DEPRECATE
+_IF_NOT_CHK(_FwdIt) uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#else
+
+template<class _InIt,
+	class _FwdIt> inline
+	_FwdIt uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#endif
+
+		// TEMPLATE FUNCTION _Uninitialized_copy WITH ALLOCATOR
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_FwdIt _Uninit_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al, _Nonscalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy [_First, _Last) to raw _Dest, using _Al, arbitrary type
+	_DEBUG_RANGE(_First, _Last);
+	_DEBUG_POINTER(_Dest);
+	_FwdIt _Next = _Dest;
+
+	_TRY_BEGIN
+	for (; _First != _Last; ++_Dest, ++_First)
+		_Al.construct(_Dest, *_First);
+	_CATCH_ALL
+	for (; _Next != _Dest; ++_Next)
+		_Al.destroy(_Next);
+	_RERAISE;
+	_CATCH_END
+	return (_Dest);
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_FwdIt _Uninit_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc&, _Scalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy [_First, _Last) to raw _Dest, scalar type
+	_DEBUG_RANGE(_First, _Last);
+	_DEBUG_POINTER(_Dest);
+	size_t _Count = (size_t)(_Last - _First);
+	_FwdIt _Result = _Dest + _Count;
+	if (_Count > 0)
+		_CRT_SECURE_MEMMOVE(&*_Dest, _Count * sizeof (*_First), &*_First, _Count * sizeof (*_First));	// NB: non-overlapping move
+	return (_Result);
+	}
+
+#if _SECURE_SCL
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+_IF_CHK(_FwdIt) _Uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest, _Al,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, class _Alloc, size_t _Size>
+inline
+_FwdElem* _Uninitialized_copy(_InIt _First, _InIt _Last, _FwdElem (&_Dest)[_Size],
+		_Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_Uninitialized_copy(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size), _Al).base());
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+_SCL_INSECURE_DEPRECATE
+_IF_NOT_CHK(_FwdIt) _Uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest, _Al,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#else
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_FwdIt _Uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest, _Al,
+		_Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#endif
+
+		// TEMPLATE FUNCTION _Uninitialized_move WITH ALLOCATOR
+template<class _InIt, class _FwdIt, class _Alloc, class _MoveCatTy>
+inline
+	_FwdIt _Uninit_move(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al, _MoveCatTy, _Range_checked_iterator_tag)
+	{	// move defaults to copy if there is not a more effecient way
+	return (_STDEXT unchecked_uninitialized_copy(_First, _Last, _Dest, _Al));
+	}
+
+template<class _InIt, class _FwdIt, class _Alloc>
+inline
+	_FwdIt _Uninit_move(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al, _Swap_move_tag, _Range_checked_iterator_tag)
+	{	// use swap to instead of the copy constructor
+	_DEBUG_RANGE(_First, _Last);
+	_DEBUG_POINTER(_Dest);
+	_FwdIt _Next = _Dest;
+	// empty value used in the construction
+	typename _Alloc::value_type _Val;
+
+	_TRY_BEGIN
+	for (; _First != _Last; ++_Dest, ++_First)
+		{
+		_Al.construct(_Dest, _Val);
+		_STD _Swap_adl(*_Dest, *_First);
+		}
+	_CATCH_ALL
+	for (; _Next != _Dest; ++_Next)
+		_Al.destroy(_Next);
+	_RERAISE;
+	_CATCH_END
+	return (_Dest);
+	}
+
+#if _SECURE_SCL
+
+template<class _InIt, class _FwdIt, class _Alloc>
+inline
+_IF_CHK(_FwdIt) _Uninitialized_move(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_move(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Dest, _Al,
+		_Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, class _Alloc, size_t _Size>
+inline
+_FwdElem* _Uninitialized_move(_InIt _First, _InIt _Last, _FwdElem (&_Dest)[_Size],
+		_Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_Uninitialized_move(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size), _Al).base());
+	}
+
+template<class _InIt, class _FwdIt, class _Alloc>
+inline
+_SCL_INSECURE_DEPRECATE
+_IF_NOT_CHK(_FwdIt) _Uninitialized_move(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_move(_CHECKED_BASE(_First),
+		_CHECKED_BASE(_Last), _Dest, _Al,
+		_Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#else
+
+template<class _InIt, class _FwdIt, class _Alloc>
+inline
+	_FwdIt _Uninitialized_move(_InIt _First, _InIt _Last, _FwdIt _Dest,
+		_Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_Uninit_move(_CHECKED_BASE(_First),
+		_CHECKED_BASE(_Last), _Dest, _Al,
+		_Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+#endif
+
+    // TEMPLATE FUNCTION uninitialized_fill
+template<class _FwdIt,
+	class _Tval> inline
+	void _Uninit_fill(_FwdIt _First, _FwdIt _Last, const _Tval& _Val,
+		_Nonscalar_ptr_iterator_tag)
+	{	// copy _Val throughout raw [_First, _Last), arbitrary type
+	_DEBUG_RANGE(_First, _Last);
+	_FwdIt _Next = _First;
+
+	_TRY_BEGIN
+	for (; _First != _Last; ++_First)
+		_Construct(&*_First, _Val);
+	_CATCH_ALL
+	for (; _Next != _First; ++_Next)
+		_Destroy(&*_Next);
+	_RERAISE;
+	_CATCH_END
+	}
+
+template<class _Ty,
+	class _Tval> inline
+	void _Uninit_fill(_Ty *_First, _Ty *_Last, const _Tval& _Val,
+		_Scalar_ptr_iterator_tag)
+	{	// copy _Val throughout raw [_First, _Last), scalar type
+	std::fill(_First, _Last, _Val);
+	}
+
+template<class _FwdIt,
+	class _Tval> inline
+	void uninitialized_fill(_FwdIt _First, _FwdIt _Last, const _Tval& _Val)
+	{	// copy _Val throughout raw [_First, _Last)
+	_Uninit_fill(_CHECKED_BASE(_First), _CHECKED_BASE(_Last), _Val, _Ptr_cat(_First, _First));
+	}
+
+		// TEMPLATE FUNCTION uninitialized_fill_n
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	void _Uninit_fill_n(_FwdIt _First, _Diff _Count, const _Tval& _Val,
+		_Nonscalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy _Count *_Val to raw _First, arbitrary type
+
+ #if _HAS_ITERATOR_DEBUGGING
+//	if (_Count < 0)
+//		_DEBUG_ERROR("negative count in uninitialized fill");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+	_FwdIt _Next = _First;
+
+	_TRY_BEGIN
+	for (; 0 < _Count; --_Count, ++_First)
+		_Construct(&*_First, _Val);
+	_CATCH_ALL
+	for (; _Next != _First; ++_Next)
+		_Destroy(&*_Next);
+	_RERAISE;
+	_CATCH_END
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	void _Uninit_fill_n(_FwdIt _First, _Diff _Count, const _Tval& _Val,
+		_Scalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy _Count *_Val to raw _First, scalar type
+	_STDEXT unchecked_fill_n(&*_First, _Count, _Val);
+	}
+
+#if _SECURE_SCL
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+_IF_CHK_(_FwdIt, void) uninitialized_fill_n(_FwdIt _First, _Diff _Count, const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_Uninit_fill_n(_First, _Count, _Val, _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdElem, class _Diff, class _Tval, size_t _Size>
+inline
+void uninitialized_fill_n(_FwdElem (&_First)[_Size], _Diff _Count, const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	uninitialized_fill_n(_STDEXT make_checked_array_iterator(_First, _Size), _Count, _Val);
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+_SCL_INSECURE_DEPRECATE
+_IF_NOT_CHK_(_FwdIt, void) uninitialized_fill_n(_FwdIt _First, _Diff _Count, const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_Uninit_fill_n(_First, _Count, _Val, _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+#else
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	void uninitialized_fill_n(_FwdIt _First, _Diff _Count, const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_Uninit_fill_n(_First, _Count, _Val, _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+#endif
+
+		// TEMPLATE FUNCTION _Uninitialized_fill_n WITH ALLOCATOR
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	void _Uninit_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al, _Nonscalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy _Count *_Val to raw _First, using _Al, arbitrary type
+
+ #if _HAS_ITERATOR_DEBUGGING
+//	if (_Count < 0)
+//		_DEBUG_ERROR("negative count in uninitialized fill");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+	_FwdIt _Next = _First;
+
+	_TRY_BEGIN
+	for (; 0 < _Count; --_Count, ++_First)
+		_Al.construct(_First, _Val);
+	_CATCH_ALL
+	for (; _Next != _First; ++_Next)
+		_Al.destroy(_Next);
+	_RERAISE;
+	_CATCH_END
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	void _Uninit_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc&, _Scalar_ptr_iterator_tag, _Range_checked_iterator_tag)
+	{	// copy _Count *_Val to raw _First, using _Al, scalar type
+		_STDEXT unchecked_fill_n(_First, _Count, _Val);
+	}
+
+#if _SECURE_SCL
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+_IF_CHK_(_FwdIt, void) _Uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_Uninit_fill_n(_First, _Count, _Val, _Al,
+		_Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdElem, class _Diff, class _Tval, class _Alloc, size_t _Size>
+inline
+void _Uninitialized_fill_n(_FwdElem (&_First)[_Size], _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_Uninitialized_fill_n(_STDEXT make_checked_array_iterator(_First, _Size), _Count, _Val, _Al);
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+_SCL_INSECURE_DEPRECATE
+_IF_NOT_CHK_(_FwdIt, void) _Uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_Uninit_fill_n(_First, _Count, _Val, _Al,
+		_Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+#else
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	void _Uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_Uninit_fill_n(_First, _Count, _Val, _Al,
+		_Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+#endif
+
+		// TEMPLATE CLASS raw_storage_iterator
+template<class _FwdIt,
+	class _Ty>
+	class raw_storage_iterator
+		: public _Outit
+	{	// wrap stores to raw buffer as output iterator
+public:
+	typedef _FwdIt iterator_type;	// retained
+	typedef _FwdIt iter_type;	// retained
+	typedef _Ty element_type;	// retained
+
+	explicit raw_storage_iterator(_FwdIt _First)
+		: _Next(_First)
+		{	// construct with iterator
+		}
+
+	raw_storage_iterator<_FwdIt, _Ty>& operator*()
+		{	// pretend to return designated value
+		return (*this);
+		}
+
+	raw_storage_iterator<_FwdIt, _Ty>& operator=(const _Ty& _Val)
+		{	// construct value designated by stored iterator
+		_Construct(&*_Next, _Val);
+		return (*this);
+		}
+
+	raw_storage_iterator<_FwdIt, _Ty>& operator++()
+		{	// preincrement
+		++_Next;
+		return (*this);
+		}
+
+	raw_storage_iterator<_FwdIt, _Ty> operator++(int)
+		{	// postincrement
+		raw_storage_iterator<_FwdIt, _Ty> _Ans = *this;
+		++_Next;
+		return (_Ans);
+		}
+
+private:
+	_FwdIt _Next;	// the stored iterator
+	};
+
+		// TEMPLATE CLASS _Temp_iterator
+template<class _Ty>
+	class _Temp_iterator
+		: public _Outit
+	{	// wrap stores to temporary buffer as output iterator
+public:
+	typedef _Ty _FARQ *_Pty;
+
+#if _SECURE_SCL
+	typedef _Range_checked_iterator_tag _Checked_iterator_category;
+#endif
+
+	_Temp_iterator(_PDFT _Count = 0)
+		{	// construct from desired temporary buffer size
+		_Buf._Begin = 0;
+		_Buf._Current = 0;
+		_Buf._Hiwater = 0;
+		_Buf._Size = _Count;	// memorize size for lazy allocation
+		_Pbuf = &_Buf;
+		}
+
+	_Temp_iterator(const _Temp_iterator<_Ty>& _Right)
+		{	// construct from _Right (share active buffer)
+		_Buf._Begin = 0;	// clear stored buffer, for safe destruction
+		_Buf._Current = 0;
+		_Buf._Hiwater = 0;
+		_Buf._Size = 0;
+		*this = _Right;
+		}
+
+	~_Temp_iterator()
+		{	// destroy the object
+		if (_Buf._Begin != 0)
+			{	// destroy any constructed elements in buffer
+			for (_Pty _Next = _Buf._Begin;
+				_Next != _Buf._Hiwater; ++_Next)
+				_Destroy(&*_Next);
+			std::return_temporary_buffer(_Buf._Begin);
+			}
+		}
+
+	_Temp_iterator<_Ty>& operator=(const _Temp_iterator<_Ty>& _Right)
+		{	// assign _Right (share active buffer)
+		_Pbuf = _Right._Pbuf;
+		return (*this);
+		}
+
+	_Temp_iterator<_Ty>& operator=(const _Ty& _Val)
+		{	// assign or construct value into active buffer, and increment
+		if (_Pbuf->_Current < _Pbuf->_Hiwater)
+			*_Pbuf->_Current++ = _Val;	// below high water mark, assign
+		else
+			{	// above high water mark, construct
+			_SCL_SECURE_VALIDATE((_Pbuf->_Current - _Pbuf->_Begin) < _Pbuf->_Size);
+			_Pty _Ptr = &*_Pbuf->_Current;
+			_Construct(_Ptr, _Val);
+			_Pbuf->_Hiwater = ++_Pbuf->_Current;
+			}
+		return (*this);
+		}
+
+	_Temp_iterator<_Ty>& operator*()
+		{	// pretend to return designated value
+		return (*this);
+		}
+
+	_Temp_iterator<_Ty>& operator++()
+		{	// pretend to preincrement
+		return (*this);
+		}
+
+	_Temp_iterator<_Ty>& operator++(int)
+		{	// pretend to postincrement
+		return (*this);
+		}
+
+	_Temp_iterator<_Ty>& _Init()
+		{	// set pointer at beginning of buffer
+		_Pbuf->_Current = _Pbuf->_Begin;
+		return (*this);
+		}
+
+	_Pty _First() const
+		{	// return pointer to beginning of buffer
+		return (_Pbuf->_Begin);
+		}
+
+	_Pty _Last() const
+		{	// return pointer past end of buffer contents
+		return (_Pbuf->_Current);
+		}
+
+	_PDFT _Maxlen()
+		{	// return size of buffer
+		if (_Pbuf->_Begin == 0 && 0 < _Pbuf->_Size)
+			{	// allocate buffer on first size query
+			pair<_Pty, _PDFT> _Pair =
+				std::get_temporary_buffer<_Ty>(_Pbuf->_Size);
+
+			_Pbuf->_Begin = _Pair.first;
+			_Pbuf->_Current = _Pair.first;
+			_Pbuf->_Hiwater = _Pair.first;
+			_Pbuf->_Size = _Pair.second;
+			}
+		return (_Pbuf->_Size);
+		}
+
+	static void _Xinvarg()
+		{	// report an invalid_argument error
+		_THROW(invalid_argument, "invalid _Temp_iterator<T> argument");
+		}
+
+private:
+	struct _Bufpar
+		{	// control information for a temporary buffer
+		_Pty _Begin;	// pointer to beginning of buffer
+		_Pty _Current;	// pointer to next available element
+		_Pty _Hiwater;	// pointer to first unconstructed element
+		_PDFT _Size;	// length of buffer
+		};
+	_Bufpar _Buf;	// buffer control stored in iterator
+	_Bufpar *_Pbuf;	// pointer to active buffer control
+	};
+
+		// TEMPLATE CLASS auto_ptr
+template<class _Ty>
+	class auto_ptr;
+
+template<class _Ty>
+	struct auto_ptr_ref
+		{	// proxy reference for auto_ptr copying
+	explicit auto_ptr_ref(_Ty *_Right)
+		: _Ref(_Right)
+		{	// construct from generic pointer to auto_ptr ptr
+		}
+
+	_Ty *_Ref;	// generic pointer to auto_ptr ptr
+	};
+
+template<class _Ty>
+	class auto_ptr
+		{	// wrap an object pointer to ensure destruction
+public:
+	typedef _Ty element_type;
+
+	explicit auto_ptr(_Ty *_Ptr = 0) _THROW0()
+		: _Myptr(_Ptr)
+		{	// construct from object pointer
+		}
+
+	auto_ptr(auto_ptr<_Ty>& _Right) _THROW0()
+		: _Myptr(_Right.release())
+		{	// construct by assuming pointer from _Right auto_ptr
+		}
+
+	auto_ptr(auto_ptr_ref<_Ty> _Right) _THROW0()
+		{	// construct by assuming pointer from _Right auto_ptr_ref
+		_Ty *_Ptr = _Right._Ref;
+		_Right._Ref = 0;	// release old
+		_Myptr = _Ptr;	// reset this
+		}
+
+	template<class _Other>
+		operator auto_ptr<_Other>() _THROW0()
+		{	// convert to compatible auto_ptr
+		return (auto_ptr<_Other>(*this));
+		}
+
+	template<class _Other>
+		operator auto_ptr_ref<_Other>() _THROW0()
+		{	// convert to compatible auto_ptr_ref
+		_Other *_Cvtptr = _Myptr;	// test implicit conversion
+		auto_ptr_ref<_Other> _Ans(_Cvtptr);
+		_Myptr = 0;	// pass ownership to auto_ptr_ref
+		return (_Ans);
+		}
+
+
+	template<class _Other>
+		auto_ptr<_Ty>& operator=(auto_ptr<_Other>& _Right) _THROW0()
+		{	// assign compatible _Right (assume pointer)
+		reset(_Right.release());
+		return (*this);
+		}
+
+	template<class _Other>
+		auto_ptr(auto_ptr<_Other>& _Right) _THROW0()
+		: _Myptr(_Right.release())
+		{	// construct by assuming pointer from _Right
+		}
+
+	auto_ptr<_Ty>& operator=(auto_ptr<_Ty>& _Right) _THROW0()
+		{	// assign compatible _Right (assume pointer)
+		reset(_Right.release());
+		return (*this);
+		}
+
+	auto_ptr<_Ty>& operator=(auto_ptr_ref<_Ty> _Right) _THROW0()
+		{	// assign compatible _Right._Ref (assume pointer)
+		_Ty *_Ptr = _Right._Ref;
+		_Right._Ref = 0;	// release old
+		reset(_Ptr);	// set new
+		return (*this);
+		}
+
+	~auto_ptr()
+		{	// destroy the object
+		delete _Myptr;
+		}
+
+	_Ty& operator*() const _THROW0()
+		{	// return designated value
+
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Myptr == 0)
+			_DEBUG_ERROR("auto_ptr not dereferencable");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		__analysis_assume(_Myptr);
+
+		return (*get());
+		}
+
+	_Ty *operator->() const _THROW0()
+		{	// return pointer to class object
+
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Myptr == 0)
+			_DEBUG_ERROR("auto_ptr not dereferencable");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		return (get());
+		}
+
+	_Ty *get() const _THROW0()
+		{	// return wrapped pointer
+		return (_Myptr);
+		}
+
+	_Ty *release() _THROW0()
+		{	// return wrapped pointer and give up ownership
+		_Ty *_Tmp = _Myptr;
+		_Myptr = 0;
+		return (_Tmp);
+		}
+
+	void reset(_Ty* _Ptr = 0)
+		{	// destroy designated object and store new pointer
+		if (_Ptr != _Myptr)
+			delete _Myptr;
+		_Myptr = _Ptr;
+		}
+
+private:
+	_Ty *_Myptr;	// the wrapped object pointer
+	};
+_STD_END
+
+_STDEXT_BEGIN
+
+template<class _InIt,
+	class _FwdIt> inline
+	_FwdIt unchecked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+		return (_STD _Uninit_copy(_CHECKED_BASE(_First),
+			_CHECKED_BASE(_Last), _Dest,
+			_STD _Ptr_cat(_First, _Dest),
+			_STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt,
+	class _FwdIt> inline
+	_IF_CHK(_FwdIt) checked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+	return (_STD _Uninit_copy(_CHECKED_BASE(_First),
+			_CHECKED_BASE(_Last), _Dest,
+			_STD _Ptr_cat(_First, _Dest),
+			_STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, size_t _Size> inline
+	_FwdElem *checked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdElem (&_Dest)[_Size])
+	{	// copy [_First, _Last) to raw _Dest
+	return (checked_uninitialized_copy(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size)).base());
+	}
+
+template<class _InIt,
+	class _FwdIt> inline
+	_SCL_CHECKED_ALGORITHM_WARN	_IF_NOT_CHK(_FwdIt)
+		checked_uninitialized_copy(_InIt _First, _InIt _Last, _FwdIt _Dest)
+	{	// copy [_First, _Last) to raw _Dest
+	return (_STD _Uninit_copy(_CHECKED_BASE(_First),
+		_CHECKED_BASE(_Last), _Dest,
+		_STD _Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_FwdIt unchecked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdIt _Dest, _Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_copy(_CHECKED_BASE(_First),
+		_CHECKED_BASE(_Last), _Dest, _Al,
+		_STD _Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_IF_CHK(_FwdIt) checked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdIt _Dest, _Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last),
+		_Dest, _Al,
+		_STD _Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, class _Alloc, size_t _Size> inline
+	_FwdElem *checked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdElem (&_Dest)[_Size], _Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (checked_uninitialized_copy(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size), _Al).base());
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_SCL_CHECKED_ALGORITHM_WARN _IF_NOT_CHK(_FwdIt)
+		checked_uninitialized_copy(_InIt _First, _InIt _Last,
+		_FwdIt _Dest, _Alloc& _Al)
+	{	// copy [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_copy(_CHECKED_BASE(_First), _CHECKED_BASE(_Last),
+		_Dest, _Al,
+		_STD _Ptr_cat(_First, _Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt,
+	class _FwdIt,
+	class _Alloc> inline
+	_FwdIt _Unchecked_uninitialized_move(_InIt _First, _InIt _Last,
+		_FwdIt _Dest, _Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_move(_CHECKED_BASE(_First),
+		_CHECKED_BASE(_Last), _Dest, _Al,
+		_STD _Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdIt, class _Alloc> inline
+	_IF_CHK(_FwdIt) _Checked_uninitialized_move(_InIt _First, _InIt _Last,
+		_FwdIt _Dest, _Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_move(_CHECKED_BASE(_First), _CHECKED_BASE(_Last),
+		_Dest, _Al,
+		_STD _Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _InIt, class _FwdElem, class _Alloc, size_t _Size> inline
+	_FwdElem *_Checked_uninitialized_move(_InIt _First, _InIt _Last,
+		_FwdElem (&_Dest)[_Size], _Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_Checked_uninitialized_move(_First, _Last,
+		_STDEXT make_checked_array_iterator(_Dest, _Size), _Al).base());
+	}
+
+template<class _InIt, class _FwdIt, class _Alloc> inline
+	_SCL_CHECKED_ALGORITHM_WARN _IF_NOT_CHK(_FwdIt)
+		_Checked_uninitialized_move(_InIt _First, _InIt _Last,
+			_FwdIt _Dest, _Alloc& _Al)
+	{	// move [_First, _Last) to raw _Dest, using _Al
+	return (_STD _Uninit_move(_CHECKED_BASE(_First), _CHECKED_BASE(_Last),
+		_Dest, _Al,
+		_STD _Move_cat(_Dest), _STD _Range_checked_iterator_tag()));
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	void unchecked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_STD _Uninit_fill_n(_First, _Count, _Val,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	_IF_CHK_(_FwdIt, void)
+		checked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+			const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_STD _Uninit_fill_n(_First, _Count, _Val,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdElem, class _Diff, class _Tval, size_t _Size> inline
+	void checked_uninitialized_fill_n(_FwdElem (&_First)[_Size],
+		_Diff _Count, const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	checked_uninitialized_fill_n(
+		_STDEXT make_checked_array_iterator(_First, _Size), _Count, _Val);
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval> inline
+	_SCL_CHECKED_ALGORITHM_WARN _IF_NOT_CHK_(_FwdIt, void)
+		checked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+			const _Tval& _Val)
+	{	// copy _Count *_Val to raw _First
+	_STD _Uninit_fill_n(_First, _Count, _Val,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	void unchecked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+		const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_STD _Uninit_fill_n(_First, _Count, _Val, _Al,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	_IF_CHK_(_FwdIt, void)
+		checked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+			const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_STD _Uninit_fill_n(_First, _Count, _Val, _Al,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+template<class _FwdElem,
+	class _Diff,
+	class _Tval,
+	class _Alloc,
+	size_t _Size> inline
+	void checked_uninitialized_fill_n(_FwdElem (&_First)[_Size],
+		_Diff _Count, const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	checked_uninitialized_fill_n(
+		_STDEXT make_checked_array_iterator(_First, _Size),
+		_Count, _Val, _Al);
+	}
+
+template<class _FwdIt,
+	class _Diff,
+	class _Tval,
+	class _Alloc> inline
+	_SCL_CHECKED_ALGORITHM_WARN _IF_NOT_CHK_(_FwdIt, void)
+		checked_uninitialized_fill_n(_FwdIt _First, _Diff _Count,
+			const _Tval& _Val, _Alloc& _Al)
+	{	// copy _Count *_Val to raw _First, using _Al
+	_STD _Uninit_fill_n(_First, _Count, _Val, _Al,
+		_STD _Ptr_cat(_First, _First), _STD _Range_checked_iterator_tag());
+	}
+
+_STDEXT_END
+
+ #if _HAS_TR1
+ #ifndef _XSTD2
+  #define _XSTD2
+ #endif /* _XSTD2 */
+
+ #include <exception>
+ #include <typeinfo>
+
+#ifndef _DO_NOT_DECLARE_INTERLOCKED_INTRINSICS_IN_MEMORY
+extern "C" long __CLRCALL_PURE_OR_CDECL _InterlockedIncrement(volatile long *);
+extern "C" long __CLRCALL_PURE_OR_CDECL _InterlockedDecrement(volatile long *);
+extern "C" long __CLRCALL_PURE_OR_CDECL _InterlockedCompareExchange(volatile long *,
+	long, long);
+
+ #pragma intrinsic(_InterlockedIncrement)
+ #pragma intrinsic(_InterlockedDecrement)
+ #pragma intrinsic(_InterlockedCompareExchange)
+#endif /* _DO_NOT_DECLARE_INTERLOCKED_INTRINSICS_IN_MEMORY */
+
+ #define _MT_INCR(mtx, x)	_InterlockedIncrement(&x)
+ #define _MT_DECR(mtx, x)	_InterlockedDecrement(&x)
+ #define _MT_CMPX(x, y, z)	_InterlockedCompareExchange(&x, y, z)
+
+_STD_BEGIN
+	namespace tr1 {	// TR1 additions
+
+	// CLASS bad_weak_ptr
+class bad_weak_ptr
+	: public _XSTD exception
+	{	// exception type for invalid use of expired weak_ptr object
+public:
+	explicit bad_weak_ptr(const char * = 0)
+		{	// construct with ignored message
+		}
+
+	virtual const char *__CLR_OR_THIS_CALL what() const _THROW0()
+		{	// return pointer to message string
+		return ("tr1::bad_weak_ptr");
+		}
+	};
+
+_CRTIMP2_PURE __declspec(noreturn) void __CLRCALL_PURE_OR_CDECL _Xweak();
+
+	// CLASS _Ref_count_base
+class _Ref_count_base
+	{	// common code for reference counting
+private:
+	virtual void _Destroy() = 0;
+	virtual void _Delete_this() = 0;
+
+	const volatile void *_Ptr;
+	long _Uses;
+	long _Weaks;
+
+protected:
+	_Ref_count_base(const volatile void *_Px)
+		: _Ptr(_Px), _Uses(0), _Weaks(1)
+		{	// construct
+		}
+
+public:
+	virtual ~_Ref_count_base()
+		{	// ensure that derived classes can be destroyed properly
+		}
+
+	bool _Incref_nz()
+		{	// increment use count if not zero, return true if successful
+		for (; ; )
+			{	// loop until state is known
+			long _Count = (volatile long&)_Uses;
+			if (_Count == 0)
+				return (false);
+			if (_MT_CMPX(_Uses, _Count + 1, _Count) == _Count)
+				return (true);
+			}
+		}
+
+	void _Incref()
+		{	// increment use count
+		_MT_INCR(_Mtx, _Uses);
+		}
+
+	void _Incwref()
+		{	// increment weak reference count
+		_MT_INCR(_Mtx, _Weaks);
+		}
+
+	void _Decref()
+		{	// decrement use count
+		if (_MT_DECR(_Mtx, _Uses) == 0)
+			{	// destroy managed resource, decrement weak reference count
+			_Destroy();
+			_Decwref();
+			}
+		}
+
+	void _Decwref()
+		{	// decrement weak reference count
+		if (_MT_DECR(_Mtx, _Weaks) == 0)
+			_Delete_this();
+		}
+
+	long _Use_count() const
+		{	// return use count
+		return (_Uses);
+		}
+
+	bool _Expired() const
+		{   // return true if _Uses == 0
+		return (_Uses == 0);
+		}
+
+	virtual void *_Get_deleter(const _XSTD2 type_info&) const
+		{	// return address of deleter object
+		return (0);
+		}
+
+	const volatile void *_Getptr() const
+		{	// return stored pointer
+		return (_Ptr);
+		}
+	};
+
+	// TEMPLATE CLASS _Ref_count, _Ref_count_d
+template<class _Ty>
+	class _Ref_count
+	: public _Ref_count_base
+	{	// handle reference counting for object without deleter
+public:
+	_Ref_count(_Ty *_Px)
+		: _Ref_count_base(_Px)
+		{	// construct
+		}
+
+private:
+	virtual void _Destroy()
+		{	// destroy managed resource
+		delete (_Ty *)_Getptr();
+		}
+
+	virtual void _Delete_this()
+		{	// destroy self
+		delete this;
+		}
+	};
+
+template<class _Ty,
+	class _Dx,
+	class _Alloc = std::allocator<int> >
+	class _Ref_count_d
+	: public _Ref_count_base
+	{	// handle reference counting for object with deleter
+public:
+	typedef _Ref_count_d<_Ty, _Dx, _Alloc> _Myty;
+	typedef typename _Alloc::template rebind<_Myty>::other _Myalty;
+
+	_Ref_count_d(_Ty *_Px, _Dx _Dt, _Myalty _Al = _Myalty())
+		: _Ref_count_base(_Px), _Dtor(_Dt), _Myal(_Al)
+		{	// construct
+		}
+
+	void *_Get_deleter(const _XSTD2 type_info& _Type) const
+		{	// return address of deleter object
+		return ((void*)(_Type == typeid(_Dx) ? &_Dtor : 0));
+		}
+
+private:
+	virtual void _Destroy()
+		{	// destroy managed resource
+		_Dtor((_Ty *)_Getptr());
+		}
+
+	virtual void _Delete_this()
+		{	// destroy self
+		_Myalty _Al = _Myal;
+		_Al.destroy(this);
+		_Al.deallocate(this, 1);
+		}
+
+	_Myalty _Myal;
+	_Dx _Dtor;
+	};
+
+	// DECLARATIONS
+template<class _Ty>
+	class weak_ptr;
+template<class _Ty>
+	class shared_ptr;
+template<class _Ty>
+	class enable_shared_from_this;
+struct _Static_tag {};
+struct _Const_tag {};
+struct _Dynamic_tag {};
+
+template<class _Ty1,
+	class _Ty2>
+	void _Do_enable(_Ty1*, enable_shared_from_this<_Ty2>*, _Ref_count_base*);
+
+template<class _Ty>
+	inline void _Enable_shared(_Ty *_Ptr, _Ref_count_base *_Refptr,
+		typename _Ty::_EStype* = 0)
+	{	// reset internal weak pointer
+	if (_Ptr)
+		_Do_enable(_Ptr,
+			(enable_shared_from_this<typename _Ty::_EStype>*)_Ptr, _Refptr);
+	}
+
+inline void _Enable_shared(const volatile void *, const volatile void *)
+	{	// not derived from enable_shared_from_this; do nothing
+	}
+
+	// TEMPLATE CLASS _Ptr_base
+template<class _Ty>
+	class _Ptr_base
+	{	// base class for shared_ptr and weak_ptr
+public:
+	typedef _Ty _Elem;
+	typedef _Elem element_type;
+
+	_Ptr_base()
+		: _Ptr(0), _Rep(0)
+		{	// construct
+		}
+
+	long use_count() const
+		{	// return use count
+		return (_Rep ? _Rep->_Use_count() : 0);
+		}
+
+	void _Swap(_Ptr_base& _Other)
+		{	// swap pointers
+		_STD swap(_Rep, _Other._Rep);
+		_STD swap(_Ptr, _Other._Ptr);
+		}
+
+	template<class _Ty2>
+		bool _Cmp(const _Ptr_base<_Ty2>& _Right) const
+		{	// compare addresses of manager objects
+		return (_Rep < _Right._Rep);
+		}
+
+	void *_Get_deleter(const _XSTD2 type_info& _Type) const
+		{	// return pointer to deleter object if its type is _Type
+		return (_Rep ? _Rep->_Get_deleter(_Type) : 0);
+		}
+
+	_Ty *_Get() const
+		{	// return pointer to resource
+		return (_Ptr);
+		}
+
+	bool _Expired() const
+		{
+		return (!_Rep || _Rep->_Expired());
+		}
+
+	void _Decref()
+		{	// decrement reference count
+		if (_Rep != 0)
+			_Rep->_Decref();
+		}
+
+	void _Reset()
+		{	// release resource
+		_Reset(0, 0);
+		}
+
+	template<class _Ty2>
+		void _Reset(const _Ptr_base<_Ty2>& _Other)
+		{	// release resource and take ownership of _Other._Ptr
+		_Reset(_Other._Ptr, _Other._Rep);
+		}
+
+	template<class _Ty2>
+		void _Reset(const _Ptr_base<_Ty2>& _Other, bool _Throw)
+		{	// release resource and take ownership from weak_ptr _Other._Ptr
+		_Reset(_Other._Ptr, _Other._Rep, _Throw);
+		}
+
+	template<class _Ty2>
+		void _Reset(const _Ptr_base<_Ty2>& _Other, const _Static_tag&)
+		{	// release resource and take ownership of _Other._Ptr
+		_Reset(static_cast<_Elem*>(_Other._Ptr), _Other._Rep);
+		}
+
+	template<class _Ty2>
+		void _Reset(const _Ptr_base<_Ty2>& _Other, const _Const_tag&)
+		{	// release resource and take ownership of _Other._Ptr
+		_Reset(const_cast<_Elem*>(_Other._Ptr), _Other._Rep);
+		}
+	template<class _Ty2>
+		void _Reset(const _Ptr_base<_Ty2>& _Other, const _Dynamic_tag&)
+		{	// release resource and take ownership of _Other._Ptr
+		_Elem *_Ptr = dynamic_cast<_Elem*>(_Other._Ptr);
+		if (_Ptr)
+			_Reset(_Ptr, _Other._Rep);
+		else
+			_Reset();
+		}
+
+	template<class _Ty2>
+		void _Reset(auto_ptr<_Ty2>& _Other)
+		{	// release resource and take _Other.get()
+		_Ty2 *_Px = _Other.get();
+		_Reset(_Px, new _Ref_count<_Elem>(_Px));
+		_Other.release();
+		}
+
+	void _Reset(_Ty *_Other_ptr, _Ref_count_base *_Other_rep)
+		{	// release resource and take _Other_ptr through _Other_rep
+		if (_Other_rep)
+			_Other_rep->_Incref();
+		if (_Rep != 0)
+			_Rep->_Decref();
+		_Rep = _Other_rep;
+		_Ptr = _Other_ptr;
+		}
+
+	void _Reset(_Ty *_Other_ptr, _Ref_count_base *_Other_rep, bool _Throw)
+		{	// take _Other_ptr through _Other_rep from weak_ptr if not expired
+			// otherwise, leave in default state if !_Throw,
+			// otherwise throw exception
+		if (_Other_rep && _Other_rep->_Incref_nz())
+			{   // take pointers
+			if (_Rep != 0)
+				_Rep->_Decref();
+			_Rep = _Other_rep;
+			_Ptr = _Other_ptr;
+			}
+		else if (_Throw)
+			_Xweak();
+		}
+
+	void _Decwref()
+		{	// decrement weak reference count
+		if (_Rep != 0)
+			_Rep->_Decwref();
+		}
+
+	void _Resetw()
+		{	// release weak reference to resource
+		_Resetw((_Elem*)0, 0);
+		}
+
+	template<class _Ty2>
+		void _Resetw(const _Ptr_base<_Ty2>& _Other)
+		{	// release weak reference to resource and take _Other._Ptr
+		_Resetw(_Other._Ptr, _Other._Rep);
+		}
+
+	template<class _Ty2>
+		void _Resetw(const _Ty2 *_Other_ptr, _Ref_count_base *_Other_rep)
+		{	// point to _Other_ptr through _Other_rep
+		_Resetw(const_cast<_Ty2*>(_Other_ptr), _Other_rep);
+		}
+
+	template<class _Ty2>
+		void _Resetw(_Ty2 *_Other_ptr, _Ref_count_base *_Other_rep)
+		{	// point to _Other_ptr through _Other_rep
+		if (_Other_rep)
+			_Other_rep->_Incwref();
+		if (_Rep != 0)
+			_Rep->_Decwref();
+		_Rep = _Other_rep;
+		_Ptr = _Other_ptr;
+		}
+
+private:
+	_Ty *_Ptr;
+	_Ref_count_base *_Rep;
+	template<class _Ty0>
+		friend class _Ptr_base;
+	};
+
+	// HELPER TEMPLATE CLASS _Ref
+template<class _Ty>
+	struct _Ref
+	{	// ref for _Ty
+	typedef _Ty& _Type;
+	};
+
+template<> struct
+	_Ref<void>
+	{	// ref for void
+	typedef void _Type;
+	};
+
+template<>
+	struct _Ref<const void>
+	{	// ref for const void
+	typedef void _Type;
+	};
+
+template<>
+	struct _Ref<volatile void>
+	{	// ref for volatile void
+	typedef void _Type;
+	};
+
+template<>
+	struct _Ref<const volatile void>
+	{	// ref for const volatile void
+	typedef void _Type;
+	};
+
+	// TEMPLATE CLASS shared_ptr
+template<class _Ty>
+	class shared_ptr
+		: public _Ptr_base<_Ty>
+	{	// class for reference counted resource management
+public:
+	shared_ptr()
+		{	// construct empty shared_ptr object
+		this->_Reset();
+		}
+
+	template<class _Ux>
+		explicit shared_ptr(_Ux *_Px)
+		{	// construct shared_ptr object that owns *_Px
+		_Resetp(_Px);
+		}
+
+	template<class _Ux,
+		class _Dx>
+		shared_ptr(_Ux *_Px, _Dx _Dt)
+		{	// construct with *_Px, deleter
+		_Resetp(_Px, _Dt);
+		}
+
+	template<class _Ux,
+		class _Dx,
+		class _Alloc>
+		shared_ptr(_Ux *_Px, _Dx _Dt, _Alloc _Ax)
+		{	// construct with *_Px, deleter, allocator
+		_Resetp(_Px, _Dt, _Ax);
+		}
+
+	shared_ptr(const shared_ptr& _Other)
+		{	// construct shared_ptr object that owns same resource as _Other
+		this->_Reset(_Other);
+		}
+
+	template<class _Ty2>
+		shared_ptr(const shared_ptr<_Ty2>& _Other)
+		{	// construct shared_ptr object that owns same resource as _Other
+		this->_Reset(_Other);
+		}
+
+	template<class _Ty2>
+		explicit shared_ptr(const weak_ptr<_Ty2>& _Other,
+			bool _Throw = true)
+		{	// construct shared_ptr object that owns resource *_Other
+		this->_Reset(_Other, _Throw);
+		}
+
+	template<class _Ty2>
+		explicit shared_ptr(auto_ptr<_Ty2>& _Other)
+		{	// construct shared_ptr object that owns *_Other.get()
+		this->_Reset(_Other);
+		}
+
+	template<class _Ty2>
+		shared_ptr(const shared_ptr<_Ty2>& _Other, const _Static_tag& _Tag)
+		{	// construct shared_ptr object for static_pointer_cast
+		this->_Reset(_Other, _Tag);
+		}
+
+	template<class _Ty2>
+		shared_ptr(const shared_ptr<_Ty2>& _Other, const _Const_tag& _Tag)
+		{	// construct shared_ptr object for const_pointer_cast
+		this->_Reset(_Other, _Tag);
+		}
+
+	template<class _Ty2>
+		shared_ptr(const shared_ptr<_Ty2>& _Other, const _Dynamic_tag& _Tag)
+		{	// construct shared_ptr object for dynamic_pointer_cast
+		this->_Reset(_Other, _Tag);
+		}
+
+	~shared_ptr()
+		{	// release resource
+		this->_Decref();
+		}
+
+	shared_ptr& operator=(const shared_ptr& _Right)
+		{	// assign shared ownership of resource owned by _Right
+		this->_Reset(_Right);
+		return (*this);
+		}
+
+	template<class _Ty2>
+		shared_ptr& operator=(const shared_ptr<_Ty2>& _Right)
+		{	// assign shared ownership of resource owned by _Right
+		this->_Reset(_Right);
+		return (*this);
+		}
+
+	template<class _Ty2>
+		shared_ptr& operator=(auto_ptr<_Ty2>& _Right)
+		{	// assign ownership of resource pointed to by _Right
+		this->_Reset(_Right);
+		return (*this);
+		}
+
+	void reset()
+		{	// release resource and convert to empty shared_ptr object
+		this->_Reset();
+		}
+
+	template<class _Ux>
+		void reset(_Ux *_Px)
+		{	// release, take ownership of _Px
+		_Resetp(_Px);
+		}
+
+	template<class _Ux,
+		class _Dx>
+		void reset(_Ux *_Px, _Dx _Dt)
+		{	// release, take ownership of _Px, with deleter _Dt
+		_Resetp(_Px, _Dt);
+		}
+
+	template<class _Ux,
+		class _Dx,
+		class _Alloc>
+		void reset(_Ux *_Px, _Dx _Dt, _Alloc _Ax)
+		{	// release, take ownership of _Px, with deleter _Dt, allocator _Ax
+		_Resetp(_Px, _Dt, _Ax);
+		}
+
+	void swap(shared_ptr& _Other)
+		{	// swap pointers
+		this->_Swap(_Other);
+		}
+
+	_Ty *get() const
+		{	// return pointer to resource
+		return (this->_Get());
+		}
+
+	typename _Ref<_Ty>::_Type operator*() const
+		{	// return reference to resource
+		return (*this->_Get());
+		}
+
+	_Ty *operator->() const
+		{	// return pointer to resource
+		return (this->_Get());
+		}
+
+	bool unique() const
+		{	// return true if no other shared_ptr object owns this resource
+		return (this->use_count() == 1);
+		}
+
+	operator _STD _Bool_type() const
+		{	// test if shared_ptr object owns no resource
+		return (this->_Get() != 0 ? _CONVERTIBLE_TO_TRUE : 0);
+		}
+
+private:
+	template<class _Ux>
+		void _Resetp(_Ux *_Px)
+		{	// release, take ownership of _Px
+		_TRY_BEGIN	// allocate control block and reset
+		_Resetp0(_Px, new _Ref_count<_Ux>(_Px));
+		_CATCH_ALL	// allocation failed, delete resource
+		delete _Px;
+		_RERAISE;
+		_CATCH_END
+		}
+
+	template<class _Ux,
+		class _Dx>
+		void _Resetp(_Ux *_Px, _Dx _Dt)
+		{	// release, take ownership of _Px, deleter _Dt
+		typedef _Ref_count_d<_Ux, _Dx> _Refd;
+
+		_TRY_BEGIN	// allocate control block and reset
+		_Resetp0(_Px, new _Refd(_Px, _Dt));
+		_CATCH_ALL	// allocation failed, delete resource
+		_Dt(_Px);
+		_RERAISE;
+		_CATCH_END
+		}
+
+	template<class _Ux,
+		class _Dx,
+		class _Alloc>
+		void _Resetp(_Ux *_Px, _Dx _Dt, _Alloc _Ax)
+		{	// release, take ownership of _Px, deleter _Dt, allocator _Ax
+		typedef _Ref_count_d<_Ux, _Dx, _Alloc> _Refd;
+		typename _Alloc::template rebind<_Refd>::other _Al = _Ax;
+
+		_TRY_BEGIN	// allocate control block and reset
+		_Refd *_Ptr = _Al.allocate(1);
+		new (_Ptr) _Refd(_Px, _Dt, _Al);
+		_Resetp0(_Px, _Ptr);
+		_CATCH_ALL	// allocation failed, delete resource
+		_Dt(_Px);
+		_RERAISE;
+		_CATCH_END
+		}
+
+	template<class _Ux>
+		void _Resetp0(_Ux *_Px, _Ref_count_base *_Rx)
+		{	// release resource and take ownership of _Px
+		this->_Reset(_Px, _Rx);
+		_Enable_shared(_Px, _Rx);
+		}
+	};
+
+template<class _Ty1,
+	class _Ty2>
+	bool operator==(const shared_ptr<_Ty1>& _S1,
+		const shared_ptr<_Ty2>& _S2)
+	{	// test if shared_ptr objects hold pointers that compare equal
+	return (_S1.get() == _S2.get());
+	}
+
+template<class _Ty1,
+	class _Ty2>
+	bool operator!=(const shared_ptr<_Ty1>& _S1,
+		const shared_ptr<_Ty2>& _S2)
+	{	// test if shared_ptr objects hold pointers that compare unequal
+	return (!(_S1 == _S2));
+	}
+
+template<class _Ty1,
+	class _Ty2>
+	bool operator< (const shared_ptr<_Ty1>& _S1,
+		const shared_ptr<_Ty2>& _S2)
+	{	// return true if _S1 precedes _S2 (order defined by control block)
+	return (_S1._Cmp(_S2));
+	}
+
+template<class _Elem,
+	class _Traits,
+	class _Ty>
+	basic_ostream<_Elem, _Traits>&
+	operator<<(basic_ostream<_Elem, _Traits>& _Out,
+		const shared_ptr<_Ty>& _Px)
+	{	// write contained pointer to stream
+	return (_Out << _Px.get());
+	}
+
+template<class _Ty>
+	void swap(shared_ptr<_Ty>& _S1, shared_ptr<_Ty>& _S2)
+	{	// swap contents of _S1 and _S2
+	_S1.swap(_S2);
+	}
+
+template<class _Ty1,
+	class _Ty2>
+	shared_ptr<_Ty1> static_pointer_cast(const shared_ptr<_Ty2>& _Other)
+	{	// return shared_ptr object holding static_cast<_Ty1 *)(_Other.get())
+	return (shared_ptr<_Ty1>(_Other, _Static_tag()));
+	}
+
+template<class _Ty1,
+	class _Ty2>
+	shared_ptr<_Ty1> const_pointer_cast(const shared_ptr<_Ty2>& _Other)
+	{	// return shared_ptr object holding const_cast<_Ty1 *)(_Other.get())
+	return (shared_ptr<_Ty1>(_Other, _Const_tag()));
+	}
+
+template<class _Ty1,
+	class _Ty2>
+	shared_ptr<_Ty1> dynamic_pointer_cast(const shared_ptr<_Ty2>& _Other)
+	{	// return shared_ptr object holding dynamic_cast<_Ty1*)(_Other.get())
+	return (shared_ptr<_Ty1>(_Other, _Dynamic_tag()));
+	}
+
+template<class _Dx,
+	class _Ty>
+	_Dx *get_deleter(const shared_ptr<_Ty>& _Sx)
+	{	// return pointer to shared_ptr's deleter object if its type is _Ty
+	return ((_Dx *)_Sx._Get_deleter(typeid(_Dx)));
+	}
+
+	// TEMPLATE CLASS weak_ptr
+template<class _Ty>
+	class weak_ptr
+		: public _Ptr_base<_Ty>
+	{	// class for pointer to reference counted resource
+	typedef typename _Ptr_base<_Ty>::_Elem _Elem;
+
+public:
+	weak_ptr()
+		{	// construct empty weak_ptr object
+		this->_Resetw();
+		}
+
+	template<class _Ty2>
+		weak_ptr(const shared_ptr<_Ty2>& _Other)
+		{	// construct weak_ptr object for resource owned by _Other
+		this->_Resetw(_Other);
+		}
+
+	weak_ptr(const weak_ptr& _Other)
+		{	// construct weak_ptr object for resource pointed to by _Other
+		this->_Resetw(_Other);
+		}
+
+	template<class _Ty2>
+		weak_ptr(const weak_ptr<_Ty2>& _Other)
+		{	// construct weak_ptr object for resource pointed to by _Other
+		this->_Resetw(_Other);
+		}
+
+	~weak_ptr()
+		{	// release resource
+		this->_Decwref();
+		}
+
+	weak_ptr& operator=(const weak_ptr& _Right)
+		{	// assign from _Right
+		this->_Resetw(_Right);
+		return (*this);
+		}
+
+	template<class _Ty2>
+		weak_ptr& operator=(const weak_ptr<_Ty2>& _Right)
+		{	// assign from _Right
+		this->_Resetw(_Right);
+		return (*this);
+		}
+
+	template<class _Ty2>
+		weak_ptr& operator=(shared_ptr<_Ty2>& _Right)
+		{	// assign from _Right
+		this->_Resetw(_Right);
+		return (*this);
+		}
+
+	void reset()
+		{	// release resource, convert to null weak_ptr object
+		this->_Resetw();
+		}
+
+	void swap(weak_ptr& _Other)
+		{	// swap pointers
+		this->_Swap(_Other);
+		}
+
+	bool expired() const
+		{	// return true if resource no longer exists
+		return (this->_Expired());
+		}
+
+	shared_ptr<_Ty> lock() const
+		{	// convert to shared_ptr
+		return (shared_ptr<_Elem>(*this, false));
+		}
+	};
+
+template<class _Ty1,
+	class _Ty2>
+	bool operator<(const weak_ptr<_Ty1>& _W1,
+		const weak_ptr<_Ty2>& _W2)
+	{	// return true if _S1 precedes _S2 (order defined by control block)
+	return (_W1._Cmp(_W2));
+	}
+
+template<class _Ty>
+	void swap(weak_ptr<_Ty>& _W1, weak_ptr<_Ty>& _W2)
+	{	// swap contents of _W1 and _W2
+	_W1.swap(_W2);
+	}
+
+	// TEMPLATE CLASS enable_shared_from_this
+template<class _Ty> class enable_shared_from_this
+	{	// provide member functions that create shared_ptr to this
+public:
+	typedef _Ty _EStype;
+
+	shared_ptr<_Ty> shared_from_this()
+		{	// return shared_ptr
+		return (shared_ptr<_Ty>(_Wptr));
+		}
+
+	shared_ptr<const _Ty> shared_from_this() const
+		{	// return shared_ptr
+		return (shared_ptr<const _Ty>(_Wptr));
+		}
+
+protected:
+	enable_shared_from_this()
+		{	// construct (do nothing)
+		}
+
+	enable_shared_from_this(const enable_shared_from_this&)
+		{	// construct (do nothing)
+		}
+
+	enable_shared_from_this& operator=(const enable_shared_from_this&)
+		{	// assign (do nothing)
+		return (*this);
+		}
+
+	~enable_shared_from_this()
+		{	// destroy (do nothing)
+		}
+
+private:
+	template<class _Ty1,
+		class _Ty2>
+		friend void _Do_enable(
+			_Ty1 *,
+			enable_shared_from_this<_Ty2>*,
+			_Ref_count_base *);
+
+	mutable weak_ptr<_Ty> _Wptr;
+	};
+
+template<class _Ty1,
+	class _Ty2>
+	inline void _Do_enable(
+		_Ty1 *_Ptr,
+		enable_shared_from_this<_Ty2> *_Es,
+		_Ref_count_base *_Refptr)
+	{	// reset internal weak pointer
+	_Es->_Wptr._Resetw(_Ptr, _Refptr);
+	}
+	}	// namespace tr1
+
+template<class _Ty>
+	class _Move_operation_category<tr1::shared_ptr<_Ty> >
+	{	// shared_ptr implements a performant swap
+public:
+	typedef _Swap_move_tag _Move_cat;
+	};
+
+template<class _Ty>
+	class _Move_operation_category<tr1::weak_ptr<_Ty> >
+	{	// weak_ptr implements a performant swap
+public:
+	typedef _Swap_move_tag _Move_cat;
+	};
+_STD_END
+ #endif /* _HAS_TR1 */
+
+#ifdef _MSC_VER
+ #pragma warning(pop)
+ #pragma pack(pop)
+#endif  /* _MSC_VER */
+
+#endif /* RC_INVOKED */
+#endif /* _MEMORY_ */
+
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+ */
+
+/*
+ * This file is derived from software bearing the following
+ * restrictions:
+ *
+ * Copyright (c) 1994
+ * Hewlett-Packard Company
+ *
+ * Permission to use, copy, modify, distribute and sell this
+ * software and its documentation for any purpose is hereby
+ * granted without fee, provided that the above copyright notice
+ * appear in all copies and that both that copyright notice and
+ * this permission notice appear in supporting documentation.
+ * Hewlett-Packard Company makes no representations about the
+ * suitability of this software for any purpose. It is provided
+ * "as is" without express or implied warranty.
+ V5.05:0009 */
+
+

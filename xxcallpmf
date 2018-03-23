@@ -1,0 +1,16 @@
+// xxcallpmf internal header
+// NOTE: no include guard
+
+ #if _NARGS != 0
+template<class _Ret _C_CLASS_ARG0>
+	_Ret _ApplyX(_ARG0_A0_REF) const
+	{ // call pointer to member function
+	return (_CLASS_NAME(_Pmf_caller)<_Ret, _Memty>::
+		_Apply_pmf(this->_Get(), _A0_A1));
+	}
+ #endif /* _NARGS != 0 */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

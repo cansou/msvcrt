@@ -1,0 +1,19 @@
+// xxcallwrap internal header
+// NOTE: no include guard
+
+ #if _NARGS != 0
+template<_CLASS_CARG0>
+ #endif /* _NARGS != 0 */
+
+	typename _Result_of<typename _Callable::_MyTy(_CARG0_CARG1_REF)>::_Type
+		operator()(_CARG0_C0_REF) const
+	{ // call target object
+	typedef typename _Result_of<
+		typename _Callable::_MyTy(_CARG0_CARG1_REF)>::_Type _Ret;
+	return (_Mybase::_Callee.template _ApplyX<_Ret>(_C0_C1));
+	}
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

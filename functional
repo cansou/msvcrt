@@ -1,0 +1,1352 @@
+// functional standard header
+#pragma once
+#ifndef _FUNCTIONAL_
+#define _FUNCTIONAL_
+#ifndef RC_INVOKED
+#include <cstdlib>
+#include <xstring>
+
+#ifdef _MSC_VER
+ #pragma pack(push,_CRT_PACKING)
+ #pragma warning(push,3)
+ #pragma warning(disable: 4100 4180 4244)
+#endif  /* _MSC_VER */
+
+_STD_BEGIN
+
+		// TEMPLATE STRUCT unary_function
+template<class _Arg,
+	class _Result>
+	struct unary_function
+	{	// base class for unary functions
+	typedef _Arg argument_type;
+	typedef _Result result_type;
+	};
+
+		// TEMPLATE STRUCT binary_function
+template<class _Arg1,
+	class _Arg2,
+	class _Result>
+	struct binary_function
+	{	// base class for binary functions
+	typedef _Arg1 first_argument_type;
+	typedef _Arg2 second_argument_type;
+	typedef _Result result_type;
+	};
+
+		// TEMPLATE STRUCT plus
+template<class _Ty>
+	struct plus
+		: public binary_function<_Ty, _Ty, _Ty>
+	{	// functor for operator+
+	_Ty operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator+ to operands
+		return (_Left + _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT minus
+template<class _Ty>
+	struct minus
+		: public binary_function<_Ty, _Ty, _Ty>
+	{	// functor for operator-
+	_Ty operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator- to operands
+		return (_Left - _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT multiplies
+template<class _Ty>
+	struct multiplies
+		: public binary_function<_Ty, _Ty, _Ty>
+	{	// functor for operator*
+	_Ty operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator* to operands
+		return (_Left * _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT divides
+template<class _Ty>
+	struct divides
+		: public binary_function<_Ty, _Ty, _Ty>
+	{	// functor for operator/
+	_Ty operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator/ to operands
+		return (_Left / _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT modulus
+template<class _Ty>
+	struct modulus
+		: public binary_function<_Ty, _Ty, _Ty>
+	{	// functor for operator%
+	_Ty operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator% to operands
+		return (_Left % _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT negate
+template<class _Ty>
+	struct negate
+		: public unary_function<_Ty, _Ty>
+	{	// functor for unary operator-
+	_Ty operator()(const _Ty& _Left) const
+		{	// apply operator- to operand
+		return (-_Left);
+		}
+	};
+
+		// TEMPLATE STRUCT equal_to
+template<class _Ty>
+	struct equal_to
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator==
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator== to operands
+		return (_Left == _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT not_equal_to
+template<class _Ty>
+	struct not_equal_to
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator!=
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator!= to operands
+		return (_Left != _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT greater
+template<class _Ty>
+	struct greater
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator>
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator> to operands
+		return (_Left > _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT less
+template<class _Ty>
+	struct less
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator<
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator< to operands
+		return (_Left < _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT greater_equal
+template<class _Ty>
+	struct greater_equal
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator>=
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator>= to operands
+		return (_Left >= _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT less_equal
+template<class _Ty>
+	struct less_equal
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator<=
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator<= to operands
+		return (_Left <= _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT logical_and
+template<class _Ty>
+	struct logical_and
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator&&
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator&& to operands
+		return (_Left && _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT logical_or
+template<class _Ty>
+	struct logical_or
+		: public binary_function<_Ty, _Ty, bool>
+	{	// functor for operator||
+	bool operator()(const _Ty& _Left, const _Ty& _Right) const
+		{	// apply operator|| to operands
+		return (_Left || _Right);
+		}
+	};
+
+		// TEMPLATE STRUCT logical_not
+template<class _Ty>
+	struct logical_not
+		: public unary_function<_Ty, bool>
+	{	// functor for unary operator!
+	bool operator()(const _Ty& _Left) const
+		{	// apply operator! to operand
+		return (!_Left);
+		}
+	};
+
+		// TEMPLATE CLASS unary_negate
+template<class _Fn1>
+	class unary_negate
+	: public unary_function<typename _Fn1::argument_type, bool>
+	{	// functor adapter !_Func(left)
+public:
+	explicit unary_negate(const _Fn1& _Func)
+		: _Functor(_Func)
+		{	// construct from functor
+		}
+
+	bool operator()(const typename _Fn1::argument_type& _Left) const
+		{	// apply functor to operand
+		return (!_Functor(_Left));
+		}
+
+protected:
+	_Fn1 _Functor;	// the functor to apply
+	};
+
+		// TEMPLATE FUNCTION not1
+template<class _Fn1> inline
+	unary_negate<_Fn1> not1(const _Fn1& _Func)
+	{	// return a unary_negate functor adapter
+	return (std::unary_negate<_Fn1>(_Func));
+	}
+
+		// TEMPLATE CLASS binary_negate
+template<class _Fn2>
+	class binary_negate
+		: public binary_function<typename _Fn2::first_argument_type,
+			typename _Fn2::second_argument_type, bool>
+	{	// functor adapter !_Func(left, right)
+public:
+	explicit binary_negate(const _Fn2& _Func)
+		: _Functor(_Func)
+		{	// construct from functor
+		}
+
+	bool operator()(const typename _Fn2::first_argument_type& _Left,
+		const typename _Fn2::second_argument_type& _Right) const
+		{	// apply functor to operands
+		return (!_Functor(_Left, _Right));
+		}
+
+protected:
+	_Fn2 _Functor;	// the functor to apply
+	};
+
+		// TEMPLATE FUNCTION not2
+template<class _Fn2> inline
+	binary_negate<_Fn2> not2(const _Fn2& _Func)
+	{	// return a binary_negate functor adapter
+	return (std::binary_negate<_Fn2>(_Func));
+	}
+
+		// TEMPLATE CLASS binder1st
+template<class _Fn2>
+	class binder1st
+		: public unary_function<typename _Fn2::second_argument_type,
+			typename _Fn2::result_type>
+	{	// functor adapter _Func(stored, right)
+public:
+	typedef unary_function<typename _Fn2::second_argument_type,
+		typename _Fn2::result_type> _Base;
+	typedef typename _Base::argument_type argument_type;
+	typedef typename _Base::result_type result_type;
+
+	binder1st(const _Fn2& _Func,
+		const typename _Fn2::first_argument_type& _Left)
+		: op(_Func), value(_Left)
+		{	// construct from functor and left operand
+		}
+
+	result_type operator()(const argument_type& _Right) const
+		{	// apply functor to operands
+		return (op(value, _Right));
+		}
+
+	result_type operator()(argument_type& _Right) const
+		{	// apply functor to operands
+		return (op(value, _Right));
+		}
+
+protected:
+	_Fn2 op;	// the functor to apply
+	typename _Fn2::first_argument_type value;	// the left operand
+	};
+
+		// TEMPLATE FUNCTION bind1st
+template<class _Fn2,
+	class _Ty> inline
+	binder1st<_Fn2> bind1st(const _Fn2& _Func, const _Ty& _Left)
+		{	// return a binder1st functor adapter
+		typename _Fn2::first_argument_type _Val(_Left);
+		return (std::binder1st<_Fn2>(_Func, _Val));
+		}
+
+		// TEMPLATE CLASS binder2nd
+template<class _Fn2>
+	class binder2nd
+		: public unary_function<typename _Fn2::first_argument_type,
+			typename _Fn2::result_type>
+	{	// functor adapter _Func(left, stored)
+public:
+	typedef unary_function<typename _Fn2::first_argument_type,
+		typename _Fn2::result_type> _Base;
+	typedef typename _Base::argument_type argument_type;
+	typedef typename _Base::result_type result_type;
+
+	binder2nd(const _Fn2& _Func,
+		const typename _Fn2::second_argument_type& _Right)
+		: op(_Func), value(_Right)
+		{	// construct from functor and right operand
+		}
+
+	result_type operator()(const argument_type& _Left) const
+		{	// apply functor to operands
+		return (op(_Left, value));
+		}
+
+	result_type operator()(argument_type& _Left) const
+		{	// apply functor to operands
+		return (op(_Left, value));
+		}
+
+protected:
+	_Fn2 op;	// the functor to apply
+	typename _Fn2::second_argument_type value;	// the right operand
+	};
+
+		// TEMPLATE FUNCTION bind2nd
+template<class _Fn2,
+	class _Ty> inline
+	binder2nd<_Fn2> bind2nd(const _Fn2& _Func, const _Ty& _Right)
+	{	// return a binder2nd functor adapter
+	typename _Fn2::second_argument_type _Val(_Right);
+	return (std::binder2nd<_Fn2>(_Func, _Val));
+	}
+
+		// TEMPLATE CLASS pointer_to_unary_function
+template<class _Arg,
+	class _Result,
+	class _Fn = _Result (*)(_Arg)>
+	class pointer_to_unary_function
+		: public unary_function<_Arg, _Result>
+	{	// functor adapter (*pfunc)(left)
+public:
+	explicit pointer_to_unary_function(_Fn _Left)
+		: _Pfun(_Left)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Arg _Left) const
+		{	// call function with operand
+		return (_Pfun(_Left));
+		}
+
+protected:
+	_Fn _Pfun;	// the function pointer
+	};
+
+		// TEMPLATE CLASS pointer_to_binary_function
+template<class _Arg1,
+	class _Arg2,
+	class _Result,
+	class _Fn = _Result (*)(_Arg1, _Arg2)>
+	class pointer_to_binary_function
+		: public binary_function<_Arg1, _Arg2, _Result>
+	{	// functor adapter (*pfunc)(left, right)
+public:
+	explicit pointer_to_binary_function(_Fn _Left)
+		: _Pfun(_Left)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Arg1 _Left, _Arg2 _Right) const
+		{	// call function with operands
+		return (_Pfun(_Left, _Right));
+		}
+
+protected:
+	_Fn _Pfun;	// the function pointer
+	};
+
+		// TEMPLATE FUNCTION ptr_fun
+template<class _Arg,
+	class _Result> inline
+	pointer_to_unary_function<_Arg, _Result,
+		_Result (__cdecl *)(_Arg)>
+			ptr_fun(_Result (__cdecl *_Left)(_Arg))
+	{	// return pointer_to_unary_function functor adapter
+	return (std::pointer_to_unary_function<_Arg, _Result,
+		_Result (__cdecl *)(_Arg)>(_Left));
+	}
+
+ #ifdef _M_IX86
+template<class _Arg,
+	class _Result> inline
+	pointer_to_unary_function<_Arg, _Result,
+		_Result (__stdcall *)(_Arg)>
+			ptr_fun(_Result (__stdcall *_Left)(_Arg))
+	{	// return pointer_to_unary_function functor adapter
+	return (std::pointer_to_unary_function<_Arg, _Result,
+		_Result (__stdcall *)(_Arg)>(_Left));
+	}
+
+  #ifndef _M_CEE
+template<class _Arg,
+	class _Result> inline
+	pointer_to_unary_function<_Arg, _Result,
+		_Result (__fastcall *)(_Arg)>
+			ptr_fun(_Result (__fastcall *_Left)(_Arg))
+	{	// return pointer_to_unary_function functor adapter
+	return (std::pointer_to_unary_function<_Arg, _Result,
+		_Result (__fastcall *)(_Arg)>(_Left));
+	}
+  #endif /* _M_CEE */
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Arg,
+	class _Result> inline
+	pointer_to_unary_function<_Arg, _Result,
+		_Result (__clrcall *)(_Arg)>
+			ptr_fun(_Result (__clrcall *_Left)(_Arg))
+	{	// return pointer_to_unary_function functor adapter
+	return (std::pointer_to_unary_function<_Arg, _Result,
+		_Result (__clrcall *)(_Arg)>(_Left));
+	}
+ #endif /* _M_CEE */
+
+template<class _Arg1,
+	class _Arg2,
+	class _Result> inline
+	pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result(__cdecl *)(_Arg1, _Arg2)>
+			ptr_fun(_Result (__cdecl *_Left)(_Arg1, _Arg2))
+	{	// return pointer_to_binary_function functor adapter
+	return (std::pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result (__cdecl *)(_Arg1, _Arg2)>(_Left));
+	}
+
+ #ifdef _M_IX86
+template<class _Arg1,
+	class _Arg2,
+	class _Result> inline
+	pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result(__stdcall *)(_Arg1, _Arg2)>
+			ptr_fun(_Result (__stdcall *_Left)(_Arg1, _Arg2))
+	{	// return pointer_to_binary_function functor adapter
+	return (std::pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result (__stdcall *)(_Arg1, _Arg2)>(_Left));
+	}
+
+  #ifndef _M_CEE
+template<class _Arg1,
+	class _Arg2,
+	class _Result> inline
+	pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result(__fastcall *)(_Arg1, _Arg2)>
+			ptr_fun(_Result (__fastcall *_Left)(_Arg1, _Arg2))
+	{	// return pointer_to_binary_function functor adapter
+	return (std::pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result (__fastcall *)(_Arg1, _Arg2)>(_Left));
+	}
+  #endif /* _M_CEE */
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Arg1,
+	class _Arg2,
+	class _Result> inline
+	pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result(__clrcall *)(_Arg1, _Arg2)>
+			ptr_fun(_Result (__clrcall *_Left)(_Arg1, _Arg2))
+	{	// return pointer_to_binary_function functor adapter
+	return (std::pointer_to_binary_function<_Arg1, _Arg2, _Result,
+		_Result (__clrcall *)(_Arg1, _Arg2)>(_Left));
+	}
+ #endif /* _M_CEE */
+
+		// TEMPLATE CLASS mem_fun_t
+template<class _Result,
+	class _Ty>
+	class mem_fun_t
+		: public unary_function<_Ty *, _Result>
+	{	// functor adapter (*p->*pfunc)(), non-const *pfunc
+public:
+	explicit mem_fun_t(_Result (_Ty::*_Pm)())
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Ty *_Pleft) const
+		{	// call function
+		return ((_Pleft->*_Pmemfun)());
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)();	// the member function pointer
+	};
+
+		// TEMPLATE CLASS mem_fun1_t
+template<class _Result,
+	class _Ty,
+	class _Arg>
+	class mem_fun1_t
+		: public binary_function<_Ty *, _Arg, _Result>
+	{	// functor adapter (*p->*pfunc)(val), non-const *pfunc
+public:
+	explicit mem_fun1_t(_Result (_Ty::*_Pm)(_Arg))
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Ty *_Pleft, _Arg _Right) const
+		{	// call function with operand
+		return ((_Pleft->*_Pmemfun)(_Right));
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)(_Arg);	// the member function pointer
+	};
+
+		// TEMPLATE CLASS const_mem_fun_t
+template<class _Result,
+	class _Ty>
+	class const_mem_fun_t
+		: public unary_function<const _Ty *, _Result>
+	{	// functor adapter (*p->*pfunc)(), const *pfunc
+public:
+	explicit const_mem_fun_t(_Result (_Ty::*_Pm)() const)
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(const _Ty *_Pleft) const
+		{	// call function
+		return ((_Pleft->*_Pmemfun)());
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)() const;	// the member function pointer
+	};
+
+		// TEMPLATE CLASS const_mem_fun1_t
+template<class _Result,
+	class _Ty,
+	class _Arg>
+	class const_mem_fun1_t
+		: public binary_function<const _Ty *, _Arg, _Result>
+	{	// functor adapter (*p->*pfunc)(val), const *pfunc
+public:
+	explicit const_mem_fun1_t(_Result (_Ty::*_Pm)(_Arg) const)
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(const _Ty *_Pleft, _Arg _Right) const
+		{	// call function with operand
+		return ((_Pleft->*_Pmemfun)(_Right));
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)(_Arg) const;	// the member function pointer
+	};
+
+		// TEMPLATE FUNCTION mem_fun
+template<class _Result,
+	class _Ty> inline
+	mem_fun_t<_Result, _Ty> mem_fun(_Result (_Ty::*_Pm)())
+	{	// return a mem_fun_t functor adapter
+	return (std::mem_fun_t<_Result, _Ty>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	mem_fun1_t<_Result, _Ty, _Arg> mem_fun(_Result (_Ty::*_Pm)(_Arg))
+	{	// return a mem_fun1_t functor adapter
+	return (std::mem_fun1_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty> inline
+	const_mem_fun_t<_Result, _Ty>
+		mem_fun(_Result (_Ty::*_Pm)() const)
+	{	// return a const_mem_fun_t functor adapter
+	return (std::const_mem_fun_t<_Result, _Ty>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	const_mem_fun1_t<_Result, _Ty, _Arg>
+		mem_fun(_Result (_Ty::*_Pm)(_Arg) const)
+	{	// return a const_mem_fun1_t functor adapter
+	return (std::const_mem_fun1_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+		// TEMPLATE FUNCTION mem_fun1 (retained)
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	mem_fun1_t<_Result, _Ty, _Arg> mem_fun1(_Result (_Ty::*_Pm)(_Arg))
+	{	// return a mem_fun1_t functor adapter
+	return (std::mem_fun1_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+		// TEMPLATE CLASS mem_fun_ref_t
+template<class _Result,
+	class _Ty>
+	class mem_fun_ref_t
+		: public unary_function<_Ty, _Result>
+	{	// functor adapter (*left.*pfunc)(), non-const *pfunc
+public:
+	explicit mem_fun_ref_t(_Result (_Ty::*_Pm)())
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Ty& _Left) const
+		{	// call function
+		return ((_Left.*_Pmemfun)());
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)();	// the member function pointer
+	};
+
+		// TEMPLATE CLASS mem_fun1_ref_t
+template<class _Result,
+	class _Ty,
+	class _Arg>
+	class mem_fun1_ref_t
+		: public binary_function<_Ty, _Arg, _Result>
+	{	// functor adapter (*left.*pfunc)(val), non-const *pfunc
+public:
+	explicit mem_fun1_ref_t(_Result (_Ty::*_Pm)(_Arg))
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(_Ty& _Left, _Arg _Right) const
+		{	// call function with operand
+		return ((_Left.*_Pmemfun)(_Right));
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)(_Arg);	// the member function pointer
+	};
+
+		// TEMPLATE CLASS const_mem_fun_ref_t
+template<class _Result,
+	class _Ty>
+	class const_mem_fun_ref_t
+		: public unary_function<_Ty, _Result>
+	{	// functor adapter (*left.*pfunc)(), const *pfunc
+public:
+	explicit const_mem_fun_ref_t(_Result (_Ty::*_Pm)() const)
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(const _Ty& _Left) const
+		{	// call function
+		return ((_Left.*_Pmemfun)());
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)() const;	// the member function pointer
+	};
+
+		// TEMPLATE CLASS const_mem_fun1_ref_t
+template<class _Result,
+	class _Ty,
+	class _Arg>
+	class const_mem_fun1_ref_t
+		: public binary_function<_Ty, _Arg, _Result>
+	{	// functor adapter (*left.*pfunc)(val), const *pfunc
+public:
+	explicit const_mem_fun1_ref_t(_Result (_Ty::*_Pm)(_Arg) const)
+		: _Pmemfun(_Pm)
+		{	// construct from pointer
+		}
+
+	_Result operator()(const _Ty& _Left, _Arg _Right) const
+		{	// call function with operand
+		return ((_Left.*_Pmemfun)(_Right));
+		}
+
+private:
+	_Result (_Ty::*_Pmemfun)(_Arg) const;	// the member function pointer
+	};
+
+		// TEMPLATE FUNCTION mem_fun_ref
+template<class _Result,
+	class _Ty> inline
+	mem_fun_ref_t<_Result, _Ty> mem_fun_ref(_Result (_Ty::*_Pm)())
+	{	// return a mem_fun_ref_t functor adapter
+	return (std::mem_fun_ref_t<_Result, _Ty>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	mem_fun1_ref_t<_Result, _Ty, _Arg>
+		mem_fun_ref(_Result (_Ty::*_Pm)(_Arg))
+	{	// return a mem_fun1_ref_t functor adapter
+	return (std::mem_fun1_ref_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty> inline
+	const_mem_fun_ref_t<_Result, _Ty>
+		mem_fun_ref(_Result (_Ty::*_Pm)() const)
+	{	// return a const_mem_fun_ref_t functor adapter
+	return (std::const_mem_fun_ref_t<_Result, _Ty>(_Pm));
+	}
+
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	const_mem_fun1_ref_t<_Result, _Ty, _Arg>
+		mem_fun_ref(_Result (_Ty::*_Pm)(_Arg) const)
+	{	// return a const_mem_fun1_ref_t functor adapter
+	return (std::const_mem_fun1_ref_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+		// TEMPLATE FUNCTION mem_fun1_ref (retained)
+template<class _Result,
+	class _Ty,
+	class _Arg> inline
+	mem_fun1_ref_t<_Result, _Ty, _Arg> mem_fun1_ref(_Result (_Ty::*_Pm)(_Arg))
+	{	// return a mem_fun1_ref_t functor adapter
+	return (std::mem_fun1_ref_t<_Result, _Ty, _Arg>(_Pm));
+	}
+
+ #if _HAS_TRADITIONAL_STL
+		// TEMPLATE STRUCT identity
+template<class _Arg>
+	struct identity
+		: public unary_function<_Arg, _Arg>
+	{	// functor for unary identity operator
+	_Arg operator()(const _Arg& _Left) const
+		{	// apply identity operator to operand
+		return (_Left);
+		}
+	};
+
+		// TEMPLATE STRUCT project1st
+template<class _Arg1,
+	class _Arg2>
+	struct project1st
+		: public binary_function<_Arg1, _Arg2, _Arg1>
+	{	// functor for binary first of two arg selector operator
+	_Arg1 operator()(const _Arg1& _Left, const _Arg2&) const
+		{	// apply first selector operator to two operands
+		return (_Left);
+		}
+	};
+
+		// TEMPLATE STRUCT project2nd
+template<class _Arg1,
+	class _Arg2>
+	struct project2nd
+		: public binary_function<_Arg1, _Arg2, _Arg2>
+	{	// functor for binary second of two arg selector operator
+	_Arg2 operator()(const _Arg1&, const _Arg2& _Right) const
+		{	// apply second selector operator to two operands
+		return (_Right);
+		}
+	};
+
+		// TEMPLATE STRUCT select1st
+template<class _Pair>
+	struct select1st
+		: public unary_function<_Pair, typename _Pair::first_type>
+	{	// functor for unary first of pair selector operator
+	const typename _Pair::first_type& operator()(const _Pair& _Left) const
+		{	// apply first selector operator to pair operand
+		return (_Left.first);
+		}
+	};
+
+		// TEMPLATE STRUCT select2nd
+template<class _Pair>
+	struct select2nd
+		: public unary_function<_Pair, typename _Pair::second_type>
+	{	// functor for unary second of pair selector operator
+	const typename _Pair::second_type& operator()(const _Pair& _Left) const
+		{	// apply second selector operator to pair operand
+		return (_Left.second);
+		}
+	};
+
+		// TEMPLATE CLASS unary_compose
+template<class _Fn1,
+	class _Fn2>
+	class unary_compose
+		: public unary_function<typename _Fn2::argument_type,
+			typename _Fn1::result_type>
+	{	// functor for f1(f2(x))
+public:
+	unary_compose(const _Fn1& _Func1, const _Fn2& _Func2)
+		: _Functor1(_Func1), _Functor2(_Func2)
+		{	// construct from functors
+		}
+
+	typename _Fn1::result_type operator()(
+		const typename _Fn2::argument_type& _Left) const
+		{	// apply functors to operand
+		return (_Functor1(_Functor2(_Left)));
+		}
+
+protected:
+	_Fn1 _Functor1;
+	_Fn2 _Functor2;
+	};
+
+		// TEMPLATE FUNCTION compose1
+template<class _Fn1,
+	class _Fn2> inline
+	unary_compose<_Fn1, _Fn2> compose1(const _Fn1& _Func1,
+		const _Fn2& _Func2)
+	{	// return a unary_compose<_Fn1, _Fn2> functor adapter
+	return (unary_compose<_Fn1, _Fn2>(_Func1, _Func2));
+	}
+
+		// TEMPLATE CLASS binary_compose
+template<class _Fn1,
+	class _Fn2,
+	class _Fn3>
+	class binary_compose
+		: public unary_function<typename _Fn2::argument_type,
+			typename _Fn1::result_type>
+	{	// functor for f1(f2(x), f3(x))
+public:
+	binary_compose(const _Fn1& _Func1, const _Fn2& _Func2, const _Fn3& _Func3)
+		: _Functor1(_Func1), _Functor2(_Func2), _Functor3(_Func3)
+		{	// construct from functors
+		}
+
+	typename _Fn1::result_type operator()(
+		const typename _Fn2::argument_type& _Left) const
+		{	// apply functors to operand
+		return (_Functor1(_Functor2(_Left), _Functor3(_Left)));
+		}
+
+protected:
+	_Fn1 _Functor1;
+	_Fn2 _Functor2;
+	_Fn3 _Functor3;
+	};
+
+		// TEMPLATE FUNCTION compose2
+template<class _Fn1,
+	class _Fn2,
+	class _Fn3> inline
+	binary_compose<_Fn1, _Fn2, _Fn3> compose2(const _Fn1& _Func1,
+		const _Fn2& _Func2, const _Fn3& _Func3)
+	{	// return a binary_compose<_Fn1, _Fn2, _Fn3> functor adapter
+	return (binary_compose<_Fn1, _Fn2, _Fn3>(_Func1, _Func2, _Func3));
+	}
+ #endif /* _HAS_TRADITIONAL_STL */
+
+_STD_END
+
+ #if _HAS_TR1
+ #include <exception>
+ #include <typeinfo>
+ #include <xrefwrap>
+
+ #ifndef _XSTD2
+  #define _XSTD2
+ #endif /* _XSTD2 */
+
+_STD_BEGIN
+	namespace tr1 {	// TR1 additions
+
+// IMPLEMENT std::tr1::mem_fn
+	// TEMPLATE FUNCTION mem_fn
+template<class _Rx,
+	class _Arg0>
+	_Call_wrapper<_Callable_pmd<_Rx _Arg0::*const, _Arg0> >
+		mem_fn(_Rx _Arg0::*const _Pmd)
+	{	// return data object wrapper
+	return (_Call_wrapper<_Callable_pmd<_Rx _Arg0::*const, _Arg0> >(_Pmd));
+	}
+
+// define multiple-argument variants of mem_fn
+ #define _INCL_FILE <xxmem_fn>
+ #define _NOZERO
+ #include <xfwrap>
+
+// IMPLEMENT std::tr1::function
+	// HELPERS
+
+ #if _NO_SFINAE
+  #define _NOT_INTEGRAL(ty)
+typedef int _Unutterable;
+
+ #else /* _NO_SFINAE */
+template<bool,
+	class _Ty>
+	struct _Not_integral;
+
+template<class _Ty>
+	struct _Not_integral<true, _Ty>
+	{	// distinguish non-integral types
+	typedef _Ty _Type;
+	};
+
+  #define _NOT_INTEGRAL(ty)	, \
+	typename _Not_integral<!_Is_integral<ty>::value, int>::_Type = 0
+
+typedef struct _Unnamed *_Unutterable;
+ #endif /* _NO_SFINAE */
+
+	// CLASS bad_function_call
+class bad_function_call
+	: public _XSTD exception
+	{	// null function pointer exception
+public:
+	explicit bad_function_call(const char * = 0)
+		{	// construct with ignored message
+		}
+
+	virtual const char *__CLR_OR_THIS_CALL what() const _THROW0()
+		{	// return pointer to message string
+		return ("bad function call");
+		}
+	};
+
+_CRTIMP2_PURE __declspec(noreturn) void __CLRCALL_PURE_OR_CDECL _Xfunc();
+
+	// TEMPLATE FUNCTION _Get_function_impl
+template<class _Tx>
+	struct _Get_function_impl;
+
+// function implementation:
+ #define _INCL_FILE <xxfunction>
+ #include <xfwrap>
+
+	// TEMPLATE CLASS function
+template<class _Fty>
+	class function
+		: public _Get_function_impl<_Fty>::_Type
+	{	// wrapper for callable objects
+public:
+	typedef function<_Fty> _Myt;
+	typedef typename _Get_function_impl<_Fty>::_Type _Mybase;
+	typedef std::allocator<int> _Alty0;
+
+	explicit function()
+		{	// construct empty function wrapper
+		this->_Reset();
+		}
+
+	function(const _Myt& _Right)
+		{	// construct holding copy of _Right
+		this->_Reset((const _Mybase&)_Right);
+		}
+
+	template<class _Fx>
+		function(_Fx _Func _NOT_INTEGRAL(_Fx))
+		{	// construct wrapper holding copy of _Func
+		this->_Reset(_Func, _Alty0());
+		}
+
+	template<class _Fx,
+		class _Alloc>
+		function(_Fx _Func _NOT_INTEGRAL(_Fx), _Alloc _Ax)
+		{	// construct wrapper holding copy of _Func
+		this->_Reset(_Func, _Ax);
+		}
+
+	template<class _Fx>
+		function(reference_wrapper<_Fx> _Func)
+		{	// construct wrapper holding reference to_Func
+		this->_Reset(_Func.get(), _Alty0());
+		}
+
+	template<class _Fx,
+		class _Alloc>
+		function(reference_wrapper<_Fx> _Func, _Alloc _Ax)
+		{	// construct wrapper holding reference to_Func
+		this->_Reset(_Func.get(), _Ax);
+		}
+
+	function(_Unutterable)
+		{	// construct empty function wrapper from null pointer
+		this->_Reset();
+		}
+
+	~function()
+		{	// destroy the object
+		this->_Tidy();
+		}
+
+	_Myt& operator=(const _Myt& _Right)
+		{	// assign _Right
+		if (this != &_Right)
+			{	// clean up and copy
+			this->_Tidy();
+			this->_Reset((const _Mybase&)_Right);
+			}
+		return (*this);
+		}
+
+	template<class _Fx>
+		_Myt& operator=(_Fx _Func _NOT_INTEGRAL(_Fx))
+		{	// assign function object _Func
+		this->_Tidy();
+		this->_Reset(_Func, _Alty0());
+		return (*this);
+		}
+
+	function& operator=(_Unutterable)
+		{	// clear function object
+		this->_Tidy();
+		this->_Reset();
+		return (*this);
+		}
+
+	template<class _Fx>
+		_Myt& operator=(reference_wrapper<_Fx> _Func)
+		{	// assign wrapper holding reference to_Func
+		this->_Reset(_Func.get(), _Alty0());
+		return (*this);
+		}
+
+	template<class _Fx,
+		class _Alloc>
+		void assign(_Fx _Func _NOT_INTEGRAL(_Fx), _Alloc _Ax)
+		{	// construct wrapper holding copy of _Func
+		this->_Reset(_Func, _Ax);
+		}
+
+	template<class _Fx,
+		class _Alloc>
+		void assign(reference_wrapper<_Fx> _Func, _Alloc _Ax)
+		{	// construct wrapper holding reference to_Func
+		this->_Reset(_Func.get(), _Ax);
+		}
+
+	void swap(_Myt& _Right)
+		{	// swap with _Right
+		this->_Swap(_Right);
+		}
+
+
+	operator _STD _Bool_type() const
+		{	// test if wrapper holds null function pointer
+		return (!this->_Empty() ? _CONVERTIBLE_TO_TRUE : 0);
+		}
+
+	const _XSTD2 type_info& target_type() const
+		{	// return type_info object for target type
+		return (this->_Target_type());
+		}
+
+	template<class _Fty2>
+		_Fty2 *target()
+		{	// return pointer to target object
+		return ((_Fty2*)this->_Target(typeid(_Fty2)));
+		}
+
+	template<class _Fty2>
+		const _Fty2 *target() const
+		{	// return pointer to target object
+		return ((const _Fty2*)this->_Target(typeid(_Fty2)));
+		}
+
+private:
+	//	not defined
+	template<class _Fty2>
+		void operator==(const function<_Fty2>&);
+	template<class _Fty2>
+		void operator!=(const function<_Fty2>&);
+	};
+
+	// TEMPLATE FUNCTION swap
+template<class _Fty>
+	void swap(function<_Fty>& _Left, function<_Fty>& _Right)
+	{   // swap contents of _Left with contents of _Right
+	_Left.swap(_Right);
+	}
+
+	// TEMPLATE NULL POINTER COMPARISONS
+template<class _Fty>
+	bool operator==(const function<_Fty>& _Other, _Unutterable)
+	{	// compare to null pointer
+	return (!_Other);
+	}
+
+template<class _Fty>
+	bool operator==(_Unutterable _Npc, const function<_Fty>& _Other)
+	{	// compare to null pointer
+	return (operator==(_Other, _Npc));
+	}
+
+template<class _Fty>
+	bool operator!=(const function<_Fty>& _Other, _Unutterable _Npc)
+	{	// compare to null pointer
+	return (!operator==(_Other, _Npc));
+	}
+
+template<class _Fty>
+	bool operator!=(_Unutterable _Npc, const function<_Fty>& _Other)
+	{	// compare to null pointer
+	return (!operator==(_Other, _Npc));
+	}
+
+// IMPLEMENT std::tr1::bind
+
+ #define _CLASS_BARG0		_LIST_MAX(class _Barg)
+ #define _BARG0_B0			_LIST2_MAX(_Barg, _Bx)
+ #define _BARG0_B0_REF		_LIST2_MAX(_Barg, &_Bx)
+ #define _BARG0_BARG1		_LIST_MAX(_Barg)
+ #define _BARG0_BARG1_REF	_LIST15_MAX(_Barg, &)
+ #define _B0_B1				_LIST_MAX(_Bx)
+
+	// PLACEHOLDERS
+template<int _Nx>
+	class _Ph
+	{	// placeholder
+	};
+
+template<class _Tx>
+	struct is_placeholder
+	{	// template to indicate that _Tx is not a placeholder
+	static const int value = 0;
+	};
+
+template<int _Nx>
+	struct is_placeholder<_Ph<_Nx> >
+	{	// template specialization to indicate that _Ph<_Nx> is a placeholder
+	static const int value = _Nx;
+	};
+
+	// TEMPLATE STRUCT _Bindret
+struct _Notforced
+	{	// operator() returns result_of<...>::type
+	};
+
+template<class _Override,
+	class _Natural>
+	struct _Bindret
+	{	// use user-specified override
+	typedef _Override _Type;
+	};
+
+template<class _Natural>
+	struct _Bindret<_Notforced, _Natural>
+	{	// use natural type
+	typedef _Natural _Type;
+	};
+
+	// TEMPLATE CLASS _Bind
+template<class _Ret,
+	class _BindN>
+	class _Bind
+	{	// template class for objects returned by bind
+public:
+	typedef typename _BindN::_MyTy _MyTy;
+	typedef _BindN _MyBind;
+
+	_Bind(_BindN _B0)
+		: _Bx(_B0)
+		{	// construct
+		}
+
+// define operator() member functions:
+ #define _INCL_FILE <xxbind0>
+ #include <xawrap>
+private:
+	_BindN _Bx;
+	};
+
+	// TEMPLATE CLASS is_bind_expression
+template<class _Tx>
+	struct is_bind_expression
+	{	// template to indicate that _Tx is not a bind expression
+	static const bool value = false;
+	};
+
+template<class _Rx,
+	class _BindN>
+	struct is_bind_expression<_Bind<_Rx, _BindN> >
+	{	// specialization to indicate a bind expression
+	static const bool value = true;
+	};
+
+	// TEMPLATE CLASS _Binder
+template<bool _Expr,
+	int _Nx>
+	struct _Binder;
+
+template<>
+	struct _Binder<true, 0>
+	{	// bind argument to result of bind expression
+	template<class _Arg,
+		_CLASS_BARG0>
+		static typename _Arg::
+			_MyBind::template _Return<_BARG0_BARG1_REF>::_Type
+				_Get(_Arg _Ax, _BARG0_B0_REF)
+		{	// return result
+		return (_Ax(_B0_B1));
+		}
+
+	template<class _Arg,
+		_CLASS_BARG0>
+		struct _Ret
+		{	// describe type of result
+		typedef typename _Arg::
+			_MyBind::template _Return<_BARG0_BARG1>::_Type
+				_Type;
+		};
+	};
+
+template<>
+	struct _Binder<false, 0>
+	{	// bind argument to passed value
+	template<class _Arg,
+		_CLASS_BARG0>
+		static _Arg& _Get(_Arg& _Val, _BARG0_B0_REF)
+		{	// return passed value
+		return (_Val);
+		}
+	template<class _Arg,
+		_CLASS_BARG0>
+		struct _Ret
+		{	// describe type of result
+		typedef _Arg& _Type;
+		};
+	};
+
+// define _Binder<false, N>, _BindN:
+ #define _INCL_FILE <xxbind1>
+ #include <xfwrap>
+	}	// namespace tr1
+
+template<class _Fty>
+	class _Move_operation_category<tr1::function<_Fty> >
+	{	// function implements a performant swap
+public:
+	typedef _Swap_move_tag _Move_cat;
+	};
+_STD_END
+ #endif /* _HAS_TR1 */
+
+_STD_BEGIN
+	namespace tr1 {	// always include std::tr1::hash for unordered_map/set
+	// TEMPLATE CLASS hash
+template<class _Kty>
+	class hash
+		: public unary_function<_Kty, size_t>
+	{	// hash functor
+public:
+	size_t operator()(const _Kty& _Keyval) const
+		{	// hash _Keyval to size_t value by pseudorandomizing transform
+		ldiv_t _Qrem = ldiv((long)(size_t)_Keyval, 127773);
+
+		_Qrem.rem = 16807 * _Qrem.rem - 2836 * _Qrem.quot;
+		if (_Qrem.rem < 0)
+			_Qrem.rem += 2147483647;
+		return ((size_t)_Qrem.rem);
+		}
+	};
+
+template<>
+	class hash<std::string>
+		: public unary_function<_STD string, size_t>
+	{	// hash functor
+public:
+	typedef std::string _Kty;
+
+	size_t operator()(const _Kty& _Keyval) const
+		{	// hash _Keyval to size_t value by pseudorandomizing transform
+		size_t _Val = 2166136261U;
+		size_t _First = 0;
+		size_t _Last = _Keyval.size();
+		size_t _Stride = 1 + _Last / 10;
+
+		if (_Stride < _Last)
+			_Last -= _Stride;
+		for(; _First < _Last; _First += _Stride)
+			_Val = 16777619U * _Val ^ (size_t)_Keyval[_First];
+		return (_Val);
+		}
+	};
+
+template<>
+	class hash<std::wstring>
+		: public unary_function<_STD wstring, size_t>
+	{	// hash functor
+public:
+	typedef std::wstring _Kty;
+
+	size_t operator()(const _Kty& _Keyval) const
+		{	// hash _Keyval to size_t value by pseudorandomizing transform
+		size_t _Val = 2166136261U;
+		size_t _First = 0;
+		size_t _Last = _Keyval.size();
+		size_t _Stride = 1 + _Last / 10;
+
+		if (_Stride < _Last)
+			_Last -= _Stride;
+		for(; _First < _Last; _First += _Stride)
+			_Val = 16777619U * _Val ^ (size_t)_Keyval[_First];
+		return (_Val);
+		}
+	};
+
+	}	// namespace tr1
+_STD_END
+
+#ifdef _MSC_VER
+ #pragma warning(default: 4100 4180 4244)
+ #pragma warning(pop)
+ #pragma pack(pop)
+#endif  /* _MSC_VER */
+
+#endif /* RC_INVOKED */
+#endif /* _FUNCTIONAL_ */
+
+/*
+ * This file is derived from software bearing the following
+ * restrictions:
+ *
+ * Copyright (c) 1994
+ * Hewlett-Packard Company
+ *
+ * Permission to use, copy, modify, distribute and sell this
+ * software and its documentation for any purpose is hereby
+ * granted without fee, provided that the above copyright notice
+ * appear in all copies and that both that copyright notice and
+ * this permission notice appear in supporting documentation.
+ * Hewlett-Packard Company makes no representations about the
+ * suitability of this software for any purpose. It is provided
+ * "as is" without express or implied warranty.
+ */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+ V5.05:0009 */
+
+

@@ -1,0 +1,535 @@
+// xxbind1 internal header
+// NOTE: no include guard
+
+#define _VN _PREV_NAME(_Vx)
+#define _AN _PREV_NAME(_Ax)
+#define _ARGN _PREV_NAME(_Arg)
+#define _BINDER_NAME _PREV_NAME(_Binder)
+#define _PREV_BINDN _PREV_NAME(_Bind)
+#define _BINDN _CLASS_NAME(_Bind)
+#define _BINDER_ARGS(N) _Self::_Binder##N::_Get(this->_Vx##N, _B0_B1)
+#define _TNAME _CLASS_NAME(_Mem_fn)
+#define _RESULT_OF	_CLASS_NAME(_Result_of)
+#define _BINDER_TYPES(N)	typename _Self::_Binder##N:: \
+	template _Ret<_MyArg _C_ARG0_ARG1 _C_TAIL(_Nil&)>::_Type
+
+ #if _NARGS == 0
+  #define _ARGS
+  #define _ARGT
+  #define _ARGU
+
+ #elif _NARGS == 1
+  #define _ARGS \
+	_BINDER_ARGS(0)
+  #define _ARGT \
+	_BINDER_TYPES(0)
+  #define _ARGU \
+	_YNAME(_Barg, 0)
+
+ #elif _NARGS == 2
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_3(_Barg)
+
+ #elif _NARGS == 3
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_4(_Barg)
+
+ #elif _NARGS == 4
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_5(_Barg)
+
+ #elif _NARGS == 5
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_6(_Barg)
+
+ #elif _NARGS == 6
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4), \
+	_BINDER_ARGS(5)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4), \
+	_BINDER_TYPES(5)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_7(_Barg)
+
+ #elif _NARGS == 7
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4), \
+	_BINDER_ARGS(5), \
+	_BINDER_ARGS(6)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4), \
+	_BINDER_TYPES(5), \
+	_BINDER_TYPES(6)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_8(_Barg)
+
+ #elif _NARGS == 8
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4), \
+	_BINDER_ARGS(5), \
+	_BINDER_ARGS(6), \
+	_BINDER_ARGS(7)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4), \
+	_BINDER_TYPES(5), \
+	_BINDER_TYPES(6), \
+	_BINDER_TYPES(7)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_9(_Barg)
+
+ #elif _NARGS == 9
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4), \
+	_BINDER_ARGS(5), \
+	_BINDER_ARGS(6), \
+	_BINDER_ARGS(7), \
+	_BINDER_ARGS(8)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4), \
+	_BINDER_TYPES(5), \
+	_BINDER_TYPES(6), \
+	_BINDER_TYPES(7), \
+	_BINDER_TYPES(8)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_10(_Barg)
+
+ #elif _NARGS == 10
+  #define _ARGS \
+	_BINDER_ARGS(0), \
+	_BINDER_ARGS(1), \
+	_BINDER_ARGS(2), \
+	_BINDER_ARGS(3), \
+	_BINDER_ARGS(4), \
+	_BINDER_ARGS(5), \
+	_BINDER_ARGS(6), \
+	_BINDER_ARGS(7), \
+	_BINDER_ARGS(8), \
+	_BINDER_ARGS(9)
+  #define _ARGT \
+	_BINDER_TYPES(0), \
+	_BINDER_TYPES(1), \
+	_BINDER_TYPES(2), \
+	_BINDER_TYPES(3), \
+	_BINDER_TYPES(4), \
+	_BINDER_TYPES(5), \
+	_BINDER_TYPES(6), \
+	_BINDER_TYPES(7), \
+	_BINDER_TYPES(8), \
+	_BINDER_TYPES(9)
+  #define _ARGU \
+	_YNAME(_Barg, 0), \
+	_CORE_10(_Barg), \
+	_YNAME(_Barg, 9)
+
+ #else /* _NARGS */
+  #error argument number mismatch
+ #endif /* _NARGS */
+
+ #if _NARGS == 0
+template<class _Callable>
+	class _Bind0
+	{	// base class to hold target object
+public:
+	typedef _Callable _MyCallable;
+	typedef typename _Callable::_MyTy _MyTy;
+
+	template<_CLASS_BARG0>
+		struct _Return
+		{	// wrap types
+		typedef typename _MyCallable::_MyTy _MyTy;
+		typedef typename result_of<_MyTy(_ARGU)>::type _Type;
+		};
+
+	_Bind0(_MyTy& _Val)
+		: _Callee(_Val)
+		{	// construct
+		}
+
+	template<class _Ret,
+		_CLASS_BARG0>
+		_Ret _ApplyX(_BARG0_B0) const
+		{	// call with no arguments
+		return (_Callee.template _ApplyX<_Ret>());
+		}
+
+	_MyCallable _Callee;
+	};
+
+ #else /* _NARGS == 0 */
+template<>
+	struct _Binder<false, _NARGS>
+	{	// select argument number (_NARGS - 1)
+	template<class _Arg,
+		_CLASS_BARG0>
+		static _PREV_NAME(_Barg)& _Get(_Arg, _BARG0_B0_REF)
+		{	// return selected argument
+		return (_PREV_NAME(_Bx));
+		}
+
+	template<class _Arg,
+		_CLASS_BARG0>
+		struct _Ret
+		{	// describe type of result
+		typedef _PREV_NAME(_Barg) _Type;
+		};
+	};
+
+template<class _Callable,
+	_CLASS_ARG0>
+	class _BINDN
+		: public _PREV_BINDN<_Callable _C_ARG0_ARG1m1>
+	{	// class to hold Nth argument to bind()
+public:
+	typedef _BINDN<_Callable _C_ARG0_ARG1> _Self;
+	typedef _Binder<is_bind_expression<_ARGN>::value,
+		is_placeholder<_ARGN>::value> _BINDER_NAME;
+	typedef _ARGN _MyArg;
+
+	template<_CLASS_BARG0>
+		struct _Return
+		{	// wrap types
+		typedef typename _PREV_BINDN<_Callable _C_ARG0_ARG1m1>::_MyCallable
+			_MyCallable;
+		typedef typename _MyCallable::_MyTy _MyTy;
+		typedef typename result_of<_MyTy(_ARGU)>::type _Type;
+		};
+
+	_BINDN(typename _Callable::_MyTy _Val, _ARG0_A0)
+		: _VN(_AN), _PREV_BINDN<_Callable _C_ARG0_ARG1m1>(_Val _C_A0_A1m1)
+		{	// construct
+		}
+
+	template<class _Ret,
+		_CLASS_BARG0>
+		_Ret _ApplyX(_BARG0_B0_REF) const
+		{	// call with N arguments
+		return (this->_Callee.template _ApplyX<_Ret>(_ARGS));
+		}
+
+	template<class _Ret,
+		_CLASS_BARG0>
+		_Ret _ApplyX(_BARG0_B0_REF)
+		{	// call with N arguments
+		return (this->_Callee.template _ApplyX<_Ret>(_ARGS));
+		}
+
+	_ARGN _VN;
+	};
+
+	// PLACEHOLDER ARGUMENTS
+		namespace placeholders {	// placeholders
+static _Ph<_NARGS> _CLASS_NAME(_);
+		}	// namespace placeholders
+ #endif /* _NARGS == 0 */
+
+template<class _Ret, class _BindTy _C_CLASS_ARG0>
+	struct _RESULT_OF<_Bind<_Ret, _BindTy> _C_ARG0_ARG1>
+	{	// result_of for bind objects
+	typedef _Ret _Type;
+	};
+
+template<class _BindTy _C_CLASS_ARG0>
+	struct _RESULT_OF<_Bind<_Notforced, _BindTy> _C_ARG0_ARG1>
+	{	// result_of for bind objects
+	typedef typename _BindTy::
+		template _Return<_ARG0_ARG1 _C_TAIL(_Nil&)>::_Type _Type;
+	};
+
+template<class _Ret,
+	class _Fty
+	_C_CLASS_ARG0>
+	_Bind<_Ret,
+		_BINDN<_Callable_obj<_Fty> _C_ARG0_ARG1> >
+			bind(_Fty _Val _C_ARG0_A0)
+	{	// bind to UDT and user-specified return type
+	typedef _BINDN<_Callable_obj<_Fty> _C_ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val _C_A0_A1)));
+	}
+
+template<class _Fty
+	_C_CLASS_ARG0>
+	_Bind<_Notforced,
+		_BINDN<_Callable_obj<_Fty> _C_ARG0_ARG1> >
+			bind(_Fty _Val _C_ARG0_A0)
+	{	// bind to UDT
+	typedef _BINDN<_Callable_obj<_Fty> _C_ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val _C_A0_A1)));
+	}
+
+ #if _NARGS == 0
+template<class _Ret,
+	class _Rx>
+
+ #else /* _NARGS == 0 */
+template<class _Ret
+	_C_CLASS_FARG0
+	_C_CLASS_ARG0,
+	class _Rx>
+ #endif /* _NARGS == 0 */
+	_Bind<_Ret,
+		_BINDN<_Callable_fun<_Rx(*const)(_FARG0_FARG1)> _C_ARG0_ARG1> >
+			bind(_Rx(* const _Val)(_FARG0_FARG1) _C_ARG0_A0)
+	{	// bind to pointer to function and user-specified return type
+	typedef _Callable_fun<_Rx(* const)(_FARG0_FARG1)> _Callable;
+	typedef _BINDN<_Callable _C_ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val _C_A0_A1)));
+	}
+
+ #if _NARGS == 0
+template<class _Rx>
+
+ #else /* _NARGS == 0 */
+template<_CLASS_FARG0
+	_C_CLASS_ARG0,
+	class _Rx>
+ #endif /* _NARGS == 0 */
+	_Bind<_Notforced,
+		_BINDN<_Callable_fun<_Rx(*const)(_FARG0_FARG1)> _C_ARG0_ARG1> >
+			bind(_Rx(* const _Val)(_FARG0_FARG1) _C_ARG0_A0)
+	{	// bind to pointer to function
+	typedef _Callable_fun<_Rx(* const)(_FARG0_FARG1)> _Callable;
+	typedef _BINDN<_Callable _C_ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val _C_A0_A1)));
+	}
+
+ #if _NARGS == 1
+template<class _Ret,
+	class _Farg0,
+	class _Arg0,
+	class _Rx>
+	_Bind<_Ret,
+		_BINDN<_Callable_pmd<_Rx _Farg0::*const, _Farg0>, _Arg0> >
+			bind(_Rx _Farg0::* const _Val, _Arg0 _A0)
+	{	// bind to pointer to member data and user-specified return type
+	typedef _Callable_pmd<_Rx _Farg0::*const, _Farg0> _Callable;
+	typedef _BINDN<_Callable, _Arg0> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val, _A0)));
+	}
+
+template<class _Farg0,
+	class _Arg0,
+	class _Rx>
+	_Bind<_Notforced,
+		_BINDN<_Callable_pmd<_Rx _Farg0::*const, _Farg0>, _Arg0> >
+			bind(_Rx _Farg0::* const _Val, _Arg0 _A0)
+	{	// bind to pointer to member data
+	typedef _Callable_pmd<_Rx _Farg0::*const, _Farg0> _Callable;
+	typedef _BINDN<_Callable, _Arg0> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val, _A0)));
+	}
+ #endif /* _NARGS == 1 */
+
+ #if _NARGS != 0
+template<class _Ret,
+	_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Ret,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2), _Farg0>,
+			_ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) _C_ARG0_A0)
+	{	// bind to pointer to member function and user-specified return type
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2), _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Notforced,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2), _Farg0>,
+			_ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) _C_ARG0_A0)
+	{	// bind to pointer to member function
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2), _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<class _Ret,
+	_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Ret,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const,
+			_Farg0>, _ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) const _C_ARG0_A0)
+	{	// bind to pointer to const member function and user-specified return
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const, _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Notforced,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const,
+			_Farg0>, _ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) const _C_ARG0_A0)
+	{	// bind to pointer to const member function
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const, _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<class _Ret,
+	_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Ret,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) volatile,
+			_Farg0>, _ARG0_ARG1> >
+		bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) volatile _C_ARG0_A0)
+	{	// bind to pointer to volatile member and user-specified return
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) volatile, _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Notforced,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) volatile,
+			_Farg0>, _ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2) volatile _C_ARG0_A0)
+	{	// bind to pointer to volatile member function
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) volatile , _Farg0>
+		_Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<class _Ret,
+	_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Ret,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const volatile,
+			_Farg0>, _ARG0_ARG1> >
+			bind(_Rx(_Farg0::* const _Val)(_FARG1_FARG2)
+				const volatile _C_ARG0_A0)
+	{	// bind to pointer to const volatile member and user-specified return
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const volatile,
+		_Farg0> _Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Ret, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+
+template<_CLASS_FARG0,
+	_CLASS_ARG0,
+	class _Rx>
+	_Bind<_Notforced,
+		_BINDN<_Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const volatile,
+			_Farg0>, _ARG0_ARG1> >
+		bind(_Rx(_Farg0::* const _Val)(
+			_FARG1_FARG2) const volatile _C_ARG0_A0)
+	{	// bind to pointer to const volatile member function
+	typedef _Callable_pmf<_Rx(_Farg0::*const)(_FARG1_FARG2) const volatile,
+		_Farg0> _Callable;
+	typedef _BINDN<_Callable, _ARG0_ARG1> _MyBind;
+	return (_Bind<_Notforced, _MyBind>(_MyBind(_Val, _A0_A1)));
+	}
+ #endif /* _NARGS != 0 */
+
+#undef _VN
+#undef _AN
+#undef _ARGN
+#undef _BINDER_NAME
+#undef _PREV_BINDN
+#undef _BINDN
+#undef _BINDER_ARGS
+#undef _ARGS
+#undef _ARGT
+#undef _ARGU
+#undef _BINDER_TYPES
+#undef _RESULT_OF
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

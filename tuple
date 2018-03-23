@@ -1,0 +1,522 @@
+// tuple TR1 header
+
+#pragma once
+#ifndef _TUPLE_
+#define _TUPLE_
+#ifndef RC_INVOKED
+#include <xutility>
+#include <xrefwrap>
+
+ #pragma pack(push,_CRT_PACKING)
+ #pragma warning(push,3)
+
+_STD_BEGIN
+ namespace tr1 {	// TR1 additions
+
+	// TEMPLATE STRUCT _Arg_traits
+template<class _Ty>
+	struct _Arg_traits
+	{	// template that transforms argument types
+	typedef const _Ty& _CType;
+	typedef _Ty& _RType;
+	typedef const _Ty& _AType;
+	typedef _Ty _VType;
+	};
+
+template<class _Ty>
+	struct _Arg_traits<_Ty&>
+	{	// template specialization for arguments passed by reference
+	typedef _Ty& _CType;
+	typedef _Ty& _RType;
+	typedef _Ty& _AType;
+	typedef _Ty& _VType;
+	};
+
+template<class _Ty>
+	struct _Arg_traits<const reference_wrapper<_Ty>&>
+	{	// template specialization for reference_wrapper arguments
+	typedef const _Ty& _CType;
+	typedef _Ty& _RType;
+	typedef _Ty& _AType;
+	typedef _Ty& _VType;
+	};
+
+	// TEMPLATE FUNCTION _Assign
+template<class _Tgt,
+	class _Src> inline
+	void _Assign(_Tgt& _Tx, _Src _Sx)
+	{	// assign _Sx to _Tx
+	_Tx = _Sx;
+	}
+
+template<class _Tgt,
+	class _Src> inline
+	void _Assign(reference_wrapper<_Tgt> _Tx, _Src _Sx)
+	{	// assign _Sx to _Tx.get()
+	_Tx.get() = _Sx;
+	}
+
+	// TEMPLATE STRUCT _Cons_node
+template<class _Car,
+	class _Cdr>
+	struct _Cons_node
+	{	// node for type list
+	typedef typename _Arg_traits<_Car>::_VType _Value_type;
+	typedef _Cdr _Tail_type;
+
+	_Cons_node()
+		: _Value(), _Tail()
+		{	// construct
+		}
+
+	template<_CLASS_ARG0_MAX>
+		_Cons_node(_ARG0_A0_REF_MAX)
+			: _Value(_Ax0), _Tail(_A1_A2_MAX, _Nil_obj)
+		{	// construct
+		}
+
+	template<class _Car1, class _Car2>
+		_Cons_node(const _Cons_node<_Car1, _Car2>& _Right)
+			: _Value(_Right._Value), _Tail(_Right._Tail)
+		{	// construct
+		}
+
+	template<class _Car1, class _Cdr1>
+		_Cons_node& operator=(const _Cons_node<_Car1, _Cdr1>& _Right)
+		{	// copy _Right to *this
+		_Assign(_Value, _Right._Value);
+		_Tail = _Right._Tail;
+		return (*this);
+		}
+
+	void swap(_Cons_node& _Right)
+		{	// swap elements
+		_STD _Swap_adl(_Value, _Right._Value);
+		_Tail.swap(_Right._Tail);
+		}
+
+	template<class _Car1, class _Cdr1>
+		bool _Eq(const _Cons_node<_Car1, _Cdr1>& _Right) const
+		{	// return true if *this == _Right
+		return (_Value == _Right._Value
+			&& _Tail._Eq(_Right._Tail));
+		}
+
+	template<class _Car1, class _Cdr1>
+		bool _Lt(const _Cons_node<_Car1, _Cdr1>& _Right) const
+		{	// return true if *this < _Right
+		return (_Value < _Right._Value ? true
+			: _Right._Value < _Value ? false
+			: _Tail._Lt(_Right._Tail));
+		}
+
+	_Value_type _Value;
+	_Tail_type _Tail;
+	};
+
+template<>
+	struct _Cons_node<_Nil, _Nil>
+	{	// node for end of list
+	typedef _Nil _Value_type;
+	typedef _Nil _Tail_type;
+
+	_Cons_node()
+		{	// construct
+		}
+
+	_Cons_node(const _Cons_node&)
+		{	// construct
+		}
+
+	_Cons_node(_NIL_TAIL_MAX)
+		{	// construct
+		}
+
+	_Cons_node& operator=(const _Cons_node&)
+		{	// assign
+		return (*this);
+		}
+
+	void swap(_Cons_node&)
+		{	// swap
+		}
+
+	bool _Eq(const _Cons_node&) const
+		{	// compare
+		return (true);
+		}
+
+	bool _Lt(const _Cons_node&) const
+		{	// compare
+		return (false);
+		}
+
+	_Value_type _Value;
+	_Tail_type _Tail;
+	};
+
+	// TEMPLATE STRUCT _Get
+template<int _Idx,
+	class _Node>
+	struct _Get
+	{	// struct that determines type and value of element at _Idx
+	typedef _Get<_Idx - 1, typename _Node::_Tail_type> _Get0;
+	typedef typename _Get0::_Type _Type;
+
+	static typename _Arg_traits<_Type>::_RType _Val(_Node& _Nx)
+		{	// return value
+		return (_Get0::_Val(_Nx._Tail));
+		}
+
+	static typename _Arg_traits<_Type>::_CType _Val(const _Node& _Nx)
+		{	// return value
+		return (_Get0::_Val(_Nx._Tail));
+		}
+	};
+
+template<class _Ty>
+	struct _Not_nil
+	{	// defined only if _Ty is not _Nil
+	};
+
+template<>
+	struct _Not_nil<_Nil>;
+
+template<class _Node>
+	struct _Get<0, _Node>
+		: public _Not_nil<typename _Node::_Value_type>
+	{	// struct that determines type and value of element at index 0
+	typedef typename _Node::_Value_type _Type;
+
+	static typename _Arg_traits<_Type>::_RType _Val(_Node& _Nx)
+		{	// return value
+		return (_Nx._Value);
+		}
+
+	static typename _Arg_traits<_Type>::_CType _Val(const _Node& _Nx)
+		{	// return value
+		return (_Nx._Value);
+		}
+	};
+
+	// TEMPLATE STRUCT _Size
+template<class _Node>
+	struct _Size
+	{	// struct that determines number of elements in type list
+	static const int _Value = 1 + _Size<typename _Node::_Tail_type>::_Value;
+	};
+
+template<>
+	struct _Size<_Cons_node<_Nil, _Nil> >
+	{	// struct that determines number of elements in empty type list
+	static const int _Value = 0;
+	};
+
+	// TEMPLATE STRUCT _Tuple_type
+template<class _Arg0,
+	_CDR15_MAX(class _Arg, = _Nil)>
+	struct _Tuple_type
+	{	// struct to determine type for a tuple's implementation
+	typedef _Cons_node<_Arg0,
+		typename _Tuple_type<_ARG1_ARG2_MAX, _Nil>::_Type> _Type;
+	};
+
+template<>
+	struct _Tuple_type<_NIL_TAIL_MAX>
+	{	// struct to determine type for an empty tuple
+	typedef _Cons_node<_Nil, _Nil> _Type;
+	};
+
+	// TEMPLATE STRUCT tuple
+template<_CLASS_ARG0_DEF_MAX>
+	class tuple
+	{	// class that holds objects of various types
+public:
+	typedef tuple<_ARG0_ARG1_MAX> _Myt;
+	typedef typename _Tuple_type<_ARG0_ARG1_MAX>::_Type _MyImpl;
+	tuple()
+		: _Impl()
+		{	// construct
+		}
+
+	// construct from one or more arguments
+#define _INCL_FILE "xxtuple0"
+#include "xfwrap"
+
+	tuple(const _Myt& _Right)
+		: _Impl(_Right._Impl)
+		{	// construct copy of _Right
+		}
+
+	template<_CLASS_FARG0_MAX>
+		tuple(const tuple<_FARG0_FARG1_MAX>& _Right)
+		: _Impl(_Right._Impl)
+		{	// construct copy of _Right
+		}
+
+	template<class _Farg0, class _Farg1>
+		tuple(const pair<_Farg0, _Farg1>& _Right)
+		: _Impl(_Right.first, _Right.second, _TAIL_2(_Nil_obj))
+		{	// construct copy of _Right
+		}
+
+	tuple& operator=(const tuple& _Right)
+		{	// copy from _Right
+		_Impl = _Right._Impl;
+		return (*this);
+		}
+
+	template<_CLASS_FARG0_MAX>
+		tuple& operator=(const tuple<_FARG0_FARG1_MAX>& _Right)
+		{	// copy from _Right
+		_Impl = _Right._Impl;
+		return (*this);
+		}
+
+	template<class _Farg0, class _Farg1>
+		tuple& operator=(const pair<_Farg0, _Farg1>& _Right)
+		{	// copy from _Right
+		_Impl._Value = _Right.first;
+		_Impl._Tail._Value = _Right.second;
+		_Impl._Tail._Tail._Value = _Nil_obj;	// ensure size == 2
+		return (*this);
+		}
+
+	void swap(_Myt& _Right)
+		{	// swap *this and _Right
+		_Impl.swap(_Right._Impl);
+		}
+
+	template<_CLASS_FARG0_MAX>
+		bool _Eq(const tuple<_FARG0_FARG1_MAX>& _Right) const
+		{	// return true if *this == _Right
+		return (_Impl._Eq(_Right._Impl));
+		}
+
+	template<_CLASS_FARG0_MAX>
+		bool _Lt(const tuple<_FARG0_FARG1_MAX>& _Right) const
+		{	// return true if *this < _Right
+		return (_Impl._Lt(_Right._Impl));
+		}
+
+	_MyImpl _Impl;
+	};
+
+	// TEMPLATE FUNCTION swap
+template<_CLASS_ARG0_MAX> inline
+	void swap(
+		tuple<_ARG0_ARG1_MAX>& _Left,
+		tuple<_ARG0_ARG1_MAX>& _Right)
+	{	// swap _Left and _Right
+	_Left.swap(_Right);
+	}
+
+template<> inline
+	void swap(tuple<>&, tuple<>&)
+	{	// swap empty tuples
+	}
+
+	// TEMPLATE operator==
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+	bool operator==(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left == _Right
+	return (_Left._Eq(_Right));
+	}
+
+template<> inline
+	bool operator==(const tuple<>&, const tuple<>&)
+	{	// return true for empty tuples
+	return (true);
+	}
+
+	// TEMPLATE operator!=
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+bool operator!=(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left != _Right
+	return (!_Left._Eq(_Right));
+	}
+
+template<> inline
+	bool operator!=(const tuple<>&, const tuple<>&)
+	{	// return false for empty tuples
+	return (false);
+	}
+
+	// TEMPLATE operator<
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+	bool operator<(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left < _Right
+	return (_Left._Lt(_Right));
+	}
+
+template<> inline
+	bool operator<(const tuple<>&, const tuple<>&)
+	{	// return false for empty tuples
+	return (false);
+	}
+
+	// TEMPLATE operator<=
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+	bool operator<=(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left <= _Right
+	return (!_Right._Lt(_Left));
+	}
+
+template<> inline
+	bool operator<=(const tuple<>&, const tuple<>&)
+	{	// return true for empty tuples
+	return (true);
+	}
+
+	// TEMPLATE operator>
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+	bool operator>(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left > _Right
+	return (_Right._Lt(_Left));
+	}
+
+template<> inline
+	bool operator>(const tuple<>&, const tuple<>&)
+	{	// return false for empty tuples
+	return (false);
+	}
+
+	// TEMPLATE operator>=
+template<_CLASS_ARG0_MAX,
+	_CLASS_FARG0_MAX> inline
+	bool operator>=(
+	const tuple<_ARG0_ARG1_MAX>& _Left,
+	const tuple<_FARG0_FARG1_MAX>& _Right)
+	{	// return _Left >= _Right
+	return (!_Left._Lt(_Right));
+	}
+
+template<> inline
+	bool operator>=(const tuple<>&, const tuple<>&)
+	{	// return true for empty tuples
+	return (true);
+	}
+
+	// TEMPLATE STRUCT tuple_size
+template<class _Tuple>
+	struct tuple_size
+	{	// struct to determine number of elements in tuple _Tuple
+	static const int value = _Size<typename _Tuple::_MyImpl>::_Value;
+	};
+
+	// TEMPLATE STRUCT tuple_element
+template<int _Idx,
+	class _Tuple>
+	struct tuple_element
+	{	// struct to determine type of element _Idx in tuple _Tuple
+	typedef typename _Get<_Idx, typename _Tuple::_MyImpl>::_Type type;
+	};
+
+	// TEMPLATE FUNCTION get
+template<int _Idx,
+	_CLASS_ARG0_MAX> inline
+	typename _Arg_traits<typename _Get<_Idx,
+		typename tuple<_ARG0_ARG1_MAX>::_MyImpl>::_Type>::_RType
+	get(tuple<_ARG0_ARG1_MAX>& _Tuple)
+	{	// return element at _Idx in tuple _Tuple
+	return (_Get<_Idx,
+		typename tuple<_ARG0_ARG1_MAX>::_MyImpl>::_Val(_Tuple._Impl));
+	}
+
+template<int _Idx,
+	_CLASS_ARG0_MAX> inline
+	typename _Arg_traits<typename _Get<_Idx,
+		typename tuple<_ARG0_ARG1_MAX>::_MyImpl>::_Type>::_CType
+	get(const tuple<_ARG0_ARG1_MAX>& _Tuple)
+	{	// return element at _Idx in tuple _Tuple
+	return (_Get<_Idx,
+		typename tuple<_ARG0_ARG1_MAX>::_MyImpl>::_Val(_Tuple._Impl));
+	}
+
+	// STRUCT _Ignore
+struct _Ignore
+	{	// class that ignores assignments
+	_Ignore()
+		{	// construct
+		}
+
+	template<class _Ty>
+		void operator=(const _Ty&) const
+		{	// do nothing
+		}
+	};
+
+const _Ignore ignore;
+
+	// TEMPLATE STRUCT _Ttype
+template<class _Ty>
+	struct _Ttype
+	{	// determine tuple element type for tuple returned by make_tuple
+	typedef _Ty _Type;
+	};
+
+template<class _Ty>
+	struct _Ttype<reference_wrapper<_Ty> >
+	{	// determine tuple element type for tuple returned by make_tuple
+	typedef _Ty& _Type;
+	};
+
+	// TEMPLATE STRUCT _Make_tuple
+template<_CLASS_ARG0_DEF_MAX>
+	struct _Make_tuple
+	{	// determine tuple element type for tuple returned by make_tuple
+	typedef tuple<_LIST15_MAX(typename _Ttype<_Arg, >::_Type)> _Type;
+	};
+
+	// TEMPLATE FUNCTION make_tuple, TEMPLATE FUNCTION tie
+#define _INCL_FILE "xxtuple1"
+#include "xfwrap"
+
+	}	// namespace tr1
+
+	// tuple implements a performant swap
+template<_CLASS_ARG0_MAX>
+	class _Move_operation_category<tr1::tuple<_ARG0_ARG1_MAX> >
+	{	// tuple implements a performant swap if all elements do
+public:
+	typedef typename _If<
+		_Is_swap_move<typename _Move_operation_category<
+			_Arg0>::_Move_cat>::_Value &&
+		_Is_swap_move<typename _Move_operation_category<
+			tr1::tuple<_ARG1_ARG2_MAX> >::_Move_cat>::_Value,
+		_Swap_move_tag,
+		_Undefined_move_tag>::_Result _Move_cat;
+	};
+
+template<>
+	class _Move_operation_category<tr1::tuple<> >
+	{	// empty tuple implements a performant swap
+public:
+	typedef _Swap_move_tag _Move_cat;
+	};
+_STD_END
+ #pragma warning(pop)
+ #pragma pack(pop)
+
+#endif /* RC_INVOKED */
+#endif /* _TUPLE_ */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

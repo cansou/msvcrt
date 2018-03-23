@@ -1,0 +1,677 @@
+// array TR1 header
+#pragma once
+#ifndef _ARRAY_
+#define _ARRAY_
+#ifndef RC_INVOKED
+#include <algorithm>
+#include <iterator>
+
+ #pragma pack(push,_CRT_PACKING)
+ #pragma warning(push,3)
+ #pragma warning(disable: 4284)
+ #pragma warning(disable: 4996)
+
+_STD_BEGIN
+	namespace tr1 {	// TR1 additions
+
+_CRTIMP2_PURE __declspec(noreturn) void __CLRCALL_PURE_OR_CDECL _Xoutrange();
+
+	// static_assert
+template<bool expr>
+	struct _Assert_failed;
+template<>
+	struct _Assert_failed<true>
+	{	// specialize for true
+	};
+
+ #define _Assert_static(EXPR)	\
+	enum {static_assert_failure = sizeof (_Assert_failed<(bool)(EXPR)>)}
+
+template<class _Ty,
+	size_t _Size>
+	class array;
+
+		// TEMPLATE CLASS _Array_const_iterator
+template<class _Ty,
+	size_t _Size>
+	class _Array_const_iterator
+		: public _Iterator_base_universal
+	{	// iterator for nonmutable array
+public:
+	typedef _Array_const_iterator<_Ty, _Size> _Myiter;
+	typedef array<_Ty, _Size> _Myarr;
+	typedef random_access_iterator_tag iterator_category;
+
+	typedef typename _Myarr::pointer _Tptr;
+	typedef typename _Myarr::value_type value_type;
+	typedef typename _Myarr::size_type size_type;
+	typedef typename _Myarr::difference_type difference_type;
+	typedef typename _Myarr::const_pointer pointer;
+	typedef typename _Myarr::const_reference reference;
+
+	_Array_const_iterator()
+		{	// construct with null pointer
+		_Ptr = 0;
+		_Idx = 0;
+		}
+
+	_Array_const_iterator(_Tptr _Parg, size_t _Off)
+		{	// construct with pointer and offset
+		_Ptr = _Parg;
+		_Idx = _Off;
+		}
+
+	enum {_EEN_SIZE = _Size};	// helper for expression evaluator
+
+	typedef _Range_checked_iterator_tag _Checked_iterator_category;
+	typedef value_type _Inner_type;
+	typedef pointer _Checked_iterator_base_type;
+
+	_Checked_iterator_base_type _Checked_iterator_base() const
+		{	// get unchecked version of iterator
+		return (_Ptr + _Idx);
+		}
+
+	void _Checked_iterator_assign_from_base(_Checked_iterator_base_type _Iter)
+		{	// resync with unchecked version
+		_Idx = _Iter - _Ptr;
+		}
+
+	reference operator*() const
+		{	// return designated object
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Ptr == 0
+			|| _Size <= _Idx)
+			{	// report error
+			_DEBUG_ERROR("array iterator not dereferencable");
+			_SCL_SECURE_OUT_OF_RANGE;
+			}
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE(_Ptr != 0);
+		_SCL_SECURE_VALIDATE_RANGE(_Idx < _Size);
+
+		return (_Ptr[_Idx]);
+		}
+
+	pointer operator->() const
+		{	// return pointer to class object
+		return (&**this);
+		}
+
+	_Myiter& operator++()
+		{	// preincrement
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Ptr == 0
+			|| _Size <= _Idx)
+			{	// report error
+			_DEBUG_ERROR("array iterator not incrementable");
+			_SCL_SECURE_OUT_OF_RANGE;
+			}
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE(_Ptr != 0);
+		_SCL_SECURE_VALIDATE_RANGE(_Idx < _Size);
+
+		++_Idx;
+		return (*this);
+		}
+
+	_Myiter operator++(int)
+		{	// postincrement
+		_Myiter _Tmp = *this;
+		++*this;
+		return (_Tmp);
+		}
+
+	_Myiter& operator--()
+		{	// predecrement
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Ptr == 0
+			|| _Idx <= 0)
+			{	// report error
+			_DEBUG_ERROR("array iterator not decrementable");
+			_SCL_SECURE_OUT_OF_RANGE;
+			}
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE(_Ptr != 0);
+		_SCL_SECURE_VALIDATE_RANGE(0 < _Idx);
+
+		--_Idx;
+		return (*this);
+		}
+
+	_Myiter operator--(int)
+		{	// postdecrement
+		_Myiter _Tmp = *this;
+		--*this;
+		return (_Tmp);
+		}
+
+	_Myiter& operator+=(difference_type _Off)
+		{	// increment by integer
+		_Idx += _Off;
+		return (*this);
+		}
+
+	_Myiter operator+(difference_type _Off) const
+		{	// return this + integer
+		_Myiter _Tmp = *this;
+		return (_Tmp += _Off);
+		}
+
+	_Myiter& operator-=(difference_type _Off)
+		{	// decrement by integer
+		return (*this += -_Off);
+		}
+
+	_Myiter operator-(difference_type _Off) const
+		{	// return this - integer
+		_Myiter _Tmp = *this;
+		return (_Tmp -= _Off);
+		}
+
+	difference_type operator-(const _Myiter& _Right) const
+		{	// return difference of iterators
+		_Compat(_Right);
+		return (_Idx < _Right._Idx
+			? -(difference_type)(_Right._Idx - _Idx)
+			: (difference_type)_Idx - _Right._Idx);
+		}
+
+	reference operator[](difference_type _Off) const
+		{	// subscript
+		return (*(*this + _Off));
+		}
+
+	bool operator==(const _Myiter& _Right) const
+		{	// test for iterator equality
+		_Compat(_Right);
+		return (_Idx == _Right._Idx);
+		}
+
+	bool operator!=(const _Myiter& _Right) const
+		{	// test for iterator inequality
+		return (!(*this == _Right));
+		}
+
+	bool operator<(const _Myiter& _Right) const
+		{	// test if this < _Right
+		_Compat(_Right);
+		return (_Idx < _Right._Idx);
+		}
+
+	bool operator>(const _Myiter& _Right) const
+		{	// test if this > _Right
+		return (_Right < *this);
+		}
+
+	bool operator<=(const _Myiter& _Right) const
+		{	// test if this <= _Right
+		return (!(_Right < *this));
+		}
+
+	bool operator>=(const _Myiter& _Right) const
+		{	// test if this >= _Right
+		return (!(*this < _Right));
+		}
+
+	void _Compat(const _Myiter& _Right) const
+		{	// test for compatible iterator pair
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Ptr != _Right._Ptr)
+			{	// report error
+			_DEBUG_ERROR("array iterators incompatible");
+			_SCL_SECURE_INVALID_ARGUMENT;
+			}
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(_Ptr == _Right._Ptr);
+		}
+
+	_Tptr _Ptr;	// beginning of array
+	size_t _Idx;	// offset into array
+	};
+
+template<class _Ty,
+	size_t _Size> inline
+	_Array_const_iterator<_Ty, _Size> operator+(
+		typename _Array_const_iterator<_Ty, _Size>::difference_type _Off,
+		_Array_const_iterator<_Ty, _Size> _Next)
+	{	// add offset to iterator
+	return (_Next += _Off);
+	}
+
+		// TEMPLATE CLASS _Array_iterator
+template<class _Ty,
+	size_t _Size>
+	class _Array_iterator
+		: public _Array_const_iterator<_Ty, _Size>
+	{	// iterator for mutable array
+public:
+	typedef _Array_iterator<_Ty, _Size> _Myiter;
+	typedef _Array_const_iterator<_Ty, _Size> _Mybase;
+	typedef array<_Ty, _Size> _Myarr;
+	typedef random_access_iterator_tag iterator_category;
+
+	typedef typename _Myarr::value_type value_type;
+	typedef typename _Myarr::size_type size_type;
+	typedef typename _Myarr::difference_type difference_type;
+	typedef typename _Myarr::pointer pointer;
+	typedef typename _Myarr::reference reference;
+
+	_Array_iterator()
+		{	// construct with null pointer
+		}
+
+	_Array_iterator(pointer _Parg, size_t _Off)
+		: _Mybase(_Parg, _Off)
+		{	// construct with pointer and offset
+		}
+
+	enum {_EEN_SIZE = _Size};	// helper for expression evaluator
+
+	typedef _Range_checked_iterator_tag _Checked_iterator_category;
+	typedef _Ty _Inner_type;
+	typedef pointer _Checked_iterator_base_type;
+
+	_Checked_iterator_base_type _Checked_iterator_base() const
+		{	// get unchecked version of iterator
+		return (this->_Ptr + this->_Idx);
+		}
+
+	void _Checked_iterator_assign_from_base(_Checked_iterator_base_type _Iter)
+		{	// resync with unchecked version
+		this->_Idx = _Iter - this->_Ptr;
+		}
+
+	reference operator*() const
+		{	// return designated object
+		return ((reference)**(_Mybase *)this);
+		}
+
+	pointer operator->() const
+		{	// return pointer to class object
+		return (&**this);
+		}
+
+	_Myiter& operator++()
+		{	// preincrement
+		++*(_Mybase *)this;
+		return (*this);
+		}
+
+	_Myiter operator++(int)
+		{	// postincrement
+		_Myiter _Tmp = *this;
+		++*this;
+		return (_Tmp);
+		}
+
+	_Myiter& operator--()
+		{	// predecrement
+		--*(_Mybase *)this;
+		return (*this);
+		}
+
+	_Myiter operator--(int)
+		{	// postdecrement
+		_Myiter _Tmp = *this;
+		--*this;
+		return (_Tmp);
+		}
+
+	_Myiter& operator+=(difference_type _Off)
+		{	// increment by integer
+		*(_Mybase *)this += _Off;
+		return (*this);
+		}
+
+	_Myiter operator+(difference_type _Off) const
+		{	// return this + integer
+		_Myiter _Tmp = *this;
+		return (_Tmp += _Off);
+		}
+
+	_Myiter& operator-=(difference_type _Off)
+		{	// decrement by integer
+		return (*this += -_Off);
+		}
+
+	_Myiter operator-(difference_type _Off) const
+		{	// return this - integer
+		_Myiter _Tmp = *this;
+		return (_Tmp -= _Off);
+		}
+
+	difference_type operator-(const _Mybase& _Right) const
+		{	// return difference of iterators
+		return (*(_Mybase *)this - _Right);
+		}
+
+	reference operator[](difference_type _Off) const
+		{	// subscript
+		return (*(*this + _Off));
+		}
+	};
+
+template<class _Ty,
+	size_t _Size> inline
+	_Array_iterator<_Ty, _Size> operator+(
+		typename _Array_iterator<_Ty, _Size>::difference_type _Off,
+		_Array_iterator<_Ty, _Size> _Next)
+	{	// add offset to iterator
+	return (_Next += _Off);
+	}
+
+	// TEMPLATE CLASS array
+template<class _Ty,
+	size_t _Size>
+	class array
+	{	// fixed size array of values
+public:
+	enum {_EEN_SIZE = _Size};	// helper for expression evaluator
+
+	typedef array<_Ty, _Size> _Myt;
+	typedef _Ty value_type;
+	typedef size_t size_type;
+	typedef ptrdiff_t difference_type;
+	typedef _Ty *pointer;
+	typedef const _Ty *const_pointer;
+	typedef _Ty& reference;
+	typedef const _Ty& const_reference;
+
+	typedef _Array_iterator<_Ty, _Size> iterator;
+	typedef _Array_const_iterator<_Ty, _Size> const_iterator;
+
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	void assign(const _Ty& _Value)
+		{	// assign value to all elements
+		std::fill_n(_Elems, _Size, _Value);
+		}
+
+	void swap(_Myt& _Other)
+		{	// swap contents with _Other
+		std::swap_ranges(_Other.begin(), _Other.end(), begin());
+		}
+
+	iterator begin()
+		{	// return iterator for beginning of mutable sequence
+		return (iterator(&_Elems[0], 0));
+		}
+
+	const_iterator begin() const
+		{	// return iterator for beginning of nonmutable sequence
+		return (const_iterator((pointer)&_Elems[0], 0));
+		}
+
+	iterator end()
+		{	// return iterator for end of mutable sequence
+		return (iterator(&_Elems[0], _Size));
+		}
+
+	const_iterator end() const
+		{	// return iterator for beginning of nonmutable sequence
+		return (const_iterator((pointer)&_Elems[0], _Size));
+		}
+
+	reverse_iterator rbegin()
+		{	// return iterator for beginning of reversed mutable sequence
+		return (reverse_iterator(end()));
+		}
+
+	const_reverse_iterator rbegin() const
+		{	// return iterator for beginning of reversed nonmutable sequence
+		return (const_reverse_iterator(end()));
+		}
+
+	reverse_iterator rend()
+		{	// return iterator for end of reversed mutable sequence
+		return (reverse_iterator(begin()));
+		}
+
+	const_reverse_iterator rend() const
+		{	// return iterator for end of reversed nonmutable sequence
+		return (const_reverse_iterator(begin()));
+		}
+
+	size_type size() const
+		{	// return length of sequence
+		return (_Size);
+		}
+
+	size_type max_size() const
+		{	// return maximum possible length of sequence
+		return (_Size);
+		}
+
+	bool empty() const
+		{	// test if sequence is empty
+		return (_Size == 0);
+		}
+
+	reference at(size_type _Pos)
+		{	// subscript mutable sequence with checking
+		if (_Size <= _Pos)
+			_Xoutrange();
+		return (_Elems[_Pos]);
+		}
+
+	const_reference at(size_type _Pos) const
+		{	// subscript nonmutable sequence with checking
+		if (_Size <= _Pos)
+			_Xoutrange();
+		return (_Elems[_Pos]);
+		}
+
+	reference operator[](size_type _Pos)
+		{	// subscript mutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size <= _Pos)
+			_DEBUG_ERROR("array subscript out of range");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(_Pos < _Size);
+
+		return (_Elems[_Pos]);
+		}
+
+	const_reference operator[](size_type _Pos) const
+		{	// subscript nonmutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size <= _Pos)
+			_DEBUG_ERROR("array subscript out of range");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(_Pos < _Size);
+
+		return (_Elems[_Pos]);
+		}
+
+	reference front()
+		{	// return first element of mutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size == 0)
+			_DEBUG_ERROR("array<T, 0>::front() invalid");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(0 < _Size);
+
+		return (_Elems[0]);
+		}
+
+	const_reference front() const
+		{	// return first element of nonmutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size == 0)
+			_DEBUG_ERROR("array<T, 0>::front() invalid");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(0 < _Size);
+
+		return (_Elems[0]);
+		}
+
+	reference back()
+		{	// return last element of mutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size == 0)
+			_DEBUG_ERROR("array<T, 0>::back() invalid");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(0 < _Size);
+
+		return (_Elems[_Size - 1]);
+		}
+
+	const_reference back() const
+		{	// return last element of nonmutable sequence
+ #if _HAS_ITERATOR_DEBUGGING
+		if (_Size == 0)
+			_DEBUG_ERROR("array<T, 0>::back() invalid");
+ #endif /* _HAS_ITERATOR_DEBUGGING */
+
+		_SCL_SECURE_VALIDATE_RANGE(0 < _Size);
+
+		return (_Elems[_Size - 1]);
+		}
+
+	_Ty *data()
+		{	// return pointer to mutable data array
+		return (_Elems);
+		}
+
+	const _Ty *data() const
+		{	// return pointer to nonmutable data array
+		return (_Elems);
+		}
+
+	_Ty _Elems[_Size == 0 ? 1 : _Size];
+	};
+
+template<class _Ty,
+	size_t _Size>
+	void swap(array<_Ty,_Size>& _Left,
+		array<_Ty,_Size>& _Right)
+	{	// swap arrays
+	return (_Left.swap(_Right));
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator==(const array<_Ty,_Size>& _Left,
+		const array<_Ty,_Size>& _Right)
+	{	// test for array equality
+	return (std::equal(_Left.begin(), _Left.end(), _Right.begin()));
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator!=(const array<_Ty,_Size>& _Left,
+		const array<_Ty,_Size>& _Right)
+	{	// test for array inequality
+	return (!(_Left == _Right));
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator<(const array<_Ty,_Size>& _Left,
+		const array<_Ty,_Size>& _Right)
+	{	// test if _Left < _Right for arrays
+	return (std::lexicographical_compare(_Left.begin(), _Left.end(),
+		_Right.begin(), _Right.end()));
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator>(const array<_Ty,_Size>& _Left,
+		const array<_Ty,_Size>& _Right)
+	{	// test if _Left > _Right for arrays
+	return (_Right < _Left);
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator<=(const array<_Ty,_Size>& _Left,
+	const array<_Ty,_Size>& _Right)
+	{	// test if _Left <= _Right for arrays
+	return (!(_Right < _Left));
+	}
+
+template<class _Ty,
+	size_t _Size>
+	bool operator>=(const array<_Ty,_Size>& _Left,
+	const array<_Ty,_Size>& _Right)
+	{	// test if _Left >= _Right for arrays
+	return (!(_Left < _Right));
+	}
+
+ #if _HAS_TR1
+	// TUPLE INTERFACE TO array
+template<class _Tuple>
+	struct tuple_size;
+
+template<int _Idx,
+	class _Tuple>
+	struct tuple_element;
+
+template<class _Ty,
+	size_t _Size>
+	struct tuple_size<array<_Ty, _Size> >
+	{	// struct to determine number of elements in array
+	static const int value = _Size;
+	};
+
+template<int _Idx,
+	class _Ty,
+	size_t _Size>
+	struct tuple_element<_Idx, array<_Ty, _Size> >
+	{	// struct to determine type of element _Idx in array
+	typedef _Ty type;
+	};
+
+template<int _Idx,
+	class _Ty,
+	size_t _Size>
+	_Ty& get(array<_Ty, _Size>& _Arr)
+	{	// return element at _Idx in array _Arr
+	_Assert_static(0 <= _Idx && _Idx < _Size);
+	return (_Arr[_Idx]);
+	}
+
+template<int _Idx,
+	class _Ty,
+	size_t _Size>
+	const _Ty& get(const array<_Ty, _Size>& _Arr)
+	{	// return element at _Idx in array _Arr
+	_Assert_static(0 <= _Idx && _Idx < _Size);
+	return (_Arr[_Idx]);
+	}
+ #endif /* _HAS_TR1 */
+
+	}	// namespace tr1
+
+	// array implements a performant swap if its elements do
+template<class _Ty,
+	size_t _Size>
+	class _Move_operation_category<tr1::array<_Ty, _Size> >
+	{
+public:
+	typedef typename _Move_operation_category<_Ty>::_Move_cat _Move_cat;
+	};
+
+_STD_END
+ #pragma warning(default: 4996)
+ #pragma warning(default: 4284)
+ #pragma warning(pop)
+ #pragma pack(pop)
+#endif /* RC_INVOKED */
+#endif /* _ARRAY_ */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

@@ -1,0 +1,14 @@
+// xxtuple0 internal header
+// NOTE: no include guard
+
+ #if _NARGS != 0
+explicit tuple(_LIST2(typename _Arg_traits<_Arg, >::_AType _Ax))
+	: _Impl(_A0_A1 _C_TAIL(_Nil_obj))
+	{	// construct from one or more arguments
+	}
+ #endif /* _NARGS != 0 */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

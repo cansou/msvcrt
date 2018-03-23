@@ -1,0 +1,171 @@
+// xawrap2 internal header
+// NOTE: no include guards
+
+// sets up macro arguments for use in the header named by _INCL_FILE
+
+ #if _CMASK & 0x01
+  #define _MCONST0	const
+
+ #else
+  #define _MCONST0
+ #endif
+
+ #if _CMASK & 0x02
+  #define _MCONST1	const
+
+ #else
+  #define _MCONST1
+ #endif
+
+ #if _CMASK & 0x04
+  #define _MCONST2	const
+
+ #else
+  #define _MCONST2
+ #endif
+
+ #if _CMASK & 0x08
+  #define _MCONST3	const
+
+ #else
+  #define _MCONST3
+ #endif
+
+ #if _CMASK & 0x10
+  #define _MCONST4	const
+
+ #else
+  #define _MCONST4
+ #endif
+
+ #if _CMASK2 & 0x01
+  #define _MCONST5	const
+
+ #else
+  #define _MCONST5
+ #endif
+
+ #if _CMASK2 & 0x02
+  #define _MCONST6	const
+
+ #else
+  #define _MCONST6
+ #endif
+
+ #if _CMASK2 & 0x04
+  #define _MCONST7	const
+
+ #else
+  #define _MCONST7
+ #endif
+
+ #if _CMASK2 & 0x08
+  #define _MCONST8	const
+
+ #else
+  #define _MCONST8
+ #endif
+
+ #if _CMASK2 & 0x10
+  #define _MCONST9	const
+
+ #else
+  #define _MCONST9
+ #endif
+
+ #if _NARGS == 0
+  #define _CARG0_CARG1_REF
+  #define _CARG0_C0_REF
+
+ #elif _NARGS == 1
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0
+
+ #elif _NARGS == 2
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1
+
+ #elif _NARGS == 3
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2
+
+ #elif _NARGS == 4
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3
+
+ #elif _NARGS == 5
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4
+
+ #elif _NARGS == 6
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&, \
+	_MCONST5 _Carg5&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4, \
+	_MCONST5 _Carg5& _CA5
+
+ #elif _NARGS == 7
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&, \
+	_MCONST5 _Carg5&, _Carg6&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4, \
+	_MCONST5 _Carg5& _CA5, _MCONST6 _Carg6& _CA6
+
+ #elif _NARGS == 8
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&, \
+	_MCONST5 _Carg5&, _Carg6&, _Carg7&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4, \
+	_MCONST5 _Carg5& _CA5, _MCONST6 _Carg6& _CA6, _MCONST7 _Carg7& _CA7
+
+ #elif _NARGS == 9
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&, \
+	_MCONST5 _Carg5&, _Carg6&, _Carg7&, _Carg8&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4, \
+	_MCONST5 _Carg5& _CA5, _MCONST6 _Carg6& _CA6, _MCONST7 _Carg7& _CA7, \
+	_MCONST8 _Carg8& _CA8
+
+ #elif _NARGS == 10
+  #define _CARG0_CARG1_REF	_MCONST0 _Carg0&, _MCONST1 _Carg1&, \
+	_MCONST2 _Carg2&, _MCONST3 _Carg3&, _MCONST4 _Carg4&, \
+	_MCONST5 _Carg5&, _Carg6&, _Carg7&, _Carg8&, _Carg9&
+  #define _CARG0_C0_REF		_MCONST0 _Carg0& _CA0, _MCONST1 _Carg1& _CA1, \
+	_MCONST2 _Carg2& _CA2, _MCONST3 _Carg3& _CA3, _MCONST4 _Carg4& _CA4, \
+	_MCONST5 _Carg5& _CA5, _MCONST6 _Carg6& _CA6, _MCONST7 _Carg7& _CA7, \
+	_MCONST8 _Carg8& _CA8, _MCONST9 _Carg9& _CA9
+
+ #else /* _NARGS */
+  #error bad number of arguments
+ #endif /* _NARGS */
+
+#include _INCL_FILE
+
+#undef _MCONST9
+#undef _MCONST8
+#undef _MCONST7
+#undef _MCONST6
+#undef _MCONST5
+#undef _MCONST4
+#undef _MCONST3
+#undef _MCONST2
+#undef _MCONST1
+#undef _MCONST0
+#undef _CARG0_C0_REF
+#undef _CARG0_CARG1_REF
+#undef _CMASK
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

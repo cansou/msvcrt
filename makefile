@@ -22,23 +22,12 @@ RETAIL_DLL_NAME=_sample_
 RETAIL_LIB_NAME=_sample_
 RETAIL_DLLCPP_NAME=sample_p
 RETAIL_LIBCPP_NAME=sample_p
-RETAIL_DLLMIXED_NAME=sample_m
-RETAIL_LIBMIXED_NAME=sample_m
-RETAIL_LIBPURE_NAME=sample_u
-RETAIL_PT_LIBMIXED_NAME=sample_pm
-RETAIL_PT_LIBPURE_NAME=sample_pu
-DEBUG_DLL_NAME=_sampld_
-DEBUG_LIB_NAME=_sampld_
-DEBUG_DLLCPP_NAME=sampld_p
-DEBUG_LIBCPP_NAME=sampld_p
-DEBUG_DLLMIXED_NAME=sampld_m
-DEBUG_LIBMIXED_NAME=sampld_m
-DEBUG_LIBPURE_NAME=sampld_u
-DEBUG_PT_LIBMIXED_NAME=sampld_pm
-DEBUG_PT_LIBPURE_NAME=sampld_pu
+DEBUG_DLL_NAME=_sampled_
+DEBUG_LIB_NAME=_sampled_
+DEBUG_DLLCPP_NAME=sampled_p
+DEBUG_LIBCPP_NAME=sampled_p
 RC_NAME=_sample_
 RCCPP_NAME=sample_p
-RCMIXED_NAME=sample_m
 #
 POST_BLD=1
 
@@ -136,13 +125,10 @@ RTC = YES
 
 STDCPP_SRC = stdcpp
 
-MIXED_SRC = mix_
-
 SOURCE_OBJS = $(SOURCE_OBJS_RAW:*=*_obj)
 CPPSRC_OBJS = $(CPPSRC_OBJS_RAW:*=*_obj)
 SOURCE_OBJS_DLL = $(SOURCE_OBJS_RAW_DLL:*=*_obj)
 CPPSRC_OBJS_DLL = $(CPPSRC_OBJS_RAW_DLL:*=*_obj)
-MIXEDSRC_OBJS_DLL = $(MIXEDSRC_OBJS_RAW_DLL:*=*_obj)
 BSKU_OBJS = $(BSKU_OBJS_RAW:*=*_obj)
 
 # Source directories:
@@ -276,7 +262,6 @@ SOURCE_OBJS_RAW_DLL = \
  build\$(CPUDIR)\*\tran.lib
 
 CPPSRC_OBJS_RAW_DLL = build\$(CPUDIR)\*\$(STDCPP_SRC).lib
-MIXEDSRC_OBJS_RAW_DLL = build\$(CPUDIR)\*\$(MIXED_SRC).lib
 
 UPDATE_MSG = *** Updating Component Objects ***
 
@@ -363,7 +348,6 @@ LINKIMPLIB=$(LINKIMPLIB)
 ST_DEFINES=$(COMMON_DEFS)
 MT_DEFINES=$(ST_DEFINES) -D_MT
 DLL_DEFINES=$(MT_DEFINES) -DCRTDLL
-DLLMIXED_DEFINES=$(MT_DEFINES) -D_DLL -DMRTDLL
 DLLCPP_DEFINES=$(MT_DEFINES) -D_DLL -DCRTDLL2
 
 
@@ -381,14 +365,8 @@ RELEASE_LIBCMT          = $(RELDIR_CPU)\libcmt.lib
 RELEASE_LIBCPPMT        = $(RELDIR_CPU)\libcpmt.lib
 RELEASE_DLL             = $(RELDIR_CPU)\$(RETAIL_DLL_NAME).dll
 RELEASE_DLLCPP          = $(RELDIR_CPU)\$(RETAIL_DLLCPP_NAME).dll
-RELEASE_DLLMIXED        = $(RELDIR_CPU)\$(RETAIL_DLLMIXED_NAME).dll
-RELEASE_DLLMIXED_CLR    = $(OBJDIR_DLL)\$(CLR_OBJ_DIR)\$(RETAIL_DLLMIXED_NAME).dll
 RELEASE_IMPLIB_DLL      = $(RELDIR_CPU)\$(RETAIL_LIB_NAME).lib
 RELEASE_IMPLIB_DLLCPP   = $(RELDIR_CPU)\$(RETAIL_LIBCPP_NAME).lib
-RELEASE_IMPLIB_DLLPURE  = $(RELDIR_CPU)\$(RETAIL_LIBPURE_NAME).lib
-RELEASE_IMPLIB_DLLMIXED = $(RELDIR_CPU)\$(RETAIL_LIBMIXED_NAME).lib
-RELEASE_PT_LIB_PURE  = $(RELDIR_CPU)\$(RETAIL_PT_LIBPURE_NAME).lib
-RELEASE_PT_LIB_MIXED = $(RELDIR_CPU)\$(RETAIL_PT_LIBMIXED_NAME).lib
 RELEASE_OLDNAMES        = $(RELDIR_CPU)\oldnames.lib
 RELEASE_SAFECRT         = $(RELDIR_CPU)\safecrt.lib
 
@@ -399,19 +377,11 @@ RELEASE_LIBCPPMT_PDB    = $(PDBDIR_CPU)\libcpmt.pdb
 RELEASE_IMPLIB_PDB      = $(PDBDIR_CPU)\$(RETAIL_LIB_NAME).pdb
 RELEASE_IMPLIBCPP_PDB   = $(PDBDIR_CPU)\$(RETAIL_LIBCPP_NAME).pdb
 RELEASE_SAFECRT_PDB     = $(PDBDIR_CPU)\safecrt.pdb
-RELEASE_IMPLIBMIXED_PDB = $(PDBDIR_CPU)\$(RETAIL_LIBMIXED_NAME).pdb
-RELEASE_PT_MIXED_PDB = $(PDBDIR_CPU)\$(RETAIL_PT_LIBMIXED_NAME).pdb
-RELEASE_PT_PURE_PDB = $(PDBDIR_CPU)\$(RETAIL_PT_LIBPURE_NAME).pdb
 RELEASE_DLL_PDB         = $(PDBDIR_CPU_DLL)\$(RETAIL_DLL_NAME)$(_PDB_VER_NAME_).pdb
 RELEASE_DLLCPP_PDB      = $(PDBDIR_CPU_DLL)\$(RETAIL_DLLCPP_NAME)$(_PDB_VER_NAME_).pdb
-RELEASE_DLLMIXED_PDB    = $(PDBDIR_CPU_DLL)\$(RETAIL_DLLMIXED_NAME)$(_PDB_VER_NAME_).pdb
-RELEASE_DLLMIXED_CLR_PDB     = $(OBJDIR_DLL)\$(CLR_OBJ_DIR)\$(RETAIL_DLLMIXED_NAME)$(_PDB_VER_NAME_).pdb
 
 RELEASE_DLL_NOVER_PDB         = $(PDBDIR_CPU_DLL)\$(RETAIL_DLL_NAME).pdb
 RELEASE_DLLCPP_NOVER_PDB      = $(PDBDIR_CPU_DLL)\$(RETAIL_DLLCPP_NAME).pdb
-RELEASE_DLLMIXED_NOVER_PDB    = $(PDBDIR_CPU_DLL)\$(RETAIL_DLLMIXED_NAME).pdb
-RELEASE_DLLMIXED_CLR_NOVER_PDB     = $(OBJDIR_DLL)\$(CLR_OBJ_DIR)\$(RETAIL_DLLMIXED_NAME).pdb
-
 
 RELEASE_LIBCST_DBG      = $(RELDIR_CPU)\libcd.lib
 RELEASE_LIBCPPST_DBG    = $(RELDIR_CPU)\libcpd.lib
@@ -419,14 +389,8 @@ RELEASE_LIBCMT_DBG      = $(RELDIR_CPU)\libcmtd.lib
 RELEASE_LIBCPPMT_DBG    = $(RELDIR_CPU)\libcpmtd.lib
 RELEASE_DLL_DBG         = $(RELDIR_CPU)\$(DEBUG_DLL_NAME).dll
 RELEASE_DLLCPP_DBG      = $(RELDIR_CPU)\$(DEBUG_DLLCPP_NAME).dll
-RELEASE_DLLMIXED_DBG    = $(RELDIR_CPU)\$(DEBUG_DLLMIXED_NAME).dll
-RELEASE_DLLMIXED_CLR_DBG    = $(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR)\$(DEBUG_DLLMIXED_NAME).dll
 RELEASE_IMPLIB_DLL_DBG  	= $(RELDIR_CPU)\$(DEBUG_LIB_NAME).lib
 RELEASE_IMPLIB_DLLCPP_DBG 	= $(RELDIR_CPU)\$(DEBUG_LIBCPP_NAME).lib
-RELEASE_IMPLIB_DLLPURE_DBG 	= $(RELDIR_CPU)\$(DEBUG_LIBPURE_NAME).lib
-RELEASE_IMPLIB_DLLMIXED_DBG = $(RELDIR_CPU)\$(DEBUG_LIBMIXED_NAME).lib
-RELEASE_PT_LIB_PURE_DBG 	= $(RELDIR_CPU)\$(DEBUG_PT_LIBPURE_NAME).lib
-RELEASE_PT_LIB_MIXED_DBG = $(RELDIR_CPU)\$(DEBUG_PT_LIBMIXED_NAME).lib
 
 RELEASE_LIBCST_DBG_PDB  = $(PDBDIR_CPU)\libcd.pdb
 RELEASE_LIBCPPST_DBG_PDB 	= $(PDBDIR_CPU)\libcpd.pdb
@@ -434,19 +398,11 @@ RELEASE_LIBCMT_DBG_PDB  = $(PDBDIR_CPU)\libcmtd.pdb
 RELEASE_LIBCPPMT_DBG_PDB 	= $(PDBDIR_CPU)\libcpmtd.pdb
 RELEASE_IMPLIB_DBG_PDB     	= $(PDBDIR_CPU)\$(DEBUG_LIB_NAME).pdb
 RELEASE_IMPLIBCPP_DBG_PDB  	= $(PDBDIR_CPU)\$(DEBUG_LIBCPP_NAME).pdb
-RELEASE_IMPLIBPURE_DBG_PDB  = $(PDBDIR_CPU)\$(DEBUG_LIBPURE_NAME).pdb
-RELEASE_IMPLIBMIXED_DBG_PDB = $(PDBDIR_CPU)\$(DEBUG_LIBMIXED_NAME).pdb
-RELEASE_PT_LIBPURE_DBG_PDB  = $(PDBDIR_CPU)\$(DEBUG_PT_LIBPURE_NAME).pdb
-RELEASE_PT_LIBMIXED_DBG_PDB = $(PDBDIR_CPU)\$(DEBUG_PT_LIBMIXED_NAME).pdb
 RELEASE_DLL_DBG_PDB     = $(PDBDIR_CPU_DLL)\$(DEBUG_DLL_NAME)$(_PDB_VER_NAME_).pdb
 RELEASE_DLLCPP_DBG_PDB  = $(PDBDIR_CPU_DLL)\$(DEBUG_DLLCPP_NAME)$(_PDB_VER_NAME_).pdb
-RELEASE_DLLMIXED_DBG_PDB 	= $(PDBDIR_CPU_DLL)\$(DEBUG_DLLMIXED_NAME)$(_PDB_VER_NAME_).pdb
-RELEASE_DLLMIXED_CLR_DBG_PDB 	= $(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR)\$(DEBUG_DLLMIXED_NAME)$(_PDB_VER_NAME_).pdb
 
 RELEASE_DLL_DBG_NOVER_PDB     = $(PDBDIR_CPU_DLL)\$(DEBUG_DLL_NAME).pdb
 RELEASE_DLLCPP_DBG_NOVER_PDB  = $(PDBDIR_CPU_DLL)\$(DEBUG_DLLCPP_NAME).pdb
-RELEASE_DLLMIXED_DBG_NOVER_PDB 	= $(PDBDIR_CPU_DLL)\$(DEBUG_DLLMIXED_NAME).pdb
-RELEASE_DLLMIXED_CLR_DBG_NOVER_PDB 	= $(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR)\$(DEBUG_DLLMIXED_NAME).pdb
 
 
 FD_REL_ST=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCST_PDB)
@@ -455,7 +411,6 @@ FD_REL_MT=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCMT_PDB)
 FD_REL_MTP=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCPPMT_PDB)
 FD_REL_DLL=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIB_PDB)
 FD_REL_DLLP=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIBCPP_PDB)
-FD_REL_DLLS=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIBMIXED_PDB)
 
 
 FD_REL_ST_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCST_DBG_PDB)
@@ -464,7 +419,6 @@ FD_REL_MT_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCMT_DBG_PDB)
 FD_REL_MTP_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_LIBCPPMT_DBG_PDB)
 FD_REL_DLL_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIB_DBG_PDB)
 FD_REL_DLLP_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIBCPP_DBG_PDB)
-FD_REL_DLLS_DBG=-Fd$(PDBDIR_PREFIX)$(RELEASE_IMPLIBMIXED_DBG_PDB)
 
 
 #
@@ -477,9 +431,6 @@ OBJDIR_PREFIX =  #
 OBJCPUDIR = $(OBJROOT)\$(CPUDIR)
 
 CPP_OBJ_DIR  = cpp_obj
-PURE_OBJ_DIR = pure_obj
-CLR_OBJ_DIR  = clr_obj
-CLR_SAFE_OBJ_DIR  = clr_safe_obj
 MT_LIB_DIR  = mt_lib
 
 OBJDIR_ST  = $(OBJCPUDIR)\st_obj
@@ -517,12 +468,10 @@ debug : xmt xdll
 
 $(OBJDIR_ST) $(OBJDIR_MT) $(OBJDIR_DLL) \
 $(OBJDIR_ST)\$(CPP_OBJ_DIR) $(OBJDIR_MT)\$(CPP_OBJ_DIR) $(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
-$(OBJDIR_MT)\$(PURE_OBJ_DIR) $(OBJDIR_DLL)\$(PURE_OBJ_DIR) $(OBJDIR_DLL)\$(CLR_OBJ_DIR) $(OBJDIR_DLL)\$(CLR_SAFE_OBJ_DIR) \
 $(OBJDIR_OLDNAMES) $(OBJDIR_SDKNAMES) $(OBJDIR_ALMAP) $(OBJDIR_TCMAP) $(OBJDIR_ALMAPDLL) $(OBJDIR_TCMAPDLL) \
 $(OBJDIR_ST_DBG) $(OBJDIR_MT_DBG) $(OBJDIR_DLL_DBG) \
-$(OBJDIR_ST_DBG)\$(CPP_OBJ_DIR) $(OBJDIR_MT_DBG)\$(CPP_OBJ_DIR) $(OBJDIR_MT_DBG)\$(PURE_OBJ_DIR) \
-$(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) $(OBJDIR_DLL_DBG)\$(PURE_OBJ_DIR) \
-$(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR) \
+$(OBJDIR_ST_DBG)\$(CPP_OBJ_DIR) $(OBJDIR_MT_DBG)\$(CPP_OBJ_DIR) \
+$(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) \
 !if "$(PDBDIR_CPU_DLL)"!="$(RELDIR_CPU)"
 $(PDBDIR_CPU_DLL) \
 !endif
@@ -652,7 +601,7 @@ mtp_env :
 !endif
 
 mt : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_MT) $(RELDIR_CPU) \
-	$(OBJDIR_MT)\$(CPP_OBJ_DIR) $(OBJDIR_MT)\$(PURE_OBJ_DIR) \
+	$(OBJDIR_MT)\$(CPP_OBJ_DIR)\
 	mt_env mt_ mtp_env mt_p
 !if "$(BLD_BROWSE)"=="1" && "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
     $(BSCMAKE) -o $(RELEASE_LIBCMT:.lib=.bsc) $(OBJDIR_MT)\*.sbr
@@ -668,7 +617,6 @@ mt_ :: $(MAKE_DIRS_MT)
 	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
         BLD_MODEL=mt OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT) \
         CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT)\$(CPP_OBJ_DIR) \
-        PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT)\$(PURE_OBJ_DIR) \
         TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
         MT_LIB_DIR=$(MT_LIB_DIR) \
         VCTOOLSINC="$(VCTOOLSINC)" \
@@ -733,24 +681,9 @@ dllp_env :
     & echo.
 !endif
 
-dlls_env :
-!if "$(BLD_LIB)"!="1"
-    !@-echo. \
-    & echo # *** These are the compiler switches for the DLL model (MSVCMRT.LIB): \
-    & echo # \
-    & echo # CL = $(CC_OPTS_BASE) \ \
-    & echo # $(WINDOWS_H_DEFS) $(FD_REL_DLL) \ \
-    & echo # $(DLLMIXED_DEFINES) \
-    & echo # \
-    & echo # ML = $(AS_OPTS) \ \
-    & echo # $(DLLMIXED_DEFINES) \
-    & echo.
-!endif
-
-dll : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL) $(OBJDIR_DLL)\$(PURE_OBJ_DIR) \
-   	$(OBJDIR_DLL)\$(CLR_OBJ_DIR) $(OBJDIR_DLL)\$(CLR_SAFE_OBJ_DIR) $(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
+dll : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL) \
+   	$(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
    	$(RELDIR_CPU) $(PDBDIR_CPU_DLL) others dll_env dll_	\
-	dlls_env dll_s	\
 	dllp_env dll_p
 !if "$(BLD_BROWSE)"=="1" && "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
     $(BSCMAKE) -o $(RELEASE_IMPLIB_DLL:.lib=.bsc) $(OBJDIR_DLL)\*.sbr
@@ -766,8 +699,6 @@ dll_ :: $(MAKE_DIRS_DLL)
 	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
         BLD_MODEL=dll BLD_DLL=1 OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL) \
         CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
-        PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(PURE_OBJ_DIR) \
-        CLR_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(CLR_OBJ_DIR) \
 		TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
         VCTOOLSINC="$(VCTOOLSINC)" \
         PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) \
@@ -790,26 +721,6 @@ dll_p :: $(MAKE_DIRSP_DLL)
 
 !endif
 
-!if "$(PRE_BLD)"!="1"
-dll_s :: $(MAKE_DIRSP_DLL)
-    !@-cd $** \
-    & set CL=$(CC_OPTS) $(DLLMIXED_DEFINES) $(FD_REL_DLLS) \
-    & set ML=$(AS_OPTS) $(DLLMIXED_DEFINES) \
-    & $(MAKE) -nologo $(IFLAG) -f makefile.sub DIR=$** CPUDIR=$(CPUDIR) \
-        WINHEAP=$(WINHEAP) RTC=$(RTC) \
-	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
-        BLD_MODEL=dll BLD_DLL=1 OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL) \
-        CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(CPP_OBJ_DIR) \
-        PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(PURE_OBJ_DIR) \
-        CLR_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(CLR_OBJ_DIR) \
-        CLR_SAFE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL)\$(CLR_SAFE_OBJ_DIR) \
-        TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
-        VCTOOLSINC="$(VCTOOLSINC)" \
-	    PURE_OBJ_DIR=$(PURE_OBJ_DIR) CLR_OBJ_DIR=$(CLR_OBJ_DIR) \
-        PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) _mix_ _pure_ \
-    & cd $(CD_ROOT)
-
-!endif
 !endif # BLD_LIB != 1
 
 !if "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
@@ -817,13 +728,11 @@ dll_ :: $(RELEASE_DLL)
 
 dll_p :: $(RELEASE_DLLCPP)
 
-dll_s :: $(RELEASE_DLLMIXED) $(RELEASE_PT_LIB_MIXED) $(RELEASE_PT_LIB_PURE)
 !else
 dll_ ::
 
 dll_p ::
 
-dll_s ::
 !endif
 
 
@@ -933,7 +842,7 @@ xmtp_env :
 !endif
 
 xmt : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_MT_DBG) $(RELDIR_CPU) \
-	$(OBJDIR_MT_DBG)\$(CPP_OBJ_DIR) $(OBJDIR_MT_DBG)\$(PURE_OBJ_DIR) \
+	$(OBJDIR_MT_DBG)\$(CPP_OBJ_DIR) \
 	xmt_env xmt_ xmtp_env xmt_p
 !if "$(BLD_BROWSE)"=="1" && "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
     $(BSCMAKE) -o $(RELEASE_LIBCMT_DBG:.lib=.bsc) $(OBJDIR_MT_DBG)\*.sbr
@@ -949,7 +858,6 @@ xmt_ :: $(MAKE_DIRS)
 	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
         BLD_MODEL=xmt BLD_DBG=1 OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT_DBG) \
         CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT_DBG)\$(CPP_OBJ_DIR) \
-        PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_MT_DBG)\$(PURE_OBJ_DIR) \
         TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
         VCTOOLSINC="$(VCTOOLSINC)" \
         PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) \
@@ -997,20 +905,6 @@ xdll_env :
     & echo.
 !endif
 
-xdlls_env :
-!if "$(PRE_BLD)"!="1" && "$(BLD_LIB)"!="1"
-    !@-echo. \
-    & echo # *** These are the compiler switches for the DLL model (MSVCMRTD.LIB): \
-    & echo # \
-    & echo # CL = $(CC_OPTS_BASE) \ \
-    & echo # $(WINDOWS_H_DEFS) $(FD_REL_DLL) \ \
-    & echo # $(DLLMIXED_DEFINES) \
-    & echo # \
-    & echo # ML = $(AS_OPTS) \ \
-    & echo # $(DLLMIXED_DEFINES) \
-    & echo.
-!endif
-
 xdllp_env :
 !if "$(PRE_BLD)"!="1" && "$(BLD_LIB)"!="1"
     !@-echo. \
@@ -1027,10 +921,8 @@ xdllp_env :
 !endif
 
 xdll : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL_DBG) \
-	$(OBJDIR_DLL_DBG)\$(PURE_OBJ_DIR) $(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR) \
-    $(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) $(RELDIR_CPU) $(PDBDIR_CPU_DLL) \
+    $(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) $(RELDIR_CPU) \
 	xothers xdll_env xdll_ \
-	xdlls_env xdll_s \
 	 xdllp_env xdll_p
 !if "$(BLD_BROWSE)"=="1" && "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
     $(BSCMAKE) -o $(RELEASE_IMPLIB_DLL_DBG:.lib=.bsc) $(OBJDIR_DLL_DBG)\*.sbr
@@ -1046,8 +938,6 @@ xdll_ :: $(MAKE_DIRS_DLL)
 	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
         BLD_MODEL=xdll BLD_DLL=1 BLD_DBG=1 OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG) \
         CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) \
-		PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(PURE_OBJ_DIR) \
-		CLR_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR) \
         TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
         VCTOOLSINC="$(VCTOOLSINC)" \
         PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) \
@@ -1068,23 +958,6 @@ xdll_p :: $(MAKE_DIRSP_DLL)
         PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) _stdcpp_ \
     & cd $(CD_ROOT)
 
-xdll_s :: $(MAKE_DIRSP_DLL)
-    !@-cd $** \
-    & set CL=$(CC_OPTS) $(DLLMIXED_DEFINES) $(FD_REL_DLLS_DBG) \
-    & set ML=$(AS_OPTS) $(DLLMIXED_DEFINES) \
-    & $(MAKE) -nologo $(IFLAG) -f makefile.sub DIR=$** CPUDIR=$(CPUDIR) \
-        WINHEAP=$(WINHEAP) RTC=$(RTC) \
-	BLD_REL_NO_DBINFO=$(BLD_REL_NO_DBINFO) \
-        BLD_MODEL=xdll BLD_DLL=1 BLD_DBG=1 OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG) \
-        CPP_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) \
-        PURE_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(PURE_OBJ_DIR) \
-        CLR_OBJDIR=$(OBJDIR_PREFIX)$(OBJDIR_DLL_DBG)\$(CLR_OBJ_DIR) \
-        TARGET_CPU=$(TARGET_CPU) HOST_CPU=$(HOST_CPU) \
-        VCTOOLSINC="$(VCTOOLSINC)" \
-	    PURE_OBJ_DIR=$(PURE_OBJ_DIR) CLR_OBJ_DIR=$(CLR_OBJ_DIR) \
-        PRE_BLD=$(PRE_BLD) POST_BLD=$(POST_BLD) _mix_ _pure_ \
-    & cd $(CD_ROOT)
-
 !endif
 !endif # BLD_LIB != 1
 
@@ -1093,14 +966,10 @@ xdll_ :: $(RELEASE_DLL_DBG)
 
 xdll_p :: $(RELEASE_DLLCPP_DBG)
 
-xdll_s :: $(RELEASE_DLLMIXED_DBG) $(RELEASE_PT_LIB_MIXED_DBG) $(RELEASE_PT_LIB_PURE_DBG)
-
 !else
 xdll_ ::
 
 xdll_p ::
-
-xdll_s ::
 
 !endif
 
@@ -1111,7 +980,7 @@ st_link: $(RELEASE_LIBCST) $(RELEASE_LIBCPPST)
 
 mt_link: $(RELEASE_LIBCMT) $(RELEASE_LIBCPPMT)
 
-dll_link: $(RELEASE_DLL) $(RELEASE_DLLCPP) $(RELEASE_DLLMIXED)
+dll_link: $(RELEASE_DLL) $(RELEASE_DLLCPP)
 
 
 
@@ -1250,17 +1119,10 @@ DLLCPP_STATIC_OBJS_RAW= \
 	$(OBJDIR_DLL_RAW)\newaop_s.obj  \
 
 
-DLLMIXED_STATIC_OBJS=$(DLLMIXED_STATIC_OBJS_RAW:*=dll)
-
-DLLMIXED_STATIC_OBJS_DBG=$(DLLMIXED_STATIC_OBJS_RAW:*=xdll)
-
 DLLCPP_STATIC_OBJS=$(DLLCPP_STATIC_OBJS_RAW:*=dll)
 
 DLLCPP_STATIC_OBJS_DBG=$(DLLCPP_STATIC_OBJS_RAW:*=xdll)
 
-DLLCPP_STATIC_OBJS_PURE=$(DLLCPP_STATIC_OBJS_RAW:*=dll)
-
-DLLCPP_STATIC_OBJS_DBG_PURE=$(DLLCPP_STATIC_OBJS_RAW:*=xdll)
 
 # These are the C++ objects in MSVCPXX{,D}.DLL which have exports
 
@@ -1309,122 +1171,10 @@ OBJS_WITH_EXPORTS_DLLCPP_RAW= \
 	$(OBJDIR_DLL_RAW)\xstrxfrm.obj \
 	$(OBJDIR_DLL_RAW)\xwctomb.obj
 
-OBJS_WITH_EXPORTS_DLLMIXED_RAW_RETAIL=
-
-OBJS_WITH_EXPORTS_DLLMIXED_RAW_DEBUG= \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mdbghook.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mdbgheap.obj \
-
-OBJS_WITH_EXPORTS_DLLMIXED_RAW= \
-	$(OBJDIR_DLL_RAW)\exedefad.obj \
-	$(OBJDIR_DLL_RAW)\dbgsec.obj \
-	$(OBJDIR_DLL_RAW)\gs_support.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mmatherr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mhandler.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\muser.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mfpieeeflt.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mstartup.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mstdexpt.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\thread.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\threadex.obj \
-	$(OBJDIR_DLL_RAW)\clr.lib
-
-OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW_RETAIL=
-
-OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW_DEBUG= \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xdebug.obj \
-
-OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW = \
-#	STDCPP objects for support of STL and SCP in /clr:pure
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\badfunction.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\badweakptr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\multprec.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\regex.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xinvalid.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlgamma.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xoutrange.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xrngabort.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xrngdev.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\iomanip.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ios.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\iostream.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wiostrea.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\iosptrs.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ushiostr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\cerr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\cin.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\clog.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\cout.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ushcerr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ushcin.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ushclog.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ushcout.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wcerr.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wcin.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wclog.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wcout.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\locale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\locale0.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlocale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wlocale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xdateord.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xstod.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xgetwctype.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xmbtowc.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xtowlower.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xtowupper.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xstrcoll.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xstrxfrm.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xwcscoll.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xwcsxfrm.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xwctomb.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xmutex.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlock.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xmtx.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xcosh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xdnorm.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xdscale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xdtest.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xexp.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xsinh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xpoly.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xvalues.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfcosh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfdnorm.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfdscale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfdtest.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfexp.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfsinh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xfvalues.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlcosh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xldscale.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xldtest.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlexp.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlsinh.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlpoly.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xlvalues.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xferaise.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\fiopen.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\string.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\stdthrow.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\nomemory.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\uncaught.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\_tolower.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\_toupper.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wctrans.obj \
-	$(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wctype.obj 
 
 OBJS_WITH_EXPORTS_DLLCPP=$(OBJS_WITH_EXPORTS_DLLCPP_RAW:*=dll)
 
 OBJS_WITH_EXPORTS_DLLCPP_DBG=$(OBJS_WITH_EXPORTS_DLLCPP_RAW:*=xdll)
-
-OBJS_WITH_EXPORTS_DLLMIXED=$(OBJS_WITH_EXPORTS_DLLMIXED_RAW:*=dll) $(OBJS_WITH_EXPORTS_DLLMIXED_RAW_RETAIL:*=dll)
-
-OBJS_WITH_EXPORTS_DLLCPPMIXED=$(OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW:*=dll) $(OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW_RETAIL:*=dll)
-
-OBJS_WITH_EXPORTS_DLLMIXED_DBG=$(OBJS_WITH_EXPORTS_DLLMIXED_RAW:*=xdll) $(OBJS_WITH_EXPORTS_DLLMIXED_RAW_DEBUG:*=xdll)
-
-OBJS_WITH_EXPORTS_DLLCPPMIXED_DBG=$(OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW:*=xdll) $(OBJS_WITH_EXPORTS_DLLCPPMIXED_RAW_DEBUG:*=xdll)
 
 DLL_MT_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\_newmode.obj \
@@ -1444,18 +1194,6 @@ DLL_MT_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\xtxtmode.obj \
         $(OBJDIR_DLL_RAW)\xthdloc.obj
 
-PURE_DLL_MT_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\_newmode.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xncommod.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xtxtmode.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xthdloc.obj
-
-CLR_DLL_MT_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\_newmode.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xncommod.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\tlssup.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xtxtmode.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\xthdloc.obj
 
 DLL_STATIC_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\atonexit.obj \
@@ -1547,164 +1285,10 @@ DLL_STATIC_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\strncpy.obj
 !endif
 
-CLR_DLL_STATIC_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\dll_argv.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\dllargv.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mehvccctr.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mehvcccvb.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mehvecctr.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mehveccvb.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mehvecdtr.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\helperfunc.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\managdeh.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\merr.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ManagedMain.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mcrtexe.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mcrtexew.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\msilexit.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mstartup.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mbsearch.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mlfind.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mlsearch.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mqsort.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mwcrtexe.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\mwcrtexew.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\puremsilcode.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wdll_av.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wdllargv.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\wildcard.obj \
-
-CLR_PT_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\msilexit.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\ptrust.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\managdeh.obj \
-        $(OBJDIR_DLL_RAW)\$(CLR_OBJ_DIR)\pureMSILcode.obj
-
-PURE_DLL_STATIC_OBJS_RAW_RETAIL= \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\delete.obj
-
-PURE_DLL_STATIC_OBJS_RAW_DEBUG= \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\dbgdel.obj
-
-PURE_DLL_STATIC_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\badfunction.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\badweakptr.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\multprec.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\regex.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xinvalid.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlgamma.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xoutrange.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xrngabort.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xrngdev.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\delete2.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\delaopnt.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\delopnt.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\dll_argv.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\dllargv.obj \
-!if "$(TARGET_CPU)"=="AMD64"
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJDIR)\dllsupp.obj \
-!elseif "$(TARGET_CPU)"=="IA64"
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJDIR)\dllsupp.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJDIR)\divhelp.obj \
-!endif
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\locale_implib_pure.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mehvccctr.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mehvcccvb.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mehvecctr.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mehveccvb.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mehvecdtr.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\helperfunc.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\managdeh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\merr.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\ManagedMain.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mcrtexe.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mcrtexew.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mpiostream.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mpushiostream.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\msilexit.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mstartup.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mbsearch.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mlfind.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mlsearch.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mqsort.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mwcrtexe.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\mwcrtexew.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\new.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\new2.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\newaopnt.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\newopnt.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\nothrow0.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\puremsilcode.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xvalues.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfvalues.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlvalues.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\ti_inst.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\wdll_av.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\wdllargv.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\wildcard.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\rtti.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xmutex.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xmtx.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xcosh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xferaise.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xdtest.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xexp.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xsinh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfcosh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfdtest.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfexp.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfsinh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xdateord.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xdnorm.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xdscale.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xpoly.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfdnorm.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xfdscale.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlcosh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xldnorm.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xldscale.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xldtest.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlexp.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlsinh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xlpoly.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\fiopen.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\stdthrow.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstrcoll.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\_tolower.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xgetwctype.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstod.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstof.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstold.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstoll.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstoul.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstoull.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstol.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xstrxfrm.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\_toupper.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xtowlower.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xtowupper.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xwcscoll.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\xwcsxfrm.obj
-
-PURE_PT_OBJS_RAW= \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\msilexit.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\ptrust.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\managdeh.obj \
-        $(OBJDIR_DLL_RAW)\$(PURE_OBJ_DIR)\pureMSILcode.obj
-
 DLL_STATIC_OBJS=$(DLL_MT_OBJS_RAW:*=dll) $(DLL_STATIC_OBJS_RAW:*=dll)
 
 DLL_STATIC_OBJS_DBG=$(DLL_MT_OBJS_RAW:*=xdll) $(DLL_STATIC_OBJS_RAW:*=xdll)
 
-PURE_DLL_STATIC_OBJS=$(PURE_DLL_MT_OBJS_RAW:*=dll) $(PURE_DLL_STATIC_OBJS_RAW:*=dll) $(PURE_DLL_STATIC_OBJS_RAW_RETAIL:*=dll)
-CLR_DLL_STATIC_OBJS=$(CLR_DLL_MT_OBJS_RAW:*=dll) $(CLR_DLL_STATIC_OBJS_RAW:*=dll)
-PURE_PT_OBJS=$(PURE_PT_OBJS_RAW:*=dll)
-CLR_PT_OBJS=$(CLR_PT_OBJS_RAW:*=dll)
-
-PURE_DLL_STATIC_OBJS_DBG=$(PURE_DLL_MT_OBJS_RAW:*=xdll) $(PURE_DLL_STATIC_OBJS_RAW:*=xdll) $(PURE_DLL_STATIC_OBJS_RAW_DEBUG:*=xdll)
-CLR_DLL_STATIC_OBJS_DBG=$(CLR_DLL_MT_OBJS_RAW:*=xdll) $(CLR_DLL_STATIC_OBJS_RAW:*=xdll)
-PURE_PT_OBJS_DBG=$(PURE_PT_OBJS_RAW:*=xdll)
-CLR_PT_OBJS_DBG=$(CLR_PT_OBJS_RAW:*=xdll)
 
 !if "$(POST_BLD)"!="1"
 
@@ -1746,27 +1330,6 @@ $(DEFFILE2_DIR)\$(DEBUG_LIBCPP_NAME).def : $(RCCPP_NAME).src
 	@echo *** Creating file $@ from $**
         $(CC) -nologo -DLIBRARYNAME=$(DEBUG_DLLCPP_NAME_UC) -DBASECRT=$(DEBUG_DLL_NAME_UC) $(DLLCPP_DEFINES) -D_DEBUG -EP -Tc$(RCCPP_NAME).src | sed "/^[ 	]*$$/d" > $@
 
-!if "$(BLD_SYSCRT)"!="1"
-$(DEFFILE2_DIR)\$(RETAIL_LIBMIXED_NAME).def : $(RCMIXED_NAME).src
-	@echo.
-	@echo *** Creating file $@ from $**
-        $(CC) -nologo -DLIBRARYNAME=$(RETAIL_DLLMIXED_NAME_UC) -DBASECRT=$(RETAIL_DLL_NAME_UC) $(DLLMIXED_DEFINES) -EP -Tc$(RCMIXED_NAME).src | sed "/^[ 	]*$$/d" > $@
-
-$(DEFFILE2_DIR)\$(RETAIL_LIBPURE_NAME).def : $(RCMIXED_NAME).src
-	@echo.
-	@echo *** Creating file $@ from $**
-        $(CC) -nologo -D_M_CEE_PURE -DLIBRARYNAME=$(RETAIL_DLLMIXED_NAME_UC) -DBASECRT=$(RETAIL_DLL_NAME_UC) $(DLLMIXED_DEFINES) -EP -Tc$(RCMIXED_NAME).src | sed "/^[ 	]*$$/d" > $@
-
-$(DEFFILE2_DIR)\$(DEBUG_LIBMIXED_NAME).def : $(RCMIXED_NAME).src
-	@echo.
-	@echo *** Creating file $@ from $**
-        $(CC) -nologo -DLIBRARYNAME=$(DEBUG_DLLMIXED_NAME_UC) -DBASECRT=$(DEBUG_DLL_NAME_UC) $(DLLMIXED_DEFINES) -D_DEBUG -EP -Tc$(RCMIXED_NAME).src | sed "/^[ 	]*$$/d" > $@
-
-$(DEFFILE2_DIR)\$(DEBUG_LIBPURE_NAME).def : $(RCMIXED_NAME).src
-	@echo.
-	@echo *** Creating file $@ from $**
-        $(CC) -nologo -D_M_CEE_PURE -DLIBRARYNAME=$(DEBUG_DLLMIXED_NAME_UC) -DBASECRT=$(DEBUG_DLL_NAME_UC) $(DLLMIXED_DEFINES) -D_DEBUG -EP -Tc$(RCMIXED_NAME).src | sed "/^[ 	]*$$/d" > $@
-!endif
 
 !endif
 
@@ -1843,9 +1406,6 @@ $(ALMAPDLLLIB_DIR)\almapdll.lib
 $(RELEASE_DLLCPP) : $(RELDIR_CPU) $(RCCPP_NAME).rc \
  $(DEFFILE2_DIR)\$(RETAIL_LIBCPP_NAME).def $(CPPSRC_OBJS_DLL:*=dll) \
  $(DLLCPP_STATIC_OBJS) \
-# !if "$(BLD_SYSCRT)" != "1"
- $(DLLCPP_STATIC_OBJS_PURE) \
-# !endif
  "$(VCTOOLSINC)\winver.h" \
  $(RELEASE_IMPLIB_DLL) \
 # !if "$(BLD_SYSCRT)" == "1"
@@ -1901,160 +1461,6 @@ $(OBJDIR_DLL)\tmpp.lib
 $(DLLCPP_STATIC_OBJS)
 <<keep
 !endif
-
-!if "$(BLD_SYSCRT)" != "1"
-# MSVCMIXED.DLL
-
-$(RELEASE_DLLMIXED) : $(RELDIR_CPU) $(RCMIXED_NAME).rc \
- $(DEFFILE2_DIR)\$(RETAIL_LIBMIXED_NAME).def \
- $(DEFFILE2_DIR)\$(RETAIL_LIBPURE_NAME).def $(MIXEDSRC_OBJS_DLL:*=dll) \
- "$(VCTOOLSINC)\winver.h" \
- $(PURE_DLL_STATIC_OBJS) \
- $(RELEASE_IMPLIB_DLL) \
- $(OBJDIR_DLL)\linkm.rsp $(OBJDIR_DLL)\linku.rsp $(OBJDIR_DLL)\implibs.rsp \
- $(OBJDIR_DLL)\implibpure.rsp
-# Note that we always link linkm.rsp before linku.rsp because linkm.rsp's exports
-# are subset of linku.rsp.
-	rc $(RC_OPTS) -Fo $(@R).res $(RC_DEFS) $(RC_INCS) $(RCMIXED_NAME).rc
-	$(LINKER) @$(OBJDIR_DLL)\linkm.rsp
-	$(LINKER) @$(OBJDIR_DLL)\linku.rsp
-	$(LINKIMPLIB) @$(OBJDIR_DLL)\implibs.rsp
-	$(LINKIMPLIB) @$(OBJDIR_DLL)\implibpure.rsp
-
-$(RELEASE_PT_LIB_PURE) : \
- $(PURE_PT_OBJS) \
- $(OBJDIR_DLL)\ptrustu.rsp
-	$(LINKLIB) @$(OBJDIR_DLL)\ptrustu.rsp
-
-$(RELEASE_PT_LIB_MIXED) : \
- $(CLR_PT_OBJS) \
- $(OBJDIR_DLL)\ptrustm.rsp
-	$(LINKLIB) @$(OBJDIR_DLL)\ptrustm.rsp
-
-!if "$(BLD_OBJ)"!="1"
-$(OBJDIR_DLL)\linkm.rsp: makefile
-	@echo *** Creating linker response file <<$@
-!if "$(TARGET_CPU)" == "i386"
--base:0x783f0000
-!endif
-!if "$(TARGET_CPU)" == "IA64"
--base:0x78640000
-!endif
-!if "$(TARGET_CPU)" == "AMD64"
--base:0x78480000
-!endif
-!if "$(BLD_REL_NO_DBINFO)" != "1"
--debug
--pdb:$(RELEASE_DLLMIXED_CLR_PDB)
-!endif
--dll
--def:$(DEFFILE2_DIR)\$(RETAIL_LIBMIXED_NAME).def
--opt:ref,icf=3
--implib:$(OBJDIR_DLL)\tmpm.lib
--incremental:no
--nodefaultlib
--include:?.cctor@@$$$$FYMXXZ
--map
--out:$(RELEASE_DLLMIXED_CLR)
--release
--nodefaultlib:$(RELEASE_IMPLIB_DLL).lib
-$(OBJS_WITH_EXPORTS_DLLMIXED)
-$(RELEASE_DLLMIXED:.dll=.res)
-$(RELEASE_IMPLIB_DLL)
-$(MIXEDSRC_OBJS_DLL:*=dll)
-$(OBJDIR_DLL)\tmp.lib
-kernel32.lib
-ole32.lib
-oleaut32.lib
-uuid.lib
-comsuppd.lib
-mscoree.lib
-<<keep
-
-#	The only difference between linkm.rsp and linku.rsp is the
-#	line below (OBJS_WITH_EXPORTS_DLLCPPMIXED)
-#	and path of output pdb and dll	
-$(OBJDIR_DLL)\linku.rsp: makefile
-	@echo *** Creating linker response file <<$@
-!if "$(TARGET_CPU)" == "i386"
--base:0x783f0000
-!endif
-!if "$(TARGET_CPU)" == "IA64"
--base:0x78640000
-!endif
-!if "$(TARGET_CPU)" == "AMD64"
--base:0x78480000
-!endif
-!if "$(BLD_REL_NO_DBINFO)" != "1"
--debug
--pdb:$(RELEASE_DLLMIXED_PDB)
-!endif
--dll
--def:$(DEFFILE2_DIR)\$(RETAIL_LIBPURE_NAME).def
--opt:ref,icf=3
--implib:$(OBJDIR_DLL)\tmpu.lib
--incremental:no
--nodefaultlib
--include:?.cctor@@$$$$FYMXXZ
--map
--out:$(RELEASE_DLLMIXED)
--release
--nodefaultlib:$(RELEASE_IMPLIB_DLL).lib
-$(OBJS_WITH_EXPORTS_DLLMIXED)
-$(OBJS_WITH_EXPORTS_DLLCPPMIXED)
-$(RELEASE_DLLMIXED:.dll=.res)
-$(RELEASE_IMPLIB_DLL)
-$(MIXEDSRC_OBJS_DLL:*=dll)
-$(OBJDIR_DLL)\tmp.lib
-kernel32.lib
-ole32.lib
-oleaut32.lib
-uuid.lib
-comsuppd.lib
-mscoree.lib
-<<keep
-
-
-$(OBJDIR_DLL)\implibs.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_IMPLIB_DLLMIXED)
-$(OBJDIR_DLL)\tmpm.lib
-$(CLR_DLL_STATIC_OBJS)
-$(SDKNAMESLIB_DIR)\sdknames.lib
-$(TCMAPLIB_DIR)\tcmap.lib
-$(TCMAPDLLLIB_DIR)\tcmapdll.lib
-$(ALMAPLIB_DIR)\almap.lib
-$(ALMAPDLLLIB_DIR)\almapdll.lib
-<<keep
-
-$(OBJDIR_DLL)\implibpure.rsp: makefile
-	@echo *** Creating linker response file <<$@
-$(ADDITIONAL_LINK_OPT)
--out:$(RELEASE_IMPLIB_DLLPURE)
-$(OBJDIR_DLL)\tmpu.lib
-$(OBJDIR_DLL)\tmp.lib
-$(PURE_DLL_STATIC_OBJS)
-$(SDKNAMESLIB_DIR)\sdknames.lib
-$(TCMAPLIB_DIR)\tcmap.lib
-$(TCMAPDLLLIB_DIR)\tcmapdll.lib
-$(ALMAPLIB_DIR)\almap.lib
-$(ALMAPDLLLIB_DIR)\almapdll.lib
-<<keep
-
-$(OBJDIR_DLL)\ptrustu.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_PT_LIB_PURE)
-$(PURE_PT_OBJS)
-<<keep
-
-$(OBJDIR_DLL)\ptrustm.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_PT_LIB_MIXED)
-$(CLR_PT_OBJS)
-<<keep
-!endif
-!endif
-
 
 
 # MSVCRXXD.DLL / MSVCRTD.LIB
@@ -2114,151 +1520,13 @@ $(ALMAPDLLLIB_DIR)\almapdll.lib
 !endif
 
 
-!if "$(BLD_SYSCRT)" != "1"
-# MSVCMIXED.DLL
-
-$(RELEASE_DLLMIXED_DBG) : $(RELDIR_CPU) $(RCMIXED_NAME).rc \
- $(DEFFILE2_DIR)\$(DEBUG_LIBMIXED_NAME).def \
- $(DEFFILE2_DIR)\$(DEBUG_LIBPURE_NAME).def $(MIXEDSRC_OBJS_DLL:*=xdll) \
- "$(VCTOOLSINC)\winver.h" \
- $(PURE_DLL_STATIC_OBJS_DBG) \
- $(RELEASE_IMPLIB_DLL_DBG) \
- $(OBJDIR_DLL_DBG)\linkm.rsp $(OBJDIR_DLL_DBG)\linku.rsp $(OBJDIR_DLL_DBG)\implibs.rsp \
- $(OBJDIR_DLL_DBG)\implibpure.rsp
-# Note that we always link linkm.rsp before linku.rsp because linkm.rsp's exports
-# are subset of linku.rsp.
-	rc $(RC_OPTS) -Fo $(@R).res -D_DEBUG $(RC_DEFS) $(RC_INCS) $(RCMIXED_NAME).rc
-	$(LINKER) @$(OBJDIR_DLL_DBG)\linkm.rsp
-	$(LINKER) @$(OBJDIR_DLL_DBG)\linku.rsp
-	$(LINKIMPLIB) @$(OBJDIR_DLL_DBG)\implibs.rsp
-	$(LINKIMPLIB) @$(OBJDIR_DLL_DBG)\implibpure.rsp
-
-$(RELEASE_PT_LIB_MIXED_DBG) : \
- $(CLR_PT_OBJS_DBG) \
- $(OBJDIR_DLL_DBG)\ptrustm.rsp
-	$(LINKLIB) @$(OBJDIR_DLL_DBG)\ptrustm.rsp
-
-$(RELEASE_PT_LIB_PURE_DBG) : \
- $(PURE_PT_OBJS_DBG) \
- $(OBJDIR_DLL_DBG)\ptrustu.rsp
-	$(LINKLIB) @$(OBJDIR_DLL_DBG)\ptrustu.rsp
-
-!if "$(BLD_OBJ)"!="1"
-$(OBJDIR_DLL_DBG)\linkm.rsp: makefile
-	@echo *** Creating linker response file <<$@
-!if "$(BLD_REL_NO_DBINFO)" != "1"
--debug
--dll
--implib:$(OBJDIR_DLL_DBG)\tmpm.lib
--incremental:no
-!endif
--nodefaultlib
--include:?.cctor@@$$$$FYMXXZ
--map
--def:$(DEFFILE2_DIR)\$(DEBUG_LIBMIXED_NAME).def
--opt:ref,icf=3
--out:$(RELEASE_DLLMIXED_CLR_DBG)
--release
--nodefaultlib:$(RELEASE_IMPLIB_DLL_DBG).lib
--pdb:$(RELEASE_DLLMIXED_CLR_DBG_PDB)
-$(OBJS_WITH_EXPORTS_DLLMIXED_DBG)
-$(RELEASE_IMPLIB_DLL_DBG)
-$(RELEASE_DLLMIXED_DBG:.dll=.res)
-$(MIXEDSRC_OBJS_DLL:*=xdll)
-$(OBJDIR_DLL_DBG)\tmp.lib
-kernel32.lib
-ole32.lib
-oleaut32.lib
-uuid.lib
-comsuppd.lib
-mscoree.lib
-<<keep
-
-#	The only difference between linkm.rsp and linku.rsp is the
-#	line below (OBJS_WITH_EXPORTS_DLLCPPMIXED_DBG)
-#	and path of output pdb and dll	
-$(OBJDIR_DLL_DBG)\linku.rsp: makefile
-	@echo *** Creating linker response file <<$@
-!if "$(BLD_REL_NO_DBINFO)" != "1"
--debug
--assemblydebug
--dll
--implib:$(OBJDIR_DLL_DBG)\tmpu.lib
--incremental:no
-!endif
--nodefaultlib
--include:?.cctor@@$$$$FYMXXZ
--map
--def:$(DEFFILE2_DIR)\$(DEBUG_LIBPURE_NAME).def
--opt:ref,icf=3
--out:$(RELEASE_DLLMIXED_DBG)
--release
--nodefaultlib:$(RELEASE_IMPLIB_DLL_DBG).lib
--pdb:$(RELEASE_DLLMIXED_DBG_PDB)
-$(OBJS_WITH_EXPORTS_DLLMIXED_DBG)
-$(OBJS_WITH_EXPORTS_DLLCPPMIXED_DBG)
-$(RELEASE_IMPLIB_DLL_DBG)
-$(RELEASE_DLLMIXED_DBG:.dll=.res)
-$(MIXEDSRC_OBJS_DLL:*=xdll)
-$(OBJDIR_DLL_DBG)\tmp.lib
-kernel32.lib
-ole32.lib
-oleaut32.lib
-uuid.lib
-comsuppd.lib
-mscoree.lib
-<<keep
-
-#$(RELEASE_IMPLIB_DLL_DBG)
-
-$(OBJDIR_DLL_DBG)\implibs.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_IMPLIB_DLLMIXED_DBG)
-$(OBJDIR_DLL_DBG)\tmpm.lib
-$(CLR_DLL_STATIC_OBJS_DBG)
-$(SDKNAMESLIB_DIR)\sdknames.lib
-$(TCMAPLIB_DIR)\tcmap.lib
-$(TCMAPDLLLIB_DIR)\tcmapdll.lib
-$(ALMAPLIB_DIR)\almap.lib
-$(ALMAPDLLLIB_DIR)\almapdll.lib
-<<keep
-
-$(OBJDIR_DLL_DBG)\implibpure.rsp: makefile
-	@echo *** Creating linker response file <<$@
-$(ADDITIONAL_LINK_OPT)
--out:$(RELEASE_IMPLIB_DLLPURE_DBG)
-$(OBJDIR_DLL_DBG)\tmpu.lib
-$(OBJDIR_DLL_DBG)\tmp.lib
-$(PURE_DLL_STATIC_OBJS_DBG)
-$(SDKNAMESLIB_DIR)\sdknames.lib
-$(TCMAPLIB_DIR)\tcmap.lib
-$(TCMAPDLLLIB_DIR)\tcmapdll.lib
-$(ALMAPLIB_DIR)\almap.lib
-$(ALMAPDLLLIB_DIR)\almapdll.lib
-<<keep
-
-$(OBJDIR_DLL_DBG)\ptrustm.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_PT_LIB_MIXED_DBG)
-$(CLR_PT_OBJS_DBG)
-<<keep
-
-$(OBJDIR_DLL_DBG)\ptrustu.rsp: makefile
-	@echo *** Creating linker response file <<$@
--out:$(RELEASE_PT_LIB_PURE_DBG)
-$(PURE_PT_OBJS_DBG)
-<<keep
-!endif
-!endif
+#!endif
 
 # MSVCPXXD.DLL / MSVCPRTD.LIB
 
 $(RELEASE_DLLCPP_DBG) : $(RELDIR_CPU) $(RCCPP_NAME).rc \
  $(DEFFILE2_DIR)\$(DEBUG_LIBCPP_NAME).def $(CPPSRC_OBJS_DLL:*=xdll) \
  $(DLLCPP_STATIC_OBJS_DBG) \
-# !if "$(BLD_SYSCRT)" != "1"
- $(DLLCPP_STATIC_OBJS_DBG_PURE) \
-# !endif
  "$(VCTOOLSINC)\winver.h" \
  $(RELEASE_IMPLIB_DLL_DBG) \
 # !if "$(BLD_SYSCRT)" == "1"
@@ -2468,9 +1736,6 @@ relobjs: \
 $(RELDIR_CPU)\binmode.obj: $(OBJDIR_MT)\binmode.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pbinmode.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pbinmode.obj
-	copy $** $@
-
 $(RELDIR_CPU)\chkstk.obj: $(OBJDIR_MT)\chkstk.obj
 	copy $** $@
 
@@ -2483,31 +1748,17 @@ $(RELDIR_CPU)\chkstk2.obj: $(OBJDIR_MT)\chkstk2.obj
 $(RELDIR_CPU)\commode.obj: $(OBJDIR_MT)\commode.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pcommode.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pcommode.obj
-	copy $** $@
-
 $(RELDIR_CPU)\newmode.obj: $(OBJDIR_MT)\newmode.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pnewmode.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pnewmode.obj
-	copy $** $@
 
 $(RELDIR_CPU)\noarg.obj: $(OBJDIR_MT)\noarg.obj
-	copy $** $@
-
-$(RELDIR_CPU)\pnoarg.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pnoarg.obj
 	copy $** $@
 
 $(RELDIR_CPU)\noenv.obj: $(OBJDIR_MT)\noenv.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pnoenv.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pnoenv.obj
-	copy $** $@
-
 $(RELDIR_CPU)\setargv.obj: $(OBJDIR_MT)\setargv.obj
-	copy $** $@
-
-$(RELDIR_CPU)\psetargv.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\psetargv.obj
 	copy $** $@
 
 $(RELDIR_CPU)\smalheap.obj: $(OBJDIR_MT)\smalheap.obj
@@ -2516,22 +1767,13 @@ $(RELDIR_CPU)\smalheap.obj: $(OBJDIR_MT)\smalheap.obj
 $(RELDIR_CPU)\threadlocale.obj: $(OBJDIR_MT)\threadlocale.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pthreadlocale.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pthreadlocale.obj
-	copy $** $@
-
 $(RELDIR_CPU)\thrownew.obj: $(OBJDIR_MT)\thrownew.obj
 	copy $** $@
 
 $(RELDIR_CPU)\nothrownew.obj: $(OBJDIR_MT)\nothrownew.obj
 	copy $** $@
 
-$(RELDIR_CPU)\pnothrownew.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pnothrownew.obj
-	copy $** $@
-
 $(RELDIR_CPU)\wsetargv.obj: $(OBJDIR_MT)\wsetargv.obj
-	copy $** $@
-
-$(RELDIR_CPU)\pwsetargv.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pwsetargv.obj
 	copy $** $@
 
 $(RELDIR_CPU)\loosefpmath.obj: $(OBJDIR_MT)\loosefpmath.obj
@@ -2539,10 +1781,7 @@ $(RELDIR_CPU)\loosefpmath.obj: $(OBJDIR_MT)\loosefpmath.obj
 	
 $(RELDIR_CPU)\invalidcontinue.obj: $(OBJDIR_MT)\invalidcontinue.obj
 	copy $** $@
-	
-$(RELDIR_CPU)\pinvalidcontinue.obj: $(OBJDIR_MT)\$(PURE_OBJ_DIR)\pinvalidcontinue.obj
-	copy $** $@
-	
+		
 $(RELDIR_CPU)\nochkclr.obj: $(OBJDIR_MT)\nochkclr.obj
 	copy $** $@
 

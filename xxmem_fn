@@ -1,0 +1,261 @@
+// xxmem_fn internal header
+// NOTE: no include guard
+
+#define _NAME _CLASS_NAME(_Mem_fn)
+
+	// TEMPLATE CLASS _Mem_fnX
+template<class _Rx,
+	class _Pmf, _CLASS_ARG0>
+	class _NAME
+		: public _Call_wrapper<_Callable_pmf<_Pmf, _Arg0> >
+
+ #if _NARGS == 1
+			, public _STD unary_function<_Arg0*, _Rx>
+
+ #elif _NARGS == 2
+			, public _STD binary_function<_Arg0*, _Arg1, _Rx>
+ #endif /* _NARGS */
+
+	{	// wrap pointer to member function
+public:
+	typedef _Rx result_type;
+
+	_NAME(_Pmf _Fx)
+		: _Call_wrapper<_Callable_pmf<_Pmf, _Arg0> >(_Fx)
+		{	// construct
+		}
+	};
+
+	// TEMPLATE FUNCTION mem_fn, pointer to member function
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2), _ARG0_ARG1>
+		mem_fn(_Rx(__thiscall _Arg0::*_Pm)(_ARG1_ARG2))
+	{	// bind to pointer to member function
+	return (_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2),
+		_ARG0_ARG1>(_Pm));
+	}
+
+ #ifdef _M_IX86
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2), _ARG0_ARG1>
+		mem_fn(_Rx(__cdecl _Arg0::*_Pm)(_ARG1_ARG2))
+	{	// bind to pointer to member function
+	return (_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2),
+		_ARG0_ARG1>(_Pm));
+	}
+
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2), _ARG0_ARG1>
+		mem_fn(_Rx(__stdcall _Arg0::*_Pm)(_ARG1_ARG2))
+	{	// bind to pointer to member function
+	return (_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2),
+		_ARG0_ARG1>(_Pm));
+	}
+
+  #ifndef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2), _ARG0_ARG1>
+		mem_fn(_Rx(__fastcall _Arg0::*_Pm)(_ARG1_ARG2))
+	{	// bind to pointer to member function
+	return (_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2),
+		_ARG0_ARG1>(_Pm));
+	}
+  #endif /* _M_CEE */
+
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2), _ARG0_ARG1>
+		mem_fn(_Rx(__clrcall _Arg0::*_Pm)(_ARG1_ARG2))
+	{	// bind to pointer to member function
+	return (_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2),
+		_ARG0_ARG1>(_Pm));
+	}
+ #endif /* _M_CEE */
+
+	// TEMPLATE FUNCTION mem_fn, pointer to const member function
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>
+		mem_fn(_Rx(__thiscall _Arg0::*_Pm)(_ARG1_ARG2) const)
+	{	// bind to pointer to const member function
+	return (_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>(_Pm));
+	}
+
+ #ifdef _M_IX86
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>
+		mem_fn(_Rx(__cdecl _Arg0::*_Pm)(_ARG1_ARG2) const)
+	{	// bind to pointer to const member function
+	return (_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>(_Pm));
+	}
+
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>
+		mem_fn(_Rx(__stdcall _Arg0::*_Pm)(_ARG1_ARG2) const)
+	{	// bind to pointer to const member function
+	return (_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>(_Pm));
+	}
+
+  #ifndef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>
+		mem_fn(_Rx(__fastcall _Arg0::*_Pm)(_ARG1_ARG2) const)
+	{	// bind to pointer to const member function
+	return (_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>(_Pm));
+	}
+  #endif /* _M_CEE */
+
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>
+		mem_fn(_Rx(__clrcall _Arg0::*_Pm)(_ARG1_ARG2) const)
+	{	// bind to pointer to const member function
+	return (_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) const,
+		const _ARG0_ARG1>(_Pm));
+	}
+ #endif /* _M_CEE */
+
+	// TEMPLATE FUNCTION mem_fn, pointer to volatile member function
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>
+		mem_fn(_Rx(__thiscall _Arg0::*_Pm)(_ARG1_ARG2) volatile)
+	{	// bind to pointer to volatile member function
+	return (_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>(_Pm));
+	}
+
+ #ifdef _M_IX86
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>
+		mem_fn(_Rx(__cdecl _Arg0::*_Pm)(_ARG1_ARG2) volatile)
+	{	// bind to pointer to volatile member function
+	return (_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>(_Pm));
+	}
+
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>
+		mem_fn(_Rx(__stdcall _Arg0::*_Pm)(_ARG1_ARG2) volatile)
+	{	// bind to pointer to volatile member function
+	return (_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>(_Pm));
+	}
+
+  #ifndef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>
+		mem_fn(_Rx(__fastcall _Arg0::*_Pm)(_ARG1_ARG2) volatile)
+	{	// bind to pointer to volatile member function
+	return (_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>(_Pm));
+	}
+  #endif /* _M_CEE */
+
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>
+		mem_fn(_Rx(__clrcall _Arg0::*_Pm)(_ARG1_ARG2) volatile)
+	{	// bind to pointer to volatile member function
+	return (_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) volatile,
+		volatile _ARG0_ARG1>(_Pm));
+	}
+ #endif /* _M_CEE */
+
+	// TEMPLATE FUNCTION mem_fn, pointer to const volatile member function
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>
+		mem_fn(_Rx(__thiscall _Arg0::*_Pm)(_ARG1_ARG2) const volatile)
+	{	// bind to pointer to const volatile member function
+	return (_NAME<_Rx, _Rx(__thiscall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>(_Pm));
+	}
+
+ #ifdef _M_IX86
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>
+		mem_fn(_Rx(__cdecl _Arg0::*_Pm)(_ARG1_ARG2) const volatile)
+	{	// bind to pointer to const volatile member function
+	return (_NAME<_Rx, _Rx(__cdecl _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>(_Pm));
+	}
+
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>
+		mem_fn(_Rx(__stdcall _Arg0::*_Pm)(_ARG1_ARG2) const volatile)
+	{	// bind to pointer to const volatile member function
+	return (_NAME<_Rx, _Rx(__stdcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>(_Pm));
+	}
+
+  #ifndef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>
+		mem_fn(_Rx(__fastcall _Arg0::*_Pm)(_ARG1_ARG2) const volatile)
+	{	// bind to pointer to const volatile member function
+	return (_NAME<_Rx, _Rx(__fastcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>(_Pm));
+	}
+  #endif /* _M_CEE */
+
+ #endif /* _M_IX86 */
+
+ #ifdef _M_CEE
+template<class _Rx,
+	_CLASS_ARG0>
+	_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>
+		mem_fn(_Rx(__clrcall _Arg0::*_Pm)(_ARG1_ARG2) const volatile)
+	{	// bind to pointer to const volatile member function
+	return (_NAME<_Rx, _Rx(__clrcall _Arg0::*)(_ARG1_ARG2) const volatile,
+		const volatile _ARG0_ARG1>(_Pm));
+	}
+ #endif /* _M_CEE */
+
+#undef _NAME
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

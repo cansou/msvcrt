@@ -1,0 +1,139 @@
+// xawrap internal header
+// NOTE: no include guard
+
+// includes <xawrap1> for [0,10] arguments
+
+ #if _NMAX != 10
+  #error argument number mismatch
+ #endif /* _NMAX != 10 */
+
+#ifdef _NOZERO
+ #undef _NOZERO
+
+#else /* _NOZERO */
+ #define _NARGS			0
+ #define _CLASS_CARG0
+ #define _C0_C1
+ #define _C_TAIL(x)		_TAIL_0(x)
+ #include <xawrap0>
+ #undef _C_TAIL
+ #undef _C0_C1
+ #undef _CLASS_CARG0
+ #undef _NARGS
+#endif /* _NOZERO */
+
+#define _NARGS 1
+#define _CLASS_CARG0	class _Carg0
+#define _C0_C1			_CA0
+ #define _C_TAIL(x)		, _TAIL_1(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 2
+#define _CLASS_CARG0	class _Carg0, class _Carg1
+#define _C0_C1			_CA0, _CA1
+ #define _C_TAIL(x)		, _TAIL_2(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 3
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2
+#define _C0_C1			_CA0, _CA1, _CA2
+ #define _C_TAIL(x)		, _TAIL_3(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 4
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, class _Carg3
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3
+ #define _C_TAIL(x)		, _TAIL_4(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 5
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4
+ #define _C_TAIL(x)		, _TAIL_5(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 6
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4, class _Carg5
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4, _CA5
+ #define _C_TAIL(x)		, _TAIL_6(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 7
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4, class _Carg5, class _Carg6
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4, _CA5, _CA6
+ #define _C_TAIL(x)		, _TAIL_7(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 8
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4, class _Carg5, class _Carg6, class _Carg7
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4, _CA5, _CA6, _CA7
+ #define _C_TAIL(x)		, _TAIL_8(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 9
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4, class _Carg5, class _Carg6, class _Carg7, \
+	class _Carg8
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4, _CA5, _CA6, _CA7, _CA8
+ #define _C_TAIL(x)		, _TAIL_9(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#define _NARGS 10
+#define _CLASS_CARG0	class _Carg0, class _Carg1, class _Carg2, \
+	class _Carg3, class _Carg4, class _Carg5, class _Carg6, class _Carg7, \
+	class _Carg8, class _Carg9
+#define _C0_C1			_CA0, _CA1, _CA2, _CA3, _CA4, _CA5, _CA6, _CA7, \
+	_CA8, _CA9
+ #define _C_TAIL(x)
+#include <xawrap0>
+#undef _C_TAIL
+#undef _C0_C1
+#undef _CLASS_CARG0
+#undef _NARGS
+
+#undef _INCL_FILE
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

@@ -1,0 +1,82 @@
+// xxpmfcaller TR1 internal header
+// NOTE: no include guard
+
+#define _NAME _CLASS_NAME(_Pmf_caller)
+
+ #if _NARGS != 0
+template<class _Ty>
+	class reference_wrapper;
+
+template<class _Ret,
+	class _Arg0>
+	struct _NAME
+	{	// bind object and pointer to member function
+	typedef _Arg0 _Funobj;
+
+// apply to pointer to member function
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Call_pmf(const volatile
+			reference_wrapper<typename _Remove_reference<_Arg0>::_Type> *,
+				_Pmf _Pm, _FARG0_F0)
+		{	// apply to reference_wrapper
+		typedef typename _Remove_reference<_Arg0>::_Type _Arg0_noref;
+		typedef typename _Remove_reference<_Farg0>::_Type _Farg0_noref;
+		typedef typename _Copy_cv<_Arg0_noref, _Farg0_noref>::_Type
+			_Funobj_cv;
+		return (((_Funobj_cv)_Fx0.*_Pm)(_F1_F2));
+		}
+
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Call_pmf(
+			const volatile typename _Remove_reference<_Arg0>::_Type *,
+				_Pmf _Pm, _FARG0_F0)
+		{	// apply to reference to an object
+		typedef typename _Remove_reference<_Arg0>::_Type _Arg0_noref;
+		typedef typename _Remove_reference<_Farg0>::_Type _Farg0_noref;
+		typedef typename _Copy_cv<_Arg0_noref, _Farg0_noref>::_Type
+			_Funobj_cv;
+		return (((_Funobj_cv)_Fx0.*_Pm)(_F1_F2));
+		}
+
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Call_pmf(
+			const volatile typename _Remove_reference<_Arg0>::_Type&,
+				_Pmf _Pm, _FARG0_F0)
+		{	// apply to pointer to an object
+		return ((_Fx0.*_Pm)(_F1_F2));
+		}
+
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Call_pmf(const volatile void*, _Pmf _Pm, _FARG0_F0)
+		{	// apply to smart pointer of type _Farg0
+		return (((*_Fx0).*_Pm)(_F1_F2));
+		}
+
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Apply_pmf(_Pmf _Pm, _FARG0_F0_REF)
+		{	// apply to reference to an object
+		return (_Call_pmf<_Pmf, _FARG0_FARG1_REF>(&_Fx0, _Pm,
+			_Fx0 _C_F1_F2));
+		}
+
+	template<class _Pmf,
+		_CLASS_FARG0>
+		static _Ret _Apply_pmf(_Pmf _Pm, _Farg0 *_Fx0 _C_FARG1_F1_REF)
+		{	// apply to pointer to an object
+		return (_Call_pmf<_Pmf, _FARG0_FARG1_REF>(_Fx0, _Pm,
+			*_Fx0 _C_F1_F2));
+		}
+	};
+ #endif /* _NARGS != 0 */
+
+#undef _NAME
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

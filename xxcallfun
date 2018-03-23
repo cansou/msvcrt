@@ -1,0 +1,21 @@
+// xxcallfun internal header
+// NOTE: no include guard
+
+template<class _Ret _C_CLASS_ARG0>
+	_Ret _ApplyX(_ARG0_A0_REF) const
+	{ // call pointer to function
+	return (this->_Get()(_A0_A1));
+	}
+
+#if _NARGS != 0
+template<class _Ret _C_CLASS_ARG0>
+	_Ret _ApplyX(const _ARG0_A0_REF) const
+	{ // call pointer to function
+	return (this->_Get()(_A0_A1));
+	}
+#endif /* _NARGS != 0 */
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */

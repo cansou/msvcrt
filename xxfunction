@@ -1,0 +1,398 @@
+// xxfunction TR1 internal header
+// NOTE: no include guard
+
+#define _NAME _CLASS_NAME(_Function_impl)
+#define _BASE_NAME _CLASS_NAME(_Impl_base)
+#define _IMPL_NAME _CLASS_NAME(_Impl)
+
+	// TEMPLATE CLASS _BASE_NAME
+template<class _Rx _C_CLASS_ARG0>
+	class _BASE_NAME
+	{	// abstract base for implementation types
+public:
+	virtual _BASE_NAME *_Copy(void * = 0) = 0;
+	virtual _Rx _Do_call(_ARG0_A0) = 0;
+	virtual const _XSTD2 type_info& _Target_type() const = 0;
+	virtual void _Delete_this(bool) = 0;
+
+	const void *_Target(const _XSTD2 type_info& _Info) const
+		{	// return pointer to stored object of type _Info
+		return (_Target_type() == _Info ? _Get() : 0);
+		}
+
+	virtual ~_BASE_NAME()
+		{	// destroy the object
+		}
+
+private:
+	virtual const void *_Get() const = 0;
+	};
+
+	// TEMPLATE CLASS _IMPL_NAME
+template<class _Callable,
+	class _Rx _C_CLASS_ARG0,
+	class _Alloc>
+	class _IMPL_NAME
+		: public _BASE_NAME<_Rx _C_ARG0_ARG1>
+	{	// derived class for specific implementation types
+public:
+	typedef _IMPL_NAME _Myty;
+	typedef typename _Alloc::template rebind<_Myty>::other _Myalty;
+
+	_IMPL_NAME(typename _Callable::_MyTy& _Val,
+		_Myalty _Ax = _Myalty())
+		: _Callee(_Val), _Myal(_Ax)
+		{	// construct
+		}
+
+	virtual ~_IMPL_NAME()
+		{	// destroy the object
+		}
+
+	virtual _BASE_NAME<_Rx _C_ARG0_ARG1> *_Copy(void *_Where = 0)
+		{	// return clone of *this
+		if (_Where == 0)
+			_Where = _Myal.allocate(1);
+		new (_Where) _IMPL_NAME(*this);
+		return ((_BASE_NAME<_Rx _C_ARG0_ARG1> *)_Where);
+		}
+
+	_Rx _Do_call(_ARG0_A0)
+		{	// call wrapped function
+		return (_Callee.template _ApplyX<_Rx>(_A0_A1));
+		}
+
+	const _XSTD2 type_info& _Target_type() const
+		{	// return type information for stored object
+		return (typeid(typename _Callable::_MyTy));
+		}
+
+private:
+	const void *_Get() const
+		{	// return address of stored object
+		return (&_Callee._Get());
+		}
+
+	virtual void _Delete_this(bool _Deallocate)
+		{	// destroy self
+		_Myalty _Al = _Myal;
+		_Al.destroy(this);	// _Dest_val(_Al, this)
+		if (_Deallocate)
+			_Al.deallocate(this, 1);
+		}
+
+	_Callable _Callee;
+	_Myalty _Myal;
+	};
+
+	// TEMPLATE CLASS _NAME
+template<class _Ret _C_CLASS_ARG0>
+	class _NAME
+
+ #if _NARGS == 1
+		: public _STD unary_function<_Arg0, _Ret>
+
+ #elif _NARGS == 2
+		: public _STD binary_function<_Arg0, _Arg1, _Ret>
+ #endif /* _NARGS */
+
+	{	// implement _STD tr1::function template
+	typedef _NAME<_Ret _C_ARG0_ARG1> _Myt;
+	typedef _BASE_NAME<_Ret _C_ARG0_ARG1> _Ptrt;
+
+public:
+	typedef _Ret result_type;
+
+	_Ret operator()(_ARG0_A0) const
+		{	// call through stored object
+		if (_Impl == 0)
+			_Xfunc();
+		return (_Impl->_Do_call(_A0_A1));
+		}
+
+	bool _Empty() const
+		{	// return true if no stored object
+		return (_Impl == 0);
+		}
+
+protected:
+	void _Reset()
+		{	// remove stored object
+		_Set(0);
+		}
+
+	void _Reset(const _Myt& _Right)
+		{	// store copy of _Right's stored object
+		if (_Right._Impl == 0)
+			_Set(0);
+		else if (_Right._Local())
+			_Set(_Right._Impl->_Copy((void *)&_Space));
+		else
+			_Set(_Right._Impl->_Copy());
+		}
+
+	template<class _Fret _C_CLASS_FARG0,
+		class _Alloc>
+		void _Reset(_Fret (*const _Val)(_FARG0_FARG1), _Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_fun<_Fret (*const)(_FARG0_FARG1)> _MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret _C_ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+
+	template<class _Fty,
+		class _Alloc>
+		void _Reset(_Fty _Val, _Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_obj<_Fty> _MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret _C_ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+
+ #if _NARGS == 1
+	template<class _Fret,
+		class _Farg0,
+		class _Alloc>
+		void _Reset(_Fret _Farg0::*const _Val, _Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_pmd<_Fret _Farg0::*const, _Arg0> _MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret, _Arg0, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+ #endif /* _NARGS == 1 */
+
+ #if _NARGS != 0
+	template<class _Fret _C_CLASS_FARG0,
+		class _Alloc>
+		void _Reset(_Fret (_Farg0::*const _Val)(_FARG1_FARG2), _Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_pmf<_Fret (_Farg0::*const)(_FARG1_FARG2), _Arg0>
+			_MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret, _ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+
+	template<class _Fret _C_CLASS_FARG0,
+		class _Alloc>
+		void _Reset(_Fret (_Farg0::*const _Val)(_FARG1_FARG2) const,
+			_Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_pmf<
+			_Fret (_Farg0::*const)(_FARG1_FARG2) const, _Arg0> _MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret, _ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+
+	template<class _Fret _C_CLASS_FARG0,
+		class _Alloc>
+		void _Reset(_Fret (_Farg0::*const _Val)(_FARG1_FARG2) volatile,
+			_Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_pmf<
+			_Fret (_Farg0::*const)(_FARG1_FARG2) volatile,_Arg0> _MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret, _ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+
+	template<class _Fret _C_CLASS_FARG0,
+		class _Alloc>
+		void _Reset(_Fret (_Farg0::*const _Val)(_FARG1_FARG2) const volatile,
+			_Alloc _Ax)
+		{	// store copy of _Val
+		typedef _Callable_pmf<
+			_Fret (_Farg0::*const)(_FARG1_FARG2) const volatile, _Arg0>
+			_MyWrapper;
+		typedef _IMPL_NAME<_MyWrapper, _Ret, _ARG0_ARG1, _Alloc> _Myimpl;
+
+		if (sizeof (_Myimpl) <= sizeof (_Space))
+			{	// small enough, allocate locally
+			new ((void *)&_Space) _Myimpl(_Val);
+			_Set((_Ptrt *)&_Space);
+			}
+		else
+			{	// use allocator
+			typename _Alloc::template rebind<_Myimpl>::other _Al = _Ax;
+			_Myimpl *_Ptr = _Al.allocate(1);
+
+			new (_Ptr) _Myimpl(_Val, _Al);
+			_Set(_Ptr);
+			}
+		}
+ #endif /* _NARGS */
+
+	void _Tidy()
+		{	// clean up
+		if (_Impl != 0)
+			{	// destroy callable object and maybe delete it
+			_Impl->_Delete_this(!_Local());
+			_Impl = 0;
+			}
+		}
+
+	void _Swap(_Myt& _Right)
+		{	// swap contents with contents of _Right
+		if (this == &_Right)
+			{
+			return; // same object, do nothing
+			}
+
+		if (_Local())
+			{
+			if (_Right._Local())
+				{	// both local
+				_Myt _Temp;
+				_Temp._Reset(*this);
+				_Tidy();
+				_Reset(_Right);
+				_Right._Tidy();
+				_Right._Reset(_Temp);
+				_Temp._Tidy();
+				}
+			else
+				{	// *this local, _Right remote/null
+				_Ptrt * _Temp = _Right._Impl;
+				_Right._Reset(*this);
+				_Tidy();
+				_Set(_Temp);
+				}
+			}
+		else
+			{
+			if (_Right._Local())
+				{	// *this remote/null, _Right local
+				_Ptrt * _Temp = _Impl;
+				_Reset(_Right);
+				_Right._Tidy();
+				_Right._Set(_Temp);
+				}
+			else
+				{	// both remote/null
+				_STD swap(_Impl, _Right._Impl);
+				}
+			}
+		}
+
+	const _XSTD2 type_info& _Target_type() const
+		{	// return type information for stored object
+		return (_Impl ? _Impl->_Target_type() : typeid(void));
+		}
+
+	const void *_Target(const _XSTD2 type_info& _Info) const
+		{	// return pointer to stored object
+		return (_Impl ? _Impl->_Target(_Info) : 0);
+		}
+
+private:
+	void _Set(_Ptrt *_Ptr)
+		{	// store pointer to object
+		_Impl = _Ptr;
+		}
+
+	bool _Local() const
+		{
+		return ((void *)_Impl == (void *)&_Space);
+		}
+
+	typedef void (*_Pfnty)();
+	union
+		{	// storage for small wrappers
+		_Pfnty _Pfn[3];
+		void *_Pobj[3];
+		long double _Ldbl;	// for maximum alignment
+		} _Space;
+
+	_Ptrt *_Impl;
+	};
+
+template<class _Ret _C_CLASS_ARG0>
+	struct _Get_function_impl<_Ret(_ARG0_ARG1)>
+	{	// determine type from argument list
+	typedef _NAME<_Ret _C_ARG0_ARG1> _Type;
+	};
+
+#undef _IMPL_NAME
+#undef _BASE_NAME
+#undef _NAME
+
+/*
+ * Copyright (c) 1992-2008 by P.J. Plauger.  ALL RIGHTS RESERVED.
+ * Consult your license regarding permissions and restrictions.
+V5.05:0009 */
