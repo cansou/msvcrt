@@ -213,53 +213,14 @@ BSKU_OBJS_RAW = build\$(CPUDIR)\*\bsku.obj
 # the dynamically linked library flavor (MSVCRTx0.DLL).
 
 SOURCE_OBJS_RAW_DLL = \
- build\$(CPUDIR)\*\_setargv.obj \
- build\$(CPUDIR)\*\_wstargv.obj \
- build\$(CPUDIR)\*\chkstk.obj \
-!if "$(TARGET_CPU)"=="i386"
- build\$(CPUDIR)\*\alloca16.obj \
-!endif
-!if "$(TARGET_CPU)"=="AMD64"
- build\$(CPUDIR)\*\chkstk2.obj \
-!endif
- build\$(CPUDIR)\*\crt0dat.obj \
- build\$(CPUDIR)\*\crt0fp.obj \
- build\$(CPUDIR)\*\crt0init.obj \
- build\$(CPUDIR)\*\crt0msg.obj \
- build\$(CPUDIR)\*\crtlib.obj \
- build\$(CPUDIR)\*\mlock.obj \
- build\$(CPUDIR)\*\stdargv.obj \
- build\$(CPUDIR)\*\stdenvp.obj \
- build\$(CPUDIR)\*\thread.obj \
- build\$(CPUDIR)\*\threadex.obj \
- build\$(CPUDIR)\*\tidtable.obj \
- build\$(CPUDIR)\*\wild.obj \
- build\$(CPUDIR)\*\wstdargv.obj \
- build\$(CPUDIR)\*\wstdenvp.obj \
- build\$(CPUDIR)\*\wwild.obj \
 !if "$(TARGET_CPU)"=="i386"
  build\$(CPUDIR)\*\fp8.obj \
 !endif
- build\$(CPUDIR)\*\convert.lib \
- build\$(CPUDIR)\*\direct.lib \
- build\$(CPUDIR)\*\dos.lib \
- build\$(CPUDIR)\*\eh.lib \
- build\$(CPUDIR)\*\exec.lib \
  build\$(CPUDIR)\*\heap.lib \
-!if "$(TARGET_CPU)"!="AMD64"
- build\$(CPUDIR)\*\helper.lib \
-!endif
- build\$(CPUDIR)\*\lowio.lib \
- build\$(CPUDIR)\*\mbstring.lib \
  build\$(CPUDIR)\*\misc.lib \
 !if "$(RTC)"=="YES"
  build\$(CPUDIR)\*\rtc.lib \
 !endif
- build\$(CPUDIR)\*\stdio.lib \
- build\$(CPUDIR)\*\string.lib \
- build\$(CPUDIR)\*\time.lib \
- build\$(CPUDIR)\*\conv.lib \
- build\$(CPUDIR)\*\tran.lib
 
 CPPSRC_OBJS_RAW_DLL = build\$(CPUDIR)\*\$(STDCPP_SRC).lib
 
@@ -453,11 +414,9 @@ OBJDIR_DLL_DBG = $(OBJCPUDIR)\xdll_obj
 
 
 
-all : release debug
+all : debug
 
-release : mt dll \
-
-debug : xmt xdll
+debug : xdll
 
 
 ####
@@ -922,8 +881,7 @@ xdllp_env :
 
 xdll : $(OBJROOT) $(OBJCPUDIR) $(OBJDIR_DLL_DBG) \
     $(OBJDIR_DLL_DBG)\$(CPP_OBJ_DIR) $(RELDIR_CPU) \
-	xothers xdll_env xdll_ \
-	 xdllp_env xdll_p
+	xdll_env xdll_ 
 !if "$(BLD_BROWSE)"=="1" && "$(PRE_BLD)"!="1" && "$(BLD_OBJ)"!="1"
     $(BSCMAKE) -o $(RELEASE_IMPLIB_DLL_DBG:.lib=.bsc) $(OBJDIR_DLL_DBG)\*.sbr
 !endif
@@ -1100,17 +1058,12 @@ $(CPPSRC_OBJS:*=xmt)
 
 # todo ... preprocess a single source .def file into machine-specific version
 
-OBJS_WITH_EXPORTS_DLL_RAW= \
-        $(OBJDIR_DLL_RAW)\handler.obj \
-        $(OBJDIR_DLL_RAW)\setnewh.obj \
-        $(OBJDIR_DLL_RAW)\new_mode.obj \
-        $(OBJDIR_DLL_RAW)\errmode.obj \
-        $(OBJDIR_DLL_RAW)\matherr.obj
+OBJS_WITH_EXPORTS_DLL_RAW= 
 
 
 OBJS_WITH_EXPORTS_DLL=$(OBJS_WITH_EXPORTS_DLL_RAW:*=dll)
 
-OBJS_WITH_EXPORTS_DLL_DBG=$(OBJS_WITH_EXPORTS_DLL_RAW:*=xdll) $(OBJDIR_DLL_RAW:*=xdll)\dbgnew.obj
+OBJS_WITH_EXPORTS_DLL_DBG=$(OBJS_WITH_EXPORTS_DLL_RAW:*=xdll)
 
 # These are the C++ objects in MSVCPRT{,D}.LIB
 
@@ -1178,19 +1131,7 @@ OBJS_WITH_EXPORTS_DLLCPP_DBG=$(OBJS_WITH_EXPORTS_DLLCPP_RAW:*=xdll)
 
 DLL_MT_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\_newmode.obj \
-!if "$(TARGET_CPU)"=="i386"
-        $(OBJDIR_DLL_RAW)\alloca16.obj \
-        $(OBJDIR_DLL_RAW)\atlssup.obj \
-!endif
-        $(OBJDIR_DLL_RAW)\charmax.obj \
-        $(OBJDIR_DLL_RAW)\chkstk.obj \
-!if "$(TARGET_CPU)"=="AMD64"
-        $(OBJDIR_DLL_RAW)\chkstk2.obj   \
-!endif
         $(OBJDIR_DLL_RAW)\xncommod.obj \
-        $(OBJDIR_DLL_RAW)\tlssup.obj \
-        $(OBJDIR_DLL_RAW)\tlsdyn.obj \
-        $(OBJDIR_DLL_RAW)\tlsdtor.obj \
         $(OBJDIR_DLL_RAW)\xtxtmode.obj \
         $(OBJDIR_DLL_RAW)\xthdloc.obj
 
@@ -1198,40 +1139,16 @@ DLL_MT_OBJS_RAW= \
 DLL_STATIC_OBJS_RAW= \
         $(OBJDIR_DLL_RAW)\atonexit.obj \
         $(OBJDIR_DLL_RAW)\cinitexe.obj \
-        $(OBJDIR_DLL_RAW)\crtdll.obj \
         $(OBJDIR_DLL_RAW)\crtexe.obj \
-        $(OBJDIR_DLL_RAW)\crtmanifest.obj \
         $(OBJDIR_DLL_RAW)\crtmanifestrtm.obj \
-        $(OBJDIR_DLL_RAW)\crtmanifestcur.obj \
-        $(OBJDIR_DLL_RAW)\crtexew.obj \
-        $(OBJDIR_DLL_RAW)\delaopnt.obj \
-        $(OBJDIR_DLL_RAW)\delopnt.obj \
-        $(OBJDIR_DLL_RAW)\dll_argv.obj \
         $(OBJDIR_DLL_RAW)\dllargv.obj \
-        $(OBJDIR_DLL_RAW)\dllmain.obj \
-        $(OBJDIR_DLL_RAW)\ehvccctr.obj \
-        $(OBJDIR_DLL_RAW)\ehvcccvb.obj \
-        $(OBJDIR_DLL_RAW)\ehvecctr.obj \
-        $(OBJDIR_DLL_RAW)\ehveccvb.obj \
-        $(OBJDIR_DLL_RAW)\ehvecdtr.obj \
         $(OBJDIR_DLL_RAW)\gs_cookie.obj \
         $(OBJDIR_DLL_RAW)\gs_report.obj \
         $(OBJDIR_DLL_RAW)\gs_support.obj \
-!if "$(BLD_SYSCRT)" != "1"
-        $(OBJDIR_DLL_RAW)\tncleanup.obj \
-!endif
         $(OBJDIR_DLL_RAW)\merr.obj \
-        $(OBJDIR_DLL_RAW)\newaopnt.obj \
-        $(OBJDIR_DLL_RAW)\newopnt.obj \
-        $(OBJDIR_DLL_RAW)\nothrow0.obj \
         $(OBJDIR_DLL_RAW)\natstart.obj \
         $(OBJDIR_DLL_RAW)\pesect.obj \
-        $(OBJDIR_DLL_RAW)\ti_inst.obj \
         $(OBJDIR_DLL_RAW)\unhandld.obj \
-        $(OBJDIR_DLL_RAW)\wcrtexe.obj \
-        $(OBJDIR_DLL_RAW)\wcrtexew.obj \
-        $(OBJDIR_DLL_RAW)\wdll_av.obj \
-        $(OBJDIR_DLL_RAW)\wdllargv.obj \
         $(OBJDIR_DLL_RAW)\wildcard.obj \
 !if "$(RTC)"=="YES"
         $(OBJDIR_DLL_RAW)\rtc.lib \
@@ -1239,50 +1156,8 @@ DLL_STATIC_OBJS_RAW= \
 !if "$(TARGET_CPU)"=="i386"
         $(OBJDIR_DLL_RAW)\adjustfd.obj \
         $(OBJDIR_DLL_RAW)\chandler4gs.obj \
-        $(OBJDIR_DLL_RAW)\cpu_disp.obj \
-        $(OBJDIR_DLL_RAW)\dllsupp.obj \
-        $(OBJDIR_DLL_RAW)\ehprolg2.obj \
-        $(OBJDIR_DLL_RAW)\ehprolg3.obj \
-        $(OBJDIR_DLL_RAW)\ehprolg3a.obj \
-        $(OBJDIR_DLL_RAW)\ehprolog.obj \
         $(OBJDIR_DLL_RAW)\fp8.obj \
-        $(OBJDIR_DLL_RAW)\ftol2.obj \
-        $(OBJDIR_DLL_RAW)\lldiv.obj \
-        $(OBJDIR_DLL_RAW)\lldvrm.obj \
-        $(OBJDIR_DLL_RAW)\llmul.obj \
-        $(OBJDIR_DLL_RAW)\llrem.obj \
-        $(OBJDIR_DLL_RAW)\llshl.obj \
-        $(OBJDIR_DLL_RAW)\llshr.obj \
-        $(OBJDIR_DLL_RAW)\loadcfg.obj \
-        $(OBJDIR_DLL_RAW)\secchk.obj \
-        $(OBJDIR_DLL_RAW)\sehprolg.obj \
-        $(OBJDIR_DLL_RAW)\sehprolg4.obj \
-        $(OBJDIR_DLL_RAW)\sehprolg4gs.obj \
-        $(OBJDIR_DLL_RAW)\ulldiv.obj \
-        $(OBJDIR_DLL_RAW)\ulldvrm.obj \
-        $(OBJDIR_DLL_RAW)\ullrem.obj \
-        $(OBJDIR_DLL_RAW)\ullshr.obj \
-!elseif "$(TARGET_CPU)"=="AMD64"
-        $(OBJDIR_DLL_RAW)\amdsecgs.obj \
-        $(OBJDIR_DLL_RAW)\dllsupp.obj \
-        $(OBJDIR_DLL_RAW)\gshandler.obj \
-        $(OBJDIR_DLL_RAW)\gshandlereh.obj \
-        $(OBJDIR_DLL_RAW)\gshandlerseh.obj \
-!elseif "$(TARGET_CPU)"=="IA64"
-        $(OBJDIR_DLL_RAW)\dllsupp.obj \
-        $(OBJDIR_DLL_RAW)\divhelp.obj \
-        $(OBJDIR_DLL_RAW)\gshandler.obj \
-        $(OBJDIR_DLL_RAW)\gshandlereh.obj \
-        $(OBJDIR_DLL_RAW)\gshandlerseh.obj \
-        $(OBJDIR_DLL_RAW)\memcmp.obj \
-        $(OBJDIR_DLL_RAW)\memcpy.obj \
-        $(OBJDIR_DLL_RAW)\memcpyi.obj \
-        $(OBJDIR_DLL_RAW)\memmove.obj \
-        $(OBJDIR_DLL_RAW)\memset.obj \
-        $(OBJDIR_DLL_RAW)\memseti.obj \
-        $(OBJDIR_DLL_RAW)\secchk.obj \
-        $(OBJDIR_DLL_RAW)\strncmp.obj \
-        $(OBJDIR_DLL_RAW)\strncpy.obj
+        $(OBJDIR_DLL_RAW)\secchk.obj 
 !endif
 
 DLL_STATIC_OBJS=$(DLL_MT_OBJS_RAW:*=dll) $(DLL_STATIC_OBJS_RAW:*=dll)
